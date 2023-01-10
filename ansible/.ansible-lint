@@ -1,0 +1,20 @@
+skip_list:
+  - name[play]
+  - name[missing]
+  - name[casing]
+  - name[template]
+  - yaml[line-length]
+  - yaml[brackets]
+  - role-name[path]
+  - no-free-form
+  - key-order[task]
+  - risky-file-permissions
+  - args[module]
+  - schema[tasks]
+  - no-changed-when
+  - risky-shell-pipe
+  - no-handler
+  - key-order
+
+exclude_paths:
+  - molecule

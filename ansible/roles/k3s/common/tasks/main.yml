@@ -1,0 +1,37 @@
+---
+
+- name: Enable IPv4 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    reload: yes
+
+- name: Enable IPv6 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: "1"
+    state: present
+    reload: yes
+
+- name: Enable IPv6 router advertisements
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.all.accept_ra
+    value: "2"
+    state: present
+    reload: yes
+
+- name: Create resolv-conf
+  ansible.builtin.copy:
+    dest: "/etc/k3s-resolv.conf"
+    content: "nameserver {{ network_svc.dns.ip }}"
+
+- name: Download k3s binary x64
+  ansible.builtin.get_url:
+    url: https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/k3s
+    checksum: sha256:https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/sha256sum-amd64.txt
+    dest: /usr/local/bin/k3s
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_facts.architecture == "x86_64"

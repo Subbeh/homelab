@@ -1,0 +1,28 @@
+---
+
+- name: Import Python pip role
+  ansible.builtin.import_role:
+    name: geerlingguy.pip
+  vars:
+    pip_install_packages:
+      - docker
+
+- name: Import Docker role
+  ansible.builtin.import_role:
+    name: geerlingguy.docker
+  vars:
+    docker_users: "{{ common_user }}"
+
+- name: Create default network
+  ansible.builtin.include_tasks:
+    file: "{{ common_ansible_root }}/tasks/containers_network.yml"
+  vars:
+    create_network:
+      - mesh
+
+- name: Prune images daily
+  ansible.builtin.cron:
+    name: "docker image prune"
+    hour: "1"
+    minute: "0"
+    job: "docker image prune --filter 'label!=skip.prune=true' --all --force > /dev/null 2>&1"

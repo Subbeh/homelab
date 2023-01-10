@@ -1,0 +1,9 @@
+resources:
+- https://raw.githubusercontent.com/longhorn/longhorn/v1.4.1/deploy/longhorn.yaml
+- ingress.yaml
+
+patchesStrategicMerge:
+- default-settings.yaml
+# - storageclass-default.yaml
+
+# namespace: longhorn-system

@@ -1,0 +1,69 @@
+---
+- hosts: all
+  become: true
+  gather_facts: false
+
+  pre_tasks:
+    - name: Gathering facts
+      tags: always
+      ansible.builtin.setup:
+      when:
+        - inventory_hostname != 'localhost'
+        - inventory_hostname != 'ansible_controller_fqdn'
+
+  vars:
+    reboot_servers: {}
+
+  tasks:
+
+    - block:
+        - name: Sync time
+          ansible.builtin.command: hwclock --hctosys
+          failed_when: false
+
+        - name: Update repo and cache
+          ansible.builtin.apt: update_cache=yes force_apt_get=yes
+          changed_when: false
+
+        - name: Update packages
+          ansible.builtin.apt: upgrade=dist force_apt_get=yes
+
+        - name: Check if the reboot-required file exists
+          tags: always
+          ansible.builtin.stat: path=/var/run/reboot-required get_md5=no
+          register: reboot_required_file
+
+        - name: Servers requiring reboot
+          tags: always
+          ansible.builtin.debug: var=reboot_required_file.stat.exists
+
+        - name: Reboot the Debian or Ubuntu server
+          tags: [ never, reboot ]
+          ansible.builtin.reboot:
+            msg: "Reboot initiated by Ansible due to kernel updates"
+            connect_timeout: 5
+            reboot_timeout: 300
+            pre_reboot_delay: 0
+            post_reboot_delay: 30
+            test_command: uptime
+          when: reboot_required_file.stat.exists
+
+        - name: Clean up system
+          tags: [ never, clean ]
+          block:
+            - name: Remove useless packages from the cache
+              ansible.builtin.apt:
+                autoclean: true
+
+            - name: Remove dependencies that are no longer required
+              ansible.builtin.apt:
+                autoremove: true
+
+            - name: Run the equivalent of "apt-get clean" as a separate step
+              ansible.builtin.apt:
+                clean: true
+
+      when:
+        - (ansible_os_family is defined) and (ansible_os_family == "Debian")
+        - inventory_hostname != 'localhost'
+        - inventory_hostname != 'ansible_controller_fqdn'

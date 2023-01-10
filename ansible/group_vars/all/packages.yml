@@ -1,0 +1,52 @@
+---
+
+packages_global:
+  - acl
+  - apt-transport-https
+  - bash-completion
+  - cron
+  - curl
+  - debian-archive-keyring
+  - dnsutils
+  - gawk
+  - git
+  - gnupg
+  - hdparm
+  - hping3
+  - htop
+  - iftop
+  - iotop
+  - iperf3
+  - iptraf-ng
+  - iputils-ping
+  - jq
+  - locales
+  - lsb-release
+  - lsof
+  - lynx
+  - make
+  - ncdu
+  - netcat
+  - nethogs
+  - net-tools
+  - nfs-common
+  - nmap
+  - nmon
+  - python3-pip
+  - python3-setuptools
+  - rsync
+  - software-properties-common
+  - strace
+  - sudo
+  - tcpdump
+  - telnet
+  - tmux
+  - traceroute
+  - tree
+  - unzip
+  - vim
+  - zip
+
+packages_custom: []
+packages_uninstall:
+  - popularity-contest

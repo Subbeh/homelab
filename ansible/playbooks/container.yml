@@ -1,0 +1,52 @@
+---
+
+- hosts: localhost
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Load all container manifests
+      tags: always
+      ansible.builtin.include_vars:
+        dir: "{{ common_ansible_root }}/containers"
+        extensions:
+          - "yml"
+        ignore_unknown_extensions: true
+        name: containers
+      no_log: true
+
+    - name: Set fact with tags
+      tags: always
+      ansible.builtin.set_fact:
+        run_container: "{{ run_container | default(ansible_run_tags[0]) }}"
+
+    - name: Add container host to temporary host group
+      tags: always
+      ansible.builtin.add_host:
+        name: "{{ containers[run_container].host }}"
+        groups: temp_group
+      changed_when: false
+
+- hosts: temp_group
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify SSH port
+      tags: always
+      ansible.builtin.include_tasks:
+        file: ../tasks/ssh_port.yml
+      vars:
+        ansible_become: false
+
+    - name: Gathering facts
+      tags: always
+      ansible.builtin.setup:
+
+  tasks:
+    - name: Import run_container task
+      tags: always
+      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      vars:
+        run_container: "{{ hostvars['localhost']['run_container'] }}"
+

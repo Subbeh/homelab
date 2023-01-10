@@ -1,0 +1,12 @@
+---
+
+- name: restart crowdsec
+  community.docker.docker_container:
+    name: crowdsec
+    state: started
+    restart: true
+
+- name: restart firewall-bouncer
+  ansible.builtin.service:
+    name: crowdsec-firewall-bouncer
+    state: restarted

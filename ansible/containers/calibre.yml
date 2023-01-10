@@ -1,0 +1,13 @@
+---
+
+calibre:
+  host: nas
+  image: lscr.io/linuxserver/calibre-web:0.6.20-ls206
+  environment:
+    DOCKER_MODS: linuxserver/mods:universal-calibre
+  ports:
+    - "{{ network_svc.calibre.port }}:8083"
+  volumes:
+    - "{{ common_dir }}/calibre:/config"
+    - "{{ common_media_dir }}/books/calibre:/books"
+

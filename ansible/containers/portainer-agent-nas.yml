@@ -1,0 +1,8 @@
+---
+
+portainer_agent_nas:
+  host: nas
+  image: portainer/agent:2.18.1
+  volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock"
+    - "/volume1/@docker/volumes:/volume1/@docker/volumes"

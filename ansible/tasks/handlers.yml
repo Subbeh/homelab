@@ -1,0 +1,11 @@
+---
+
+- name: restart sshd
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+- name: restart docker
+  ansible.builtin.service:
+    name: docker
+    state: restarted

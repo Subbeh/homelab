@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: traefik
+      repoURL: https://traefik.github.io/charts
+      targetRevision: v22.0.0
+      helm:
+        values: |
+          globalArguments:
+            - "--global.sendanonymoususage=false"
+            - "--global.checknewversion=false"
+          additionalArguments:
+            - "--serversTransport.insecureSkipVerify=true"
+            - "--log.level=DEBUG"
+          deployment:
+            enabled: true
+            replicas: 2
+            annotations: {}
+            podAnnotations: {}
+            additionalContainers: []
+            initContainers: []
+          ports:
+            web:
+              redirectTo: websecure
+            websecure:
+              tls:
+                enabled: true
+          ingressRoute:
+            dashboard:
+              enabled: false
+          providers:
+            kubernetesCRD:
+              enabled: true
+              ingressClass: traefik-external
+            kubernetesIngress:
+              enabled: true
+              publishedService:
+                enabled: false
+          rbac:
+            enabled: true
+          service:
+            enabled: true
+            type: LoadBalancer
+            annotations: {}
+            labels: {}
+            spec:
+              loadBalancerIP: 10.0.10.71
+            loadBalancerSourceRanges: []
+            externalIPs: []
+    - repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+      targetRevision: main
+      path: k8s/traefik
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true

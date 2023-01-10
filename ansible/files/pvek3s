@@ -1,0 +1,112 @@
+#!/bin/bash
+
+_DISK=/dev/disk/by-label/longhorn
+
+_stop_vm() {
+  for _vm in "${_vms[@]}" ; do 
+    read -r _id _node _name <<< "$_vm"
+    echo stopping $_id...
+    pvesh create /nodes/$_node/$_id/status/stop
+  done
+}
+
+_start_vm() {
+  for _vm in "${_vms[@]}" ; do 
+    read -r _id _node _name <<< "$_vm"
+    echo starting $_id...
+    pvesh create /nodes/$_node/$_id/status/start
+  done
+}
+
+_create_snapshot() {
+  for _vm in "${_vms[@]}" ; do 
+    read -r _id _node _name <<< "$_vm"
+    echo creating snapshot for $_id...
+    pvesh create /nodes/$_node/$_id/snapshot -snapname "$1" -description "automatically created" -vmstate false
+  done
+}
+
+_move_disk() {
+  for _vm in "${_vms[@]}" ; do 
+    read -r _id _node _name <<< "$_vm"
+    echo moving disk scsi0 on $_id to local-lvm...
+    pvesh create /nodes/$_node/$_id/move_disk -disk "scsi0" -storage "local-lvm" -delete 1
+  done
+}
+
+_detach_disk() {
+  for _vm in "${_vms[@]}" ; do 
+    read -r _id _node _name <<< "$_vm"
+    if [[ "$_name" =~ ^k3s-worker ]] ; then
+      echo detaching disk from $_id: $_DISK
+      pvesh set /nodes/$_node/$_id/config -delete scsi2
+    fi
+  done
+}
+
+_attach_disk() {
+  for _vm in "${_vms[@]}" ; do 
+    read -r _id _node _name <<< "$_vm"
+    if [[ "$_name" =~ ^k3s-worker ]] ; then
+      echo attaching disk to $_id: $_DISK
+      pvesh create /nodes/$_node/$_id/config -scsi2 "$_DISK"
+    fi
+  done
+}
+
+_resize_disk() {
+  for _vm in "${_vms[@]}" ; do 
+    read -r _id _node _name <<< "$_vm"
+    echo resizing disk on $_id to $1...
+    pvesh set /nodes/$_node/$_id/resize -disk scsi0 -size $1
+  done
+}
+
+_delete_vm() {
+  for _vm in "${_vms[@]}" ; do
+    read -r _id _node _name <<< "$_vm"
+    read -p "Are you sure you want to delete $_name? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]] ; then
+      echo deleting $_id...
+      pvesh delete /nodes/$_node/$_id
+    fi
+  done
+}
+
+main() {
+  readarray -t _vms < <(pvesh get /cluster/resources --type vm --output-format json | jq -rc '.[]|[.id,.node,.name]|@tsv'|grep k3s-)
+  case "$1" in
+    stop)
+      _stop_vm
+      ;;
+    start)
+      _start_vm
+      ;;
+    snapshot)
+      [[ -z "$2" ]] && echo no snapshot name given... && return 1
+      _stop_vm
+      _detach_disk
+      _create_snapshot $2
+      _attach_disk
+      ;;
+    move_disk)
+      _move_disk
+      ;;
+    attach_disk)
+      _attach_disk
+      ;;
+    detach_disk)
+      _detach_disk
+      ;;
+    resize_disk)
+      [[ -z "$2" ]] && echo no size given... && return 1
+      _resize_disk $2
+      ;;
+    delete)
+      _delete_vm
+      ;;
+  esac
+}
+
+main $@

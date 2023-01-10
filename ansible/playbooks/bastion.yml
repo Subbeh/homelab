@@ -1,0 +1,91 @@
+---
+
+- hosts: bastion
+  gather_facts: false
+  become: true
+
+  vars:
+    security_ssh_port: 3322
+    firewall_allowed_tcp_ports:
+      - 22
+      - 3322
+      - 80
+      - 443
+      - "{{ network_svc.portainer.agent_port }}"
+    firewall_allowed_udp_ports:
+      - 4242
+
+    borg_source_directories:
+      - '{{ common_dir }}'
+    borgmatic_cron_hour: 02
+    borgmatic_cron_minute: 00
+
+  pre_tasks:
+    - name: Verify SSH port
+      tags: [ always, pretasks ]
+      ansible.builtin.import_tasks:
+        file: ../tasks/ssh_port.yml
+      vars:
+        ansible_become: false
+
+    - name: Gathering facts
+      tags: always
+      ansible.builtin.setup:
+
+  handlers:
+    - name: Import common handlers
+      ansible.builtin.import_tasks: ../tasks/handlers.yml
+
+  tasks:
+    - name: Import bootstrap role
+      tags: bootstrap
+      ansible.builtin.import_role:
+        name: bootstrap
+
+    - name: Enable firewall
+      tags: firewall
+      ansible.builtin.import_role:
+        name: geerlingguy.firewall
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Import Borg backups role
+      tags: borg
+      ansible.builtin.import_role:
+        name: borg
+
+    - name: Restart Docker service
+      tags: [ firewall, docker ]
+      ansible.builtin.service:
+        name: docker
+        state: restarted
+      changed_when: false
+
+    - name: Create Portainer agent container
+      tags: portainer-agent
+      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      vars:
+        run_container: "portainer_agent_bastion"
+
+    - name: Import Traefik role
+      tags: traefik
+      ansible.builtin.import_role:
+        name: traefik
+
+    - name: Copy dynamic Traefik config files
+      tags: [ never, traefik-config ]
+      ansible.builtin.import_role:
+        name: traefik
+        tasks_from: copy_config
+
+    - name: Create Endlessh container
+      tags: endlessh
+      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      vars:
+        run_container: "endlessh"
+
+    - name: Import CrowdSec role
+      tags: crowdsec
+      ansible.builtin.import_role:
+        name: crowdsec

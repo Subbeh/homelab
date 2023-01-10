@@ -1,0 +1,38 @@
+---
+
+- name: Restart chronyd to sync time
+  ansible.builtin.service:
+    name: chronyd
+    state: restarted
+  when: ansible_distribution == "Debian"
+  failed_when: false
+
+- name: Restart systemd-timesyncd to sync time
+  ansible.builtin.service:
+    name: systemd-timesyncd
+    state: restarted
+  when: ansible_distribution == "Ubuntu"
+  failed_when: false
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ common_timezone }}"
+    hwclock: "local"
+
+- name: Ensure user is created
+  ansible.builtin.user:
+    name: "{{ common_user }}"
+    createhome: true
+    state: present
+    password: "{{ common_pass | string | password_hash('sha512', 'mysecretsalt') }}"
+
+- name: Create common directory
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ common_user }}"
+    group: "{{ common_group }}"
+    mode: "0771"
+  loop:
+    - "{{ common_dir }}"
+    - "{{ common_data_dir }}"

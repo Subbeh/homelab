@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: system
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: nfs-subdir-external-provisioner
+      repoURL: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+      targetRevision: 4.0.18
+      helm:
+        parameters:
+        - name: nfs.server
+          value: "nas.int.sbbh.cloud"
+        - name: nfs.path
+          value: "/volume1/backups/k8s"
+    - repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+      targetRevision: main
+      path: k8s/system
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true

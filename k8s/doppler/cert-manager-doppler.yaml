@@ -1,0 +1,11 @@
+apiVersion: secrets.doppler.com/v1alpha1
+kind: DopplerSecret
+metadata:
+  name: cert-manager
+  namespace: doppler-operator-system
+spec:
+  tokenSecret:
+    name: cert-manager-doppler-token
+  managedSecret:
+    name: cert-manager-doppler-secret
+    namespace: cert-manager

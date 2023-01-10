@@ -1,0 +1,11 @@
+apiVersion: secrets.doppler.com/v1alpha1
+kind: DopplerSecret
+metadata:
+  name: monitoring
+  namespace: doppler-operator-system
+spec:
+  tokenSecret:
+    name: monitoring-doppler-token
+  managedSecret:
+    name: monitoring-doppler-secret
+    namespace: monitoring

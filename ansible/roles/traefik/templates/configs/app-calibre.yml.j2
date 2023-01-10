@@ -1,0 +1,14 @@
+http:
+  routers:
+    calibre-rtr:
+      rule: "Host(`calibre.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: calibre-svc
+  services:
+    calibre-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.calibre.host }}:{{ network_svc.calibre.port }}"

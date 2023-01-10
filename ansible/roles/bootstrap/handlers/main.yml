@@ -1,0 +1,9 @@
+---
+
+- name: restart rsyslog
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
+
+- name: locale-gen
+  ansible.builtin.command: locale-gen

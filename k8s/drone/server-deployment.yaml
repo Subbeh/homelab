@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drone
+  namespace: drone
+  labels:
+    app: drone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drone
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: drone
+    spec:
+      containers:
+      - image: drone/drone:2
+        name: drone
+        ports:
+        - containerPort: 80
+        env:
+        - name: DRONE_GITEA_SERVER
+          value: "https://git.sbbh.cloud"
+        - name: DRONE_SERVER_HOST
+          value: "drone.k8s.sbbh.cloud"
+        - name: DRONE_SERVER_PROTO
+          value: "https"
+        - name: DRONE_GITEA_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: drone-doppler-secret
+              key: DRONE_GITEA_CLIENT_ID
+        - name: DRONE_GITEA_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: drone-doppler-secret
+              key: DRONE_GITEA_CLIENT_SECRET
+        - name: DRONE_RPC_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: drone-doppler-secret
+              key: DRONE_RPC_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: drone
+    app.kubernetes.io/instance: drone
+  name: drone
+  namespace: drone
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: drone

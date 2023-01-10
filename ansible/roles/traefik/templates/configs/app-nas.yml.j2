@@ -1,0 +1,16 @@
+---
+
+http:
+  routers:
+    nas-rtr:
+      rule: "Host(`nas.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+      service: nas-svc
+  services:
+    nas-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.nas.host }}:{{ network_svc.nas.port }}"

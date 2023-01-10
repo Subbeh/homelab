@@ -1,0 +1,9 @@
+resources:
+  - namespace.yaml
+  # - server-deployment.yaml
+  # - kube-runner-deployment.yaml
+  # - kube-runner-rbac.yaml
+  # - kube-secrets-deployment.yaml
+  - ingress.yaml
+
+# namespace: drone

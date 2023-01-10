@@ -1,0 +1,100 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:base", ":rebaseStalePrs"],
+  rebaseWhen: "conflicted",
+  dependencyDashboard: true,
+  dependencyDashboardTitle: "Renovate Dashboard",
+  timezone: "Australia/Melbourne",
+  rollbackPrs: true,
+  pruneBranchAfterAutomerge: true,
+  pruneStaleBranches: true,
+  //schedule: [
+  //  "before 6am on sunday",
+  //],
+
+  reviewers: ["sysadm"],
+
+  commitMessagePrefix: "{{depName}}:",
+  commitMessageAction: "update",
+  commitMessageTopic: "version",
+  commitMessageExtra: "to {{#if isMajor}}{{{prettyNewMajor}}}{{else}}{{{prettyNewVersion}}}{{/if}}",
+  prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}",
+
+  ansible: {
+    fileMatch: ["ansible/containers/.+\\.yml$"],
+  },
+
+  kubernetes: {
+    fileMatch: ["k8s/.+\\.yaml$"],
+    enabled: false,
+  },
+
+  python: {
+    enabled: false,
+  },
+
+  hostRules: [
+    {
+      matchHost: "docker.io",
+      concurrentRequestLimit: 2,
+      maxRequestsPerSecond: 2,
+    },
+    {
+      matchHost: "index.docker.io",
+      concurrentRequestLimit: 2,
+      maxRequestsPerSecond: 2,
+    },
+  ],
+
+  packageRules: [
+    /* Ignore latest and localhost tags */
+    {
+      matchDatasources: ["docker"],
+      matchCurrentVersion: "/localhost|latest/",
+      enabled: false,
+    },
+    /*
+      override Docker datasource defaults
+      https://docs.renovatebot.com/modules/datasource/#docker-datasource
+    */
+    {
+      matchDatasources: ["docker"],
+      commitMessageTopic: "version",
+      digest: {
+        commitMessageTopic: "digest",
+        group: {
+          commitMessageTopic: "digest",
+        },
+      },
+      pin: {
+        group: {
+          commitMessageTopic: "version",
+        },
+      },
+      group: {
+        commitMessageTopic: "version",
+      },
+    },
+
+    /* terraform */
+    {
+      matchPackageNames: ["terraform", "proxmox"],
+      enabled: false
+    },
+
+    /* postgres */
+    {
+      matchPackageNames: ["postgres"],
+      enabled: false
+    },
+
+    {
+      description: "Check for Renovate updates",
+      matchPackagePatterns: [".*\\/renovate"],
+      customChangelogUrl: "https://github.com/renovatebot/renovate",
+      matchUpdateTypes: ["patch", "minor"],
+      automerge: true,
+      ignoreTests: true,
+    },
+  ],
+}

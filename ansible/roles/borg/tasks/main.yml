@@ -1,0 +1,16 @@
+---
+
+- name: Copy SSH keys
+  become: true
+  no_log: true
+  ansible.builtin.copy:
+    content: '{{ borg_ssh_key }}'
+    dest: '/root/.ssh/borg.key'
+    owner: root
+    group: root
+    mode: 0600
+    backup: yes
+
+- name: Run borgbackup role
+  ansible.builtin.include_role:
+    name: m3nu.ansible_role_borgbackup

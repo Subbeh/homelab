@@ -1,0 +1,14 @@
+http:
+  routers:
+    PLACEHOLDER-rtr:
+      rule: "Host(`PLACEHOLDER.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+      service: PLACEHOLDER-svc
+  services:
+    PLACEHOLDER-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.PLACEHOLDER.host }}:{{ network_svc.PLACEHOLDER.port }}"

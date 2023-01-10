@@ -1,0 +1,249 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  project: default
+  sources:
+      # Loki
+    - chart: loki-distributed
+      repoURL: https://grafana.github.io/helm-charts
+      targetRevision: 0.69.11
+      helm:
+        values: |
+          loki:
+            # Disable multi-tenant support
+            auth_enabled: false
+
+            # S3 backend storage configuration
+            storage:
+              bucketNames:
+                chunks: k3s-loki
+                ruler: k3s-loki
+              type: s3
+              s3:
+                endpoint: s3.k8s.sbbh.cloud
+                region: eu-west-1
+                secretAccessKey: ${MINIO_SECRET_ACCESS_KEY}
+                accessKeyId: ${MINIO_ACCESS_KEY_ID}
+                s3ForcePathStyle: true
+                insecure: false
+                http_config:
+                  idle_conn_timeout: 90s
+                  response_header_timeout: 0s
+                  insecure_skip_verify: false
+
+          # Configuration for the write
+          write:
+            # Number of replicas for the write
+            replicas: 2
+            persistence:
+              # -- Size of persistent disk
+              size: 10Gi
+              # -- Storage class to be used.
+              storageClass: longhorn
+
+            # Enable environment variables in config file
+            # https://grafana.com/docs/loki/latest/configuration/#use-environment-variables-in-the-configuration
+            extraArgs:
+              - '-config.expand-env=true'
+            extraEnv:
+              - name: MINIO_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: monitoring-doppler-secret
+                    key: MINIO_ACCESS_KEY_ID
+              - name: MINIO_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: monitoring-doppler-secret
+                    key: MINIO_SECRET_ACCESS_KEY
+
+          # Configuration for the read
+          read:
+            # Number of replicas for the read
+            replicas: 2
+            persistence:
+              # -- Size of persistent disk
+              size: 10Gi
+              # -- Storage class to be used.
+              storageClass: longhorn
+
+            # Enable environment variables in config file
+            # https://grafana.com/docs/loki/latest/configuration/#use-environment-variables-in-the-configuration
+            extraArgs:
+              - '-config.expand-env=true'
+            extraEnv:
+              - name: MINIO_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: monitoring-doppler-secret
+                    key: MINIO_ACCESS_KEY_ID
+              - name: MINIO_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: monitoring-doppler-secret
+                    key: MINIO_SECRET_ACCESS_KEY
+
+          # Configuration for the gateway
+          gateway:
+            # -- Specifies whether the gateway should be enabled
+            enabled: true
+            # -- Number of replicas for the gateway
+            replicas: 1
+
+          # Disable mino installation
+          minio:
+            enabled: false
+
+          # Disable self-monitoring
+          monitoring:
+            selfMonitoring:
+              enabled: false
+              grafanaAgent:
+                installOperator: false
+            lokiCanary:
+                enabled: false
+
+          # Disable helm-test
+          test:
+            enabled: false
+      # Promtail
+    - chart: promtail
+      repoURL: https://grafana.github.io/helm-charts
+      targetRevision: 6.10.0
+      helm:
+        values: |
+          config:
+            clients:
+              - url: http://monitoring-loki-distributed-gateway/loki/api/v1/push
+      # Kube-prometheus-stack
+    - chart: kube-prometheus-stack
+      repoURL: https://prometheus-community.github.io/helm-charts
+      targetRevision: 45.8.1
+      helm:
+        values: |
+          fullnameOverride: prometheus
+
+          alertmanager:
+            fullnameOverride: alertmanager
+
+          grafana:
+            fullnameOverride: grafana
+            defaultDashboardsTimezone: Australia/Melbourne
+            admin:
+              existingSecret: monitoring-doppler-secret
+              userKey: GRAFANA_USER
+              passwordKey: GRAFANA_PASSWORD
+            additionalDataSources:
+              - name: Loki
+                type: loki
+                url: http://monitoring-loki-distributed-query-frontend.monitoring:3100
+            persistence:
+              type: pvc
+              enabled: true
+              storageClassName: longhorn
+              accessModes:
+                - ReadWriteOnce
+              size: 10Gi
+
+          kubelet:
+            enabled: true
+            serviceMonitor:
+              metricRelabelings:
+                - action: replace
+                  sourceLabels:
+                    - node
+                  targetLabel: instance
+
+          kubeControllerManager:
+            enabled: true
+            endpoints: # ips of servers
+              - 10.0.10.81
+              - 10.0.10.82
+              - 10.0.10.83
+
+          kubeEtcd:
+            endpoints:
+              - 10.0.10.81
+              - 10.0.10.82
+              - 10.0.10.83
+
+          kubeScheduler:
+            endpoints:
+              - 10.0.10.81
+              - 10.0.10.82
+              - 10.0.10.83
+
+          kubeProxy:
+            endpoints:
+              - 10.0.10.81
+              - 10.0.10.82
+              - 10.0.10.83
+
+          kube-state-metrics:
+            fullnameOverride: kube-state-metrics
+            selfMonitor:
+              enabled: true
+            prometheus:
+              monitor:
+                enabled: true
+                relabelings:
+                  - action: replace
+                    regex: (.*)
+                    replacement: $1
+                    sourceLabels:
+                      - __meta_kubernetes_pod_node_name
+                    targetLabel: kubernetes_node
+
+          nodeExporter:
+            serviceMonitor:
+              relabelings:
+                - action: replace
+                  regex: (.*)
+                  replacement: $1
+                  sourceLabels:
+                    - __meta_kubernetes_pod_node_name
+                  targetLabel: kubernetes_node
+
+          prometheus-node-exporter:
+            fullnameOverride: node-exporter
+            prometheus:
+              monitor:
+                relabelings:
+                  - action: replace
+                    regex: (.*)
+                    replacement: $1
+                    sourceLabels:
+                      - __meta_kubernetes_pod_node_name
+                    targetLabel: kubernetes_node
+            resources:
+              requests:
+                memory: 512Mi
+                cpu: 250m
+              limits:
+                memory: 2048Mi
+
+          prometheus:
+            prometheusSpec:
+              replicaExternalLabelName: "replica"
+              ruleSelectorNilUsesHelmValues: false
+              serviceMonitorSelectorNilUsesHelmValues: false
+              podMonitorSelectorNilUsesHelmValues: false
+              probeSelectorNilUsesHelmValues: false
+              retention: 6h
+              enableAdminAPI: true
+    - repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+      targetRevision: main
+      path: k8s/monitoring
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    # automated:
+    #   selfHeal: true
+    #   prune: true

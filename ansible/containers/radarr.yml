@@ -1,0 +1,11 @@
+---
+
+radarr:
+  host: nas
+  image: lscr.io/linuxserver/radarr:4.4.4
+  ports:
+    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.radarr.port }}:7878"
+  volumes:
+    - "{{ common_dir }}/radarr/config:/config"
+    - "{{ common_dir }}/radarr/MediaCover:/config/MediaCover"
+    - "{{ common_media_dir }}:/data"

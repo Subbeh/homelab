@@ -1,0 +1,52 @@
+---
+- hosts: "{{ ansible_limit | default(omit) }}"
+  gather_facts: true
+
+  tasks:
+    - name: Disable Enterprise Repository
+      ansible.builtin.replace:
+        path: /etc/apt/sources.list.d/pve-enterprise.list
+        regexp: '^deb'
+        replace: '#deb'
+
+    - name: Add correct PVE sources to sources.list
+      ansible.builtin.copy:
+        content: |
+          deb http://ftp.debian.org/debian bullseye main contrib
+          deb http://ftp.debian.org/debian bullseye-updates main contrib
+          deb http://security.debian.org/debian-security bullseye-security main contrib
+          deb http://download.proxmox.com/debian/pve bullseye pve-no-subscription
+        dest: /etc/apt/sources.list
+
+    - name: Disable subscription nag
+      ansible.builtin.shell: |
+        echo "DPkg::Post-Invoke { \"dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ \$? -eq 1 ]; then { echo 'Removing subscription nag from UI...'; sed -i '/data.status/{s/\!//;s/Active/NoMoreNagging/}' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi\"; };" > /etc/apt/apt.conf.d/no-nag-script
+        apt --reinstall install proxmox-widget-toolkit &>/dev/null
+
+    - name: Update apt repo and cache
+      ansible.builtin.apt: update_cache=yes force_apt_get=yes
+
+    - name: Upgrade packages
+      ansible.builtin.apt: upgrade=dist force_apt_get=yes
+
+    - name: Install required packages
+      ansible.builtin.package:
+        name:
+          - libguestfs-tools
+        state: present
+
+    - name: Download dark theme
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/Weilbyte/PVEDiscordDark/master/PVEDiscordDark.sh
+        dest: /tmp/PVEDiscordDark.sh
+        mode: 0755
+      register: download
+
+    - name: Install dark theme
+      ansible.builtin.command: /tmp/PVEDiscordDark.sh
+      when: download.changed
+
+    - name: Remove the dark theme installer
+      ansible.builtin.file:
+        path: /tmp/PVEDiscordDark.sh
+        state: absent

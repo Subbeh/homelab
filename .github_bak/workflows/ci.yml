@@ -1,0 +1,44 @@
+---
+
+name: CI
+'on':
+  pull_request:
+  push:
+    branches: ['main']
+    paths: ['ansible/**']
+
+jobs:
+
+  playbooks:
+    strategy:
+      matrix:
+        playbook:
+          - bastion
+          - hl-services
+    name: Molecule
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies
+        run: pip3 install molecule[docker] yamllint ansible-lint
+      - name: Save vault password to file
+        run: echo "$VAULT_PASS" > ~/.ansible_vault
+        env:
+          VAULT_PASS: ${{ secrets.ANSIBLE_VAULT }}
+
+      - name: Run Molecule tests
+        working-directory: ./ansible
+        run: molecule test --scenario-name ${{ matrix.playbook }}
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          ANSIBLE_ROLES_PATH: '/home/runner/.cache/molecule/ansible/test/roles:/home/runner/work/infra_v2/infra_v2:/home/runner/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/home/runner/work/infra_v2/infra_v2/ansible/molecule/test/../../roles'
+          MOLECULE_DEBUG: ${{ vars.MOLECULE_DEBUG }}

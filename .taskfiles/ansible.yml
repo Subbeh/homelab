@@ -1,0 +1,94 @@
+---
+version: "3"
+
+env:
+  ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
+  ANSIBLE_PLAYBOOK_DIR: "{{.ANSIBLE_DIR}}/playbooks"
+
+tasks:
+
+  init:
+    desc: Install / Upgrade Ansible galaxy deps
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - pip3 install --user --requirement requirements.txt
+      - ansible-galaxy install -r requirements.yml --force
+      - ansible-galaxy collection install -r requirements.yml --force
+
+  list:
+    desc: List all the hosts
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible all --list-hosts
+
+  ping:
+    desc: Ping all the hosts
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible all --one-line -m 'ping'
+
+  uptime:
+    desc: Uptime of all the hosts
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible all --one-line -a 'uptime'
+
+  playbook:
+    desc: Run playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/{{.CLI_ARGS}}
+
+  update:
+    desc: Update all the hosts
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook -f 5 {{.ANSIBLE_PLAYBOOK_DIR}}/update.yml {{.CLI_ARGS}}
+
+  container:
+    desc: Run Docker container
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/container.yml --tags {{.CLI_ARGS}}
+
+  bastion:
+    desc: Run bastion playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/bastion.yml {{.CLI_ARGS}}
+
+  services:
+    desc: Run homelab services playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/hl_svc.yml {{.CLI_ARGS}}
+
+  plex:
+    desc: Run plex playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/plex.yml {{.CLI_ARGS}}
+
+  nas:
+    desc: Run nas playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/nas.yml {{.CLI_ARGS}}
+
+  pve:
+    desc: Run pve bootstrap playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/pve_bootstrap.yml --limit {{.CLI_ARGS}}
+
+  k3s:
+    desc: Create k3s cluster
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/k3s.yml {{.CLI_ARGS}}
+
+  traefik-config:
+    desc: Update Traefik config
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/bastion.yml --tags traefik-config

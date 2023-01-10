@@ -1,0 +1,25 @@
+---
+
+- name: Copy dotfiles to "{{ common_user }}" home
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/home/{{ common_user }}/.{{ item }}"
+    mode: 0640
+    owner: "{{ common_user }}"
+    group: "{{ common_group }}"
+  with_items:
+    - "bashrc"
+    - "vimrc"
+    - "gitconfig"
+
+- name: Copy dotfiles to root home
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/root/.{{ item }}"
+    mode: 0640
+    owner: root
+    group: root
+  with_items:
+    - "bashrc"
+    - "vimrc"
+    - "gitconfig"

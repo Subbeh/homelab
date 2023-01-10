@@ -1,0 +1,16 @@
+---
+repos:
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.15.3
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.21.0
+    hooks:
+      - id: yamllint
+        args: [--format, parsable, --strict]

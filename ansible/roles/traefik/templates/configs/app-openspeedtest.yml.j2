@@ -1,0 +1,19 @@
+http:
+  routers:
+    openspeedtest-rtr:
+      rule: "Host(`speedtest.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+        - buffer-limit
+      service: openspeedtest-svc
+  middlewares:
+    buffer-limit:
+      buffering:
+        maxRequestBodyBytes: 10000000000
+  services:
+    openspeedtest-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.openspeedtest.host }}:{{ network_svc.openspeedtest.port }}"

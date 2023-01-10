@@ -1,0 +1,14 @@
+http:
+  routers:
+    qbittorrent-rtr:
+      rule: "Host(`qbittorrent.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: qbittorrent-svc
+  services:
+    qbittorrent-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.qbittorrent.host }}:{{ network_svc.qbittorrent.port }}"

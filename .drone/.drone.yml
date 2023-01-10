@@ -1,0 +1,64 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+trigger:
+  branch:
+    - main
+
+steps:
+  - name: lint
+    image: sterwindt/ansible-runner:latest
+    commands:
+      - .drone/lint.sh
+
+  - name: renovate
+    image: sterwindt/ansible-runner:latest
+    commands:
+      - .drone/renovate.sh
+    environment:
+      ANSIBLE_VAULT_PASSWORD:
+        from_secret: ANSIBLE_VAULT_PASSWORD
+      SSH_KEY:
+        from_secret: SSH_KEY
+    when:
+      event:
+      - push        
+
+  - name: discord notification
+    image: appleboy/drone-discord
+    settings:
+      username: Drone
+      webhook_id:
+        from_secret: DISCORD_ID
+      webhook_token:
+        from_secret: DISCORD_TOKEN
+      message: "{{#success build.status}}✅{{else}}❌{{/success}}  Repository `[{{repo.name}}/{{commit.branch}}]` triggered by event `[{{uppercase build.event}}]` for build.\n    - Commit [[{{commit.sha}}]({{commit.link}})]\n    - Author `[{{commit.author}} / {{commit.email}}]`\n    - Message: {{commit.message}}    - Drone build [[#{{build.number}}]({{build.link}})] reported `[{{uppercase build.status}}]` at `[{{datetime build.finished \"2006.01.02 15:04\" \"\"}}]`\n​"
+    when:
+      status: [ success, failure, changed ]
+      event: [ push ]
+---
+kind: secret
+name: DISCORD_ID
+get:
+  path: drone-doppler-secret
+  name: DISCORD_ID
+---
+kind: secret
+name: DISCORD_TOKEN
+get:
+  path: drone-doppler-secret
+  name: DISCORD_TOKEN
+---
+kind: secret
+name: ANSIBLE_VAULT_PASSWORD
+get:
+  path: drone-doppler-secret
+  name: ANSIBLE_VAULT_PASSWORD
+---
+kind: secret
+name: SSH_KEY
+get:
+  path: drone-doppler-secret
+  name: SSH_KEY

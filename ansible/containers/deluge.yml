@@ -1,0 +1,13 @@
+---
+
+deluge:
+  host: nas
+  image: lscr.io/linuxserver/deluge:2.1.1-r6-ls202
+  network_mode: "container:gluetun"
+  networks: 
+  environment:
+    "DELUGE_LOGLEVEL": "debug"
+  volumes:
+    - "{{ common_dir }}/deluge/config:/config"
+    - "{{ common_media_dir }}:/data"
+  command: bash -c "curl -c /config/mam.cookies -b 'mam_id={{ media_mam_id }}' https://t.myanonamouse.net/json/dynamicSeedbox.php ; sleep infinity"

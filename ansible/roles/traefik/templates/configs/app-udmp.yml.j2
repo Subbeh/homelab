@@ -1,0 +1,20 @@
+---
+
+http:
+  routers:
+    udmp-rtr:
+      rule: "Host(`udmp.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - local-only
+      service: udmp-svc
+  services:
+    udmp-svc:
+      loadBalancer:
+        serversTransport: "udmp"
+        servers:
+          - url: "https://10.0.0.1"
+  serversTransports:
+    udmp:
+      insecureSkipVerify: true

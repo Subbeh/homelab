@@ -1,0 +1,25 @@
+---
+
+http:
+  routers:
+    radarr-rtr-bypass:
+      rule: "Host(`radarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_radarr_api }}`)"
+      priority: 100
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: radarr-svc
+    radarr-rtr:
+      rule: "Host(`radarr.{{ network_domain.tld }}`)"
+      priority: 99
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+      service: radarr-svc
+  services:
+    radarr-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.radarr.host }}:{{ network_svc.radarr.port }}"

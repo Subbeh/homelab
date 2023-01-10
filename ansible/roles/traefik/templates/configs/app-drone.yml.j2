@@ -1,0 +1,14 @@
+http:
+  routers:
+    drone-rtr:
+      rule: "Host(`drone.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+      service: drone-svc
+  services:
+    drone-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.drone.host }}:{{ network_svc.drone.port_web }}"

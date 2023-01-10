@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: longhorn-default-setting
+  namespace: longhorn-system
+data:
+  default-setting.yaml: |-
+    backup-target: nfs://nas.int.sbbh.cloud:/volume1/backups/longhorn
+    default-data-path: /data

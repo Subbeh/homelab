@@ -1,0 +1,52 @@
+---
+
+- name: Create GPG keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/
+    state: directory
+
+- name: Add GPG keys
+  ansible.builtin.shell: |
+    set pipefail -eou
+    curl -fsSL https://packagecloud.io/crowdsec/crowdsec/gpgkey | gpg --dearmor > /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
+
+- name: Add CrowdSec apt sources
+  ansible.builtin.copy:
+    content: |
+      deb [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main
+      deb-src [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main
+    dest: /etc/apt/sources.list.d/crowdsec_crowdsec.list
+
+- name: Install Crowdsec firewall bouncer
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - debian-archive-keyring
+    - crowdsec-firewall-bouncer-iptables
+
+- name: Include bouncer task for IPTables bouncer
+  ansible.builtin.include_tasks: bouncer.yml
+  vars:
+    crowdsec_bouncer: firewall-bouncer
+
+- name: Copy firewall bouncer config over
+  ansible.builtin.template:
+    src: crowdsec-firewall-bouncer.yaml.j2
+    dest: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
+  changed_when: false
+
+- name: Copy firewall bouncer service config over
+  ansible.builtin.copy:
+    src: crowdsec-firewall-bouncer.service
+    dest: /etc/systemd/system/crowdsec-firewall-bouncer.service
+
+- name: Enable and restart firewall bouncer
+  ansible.builtin.service:
+    name: crowdsec-firewall-bouncer
+    state: restarted
+    enabled: true
+  changed_when: false

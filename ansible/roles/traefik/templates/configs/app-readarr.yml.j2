@@ -1,0 +1,26 @@
+---
+
+http:
+  routers:
+    readarr-rtr-bypass:
+      rule: "Host(`readarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_api }}`)"
+      priority: 100
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: readarr-svc
+    readarr-rtr:
+      rule: "Host(`readarr.{{ network_domain.tld }}`)"
+      priority: 99
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+      service: readarr-svc
+  services:
+    readarr-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.readarr.host }}:{{ network_svc.readarr.port }}"
+

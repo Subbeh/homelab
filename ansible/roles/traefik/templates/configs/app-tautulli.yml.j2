@@ -1,0 +1,14 @@
+http:
+  routers:
+    tautulli-rtr:
+      rule: "Host(`tautulli.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+      service: tautulli-svc
+  services:
+    tautulli-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.tautulli.host }}:{{ network_svc.tautulli.port }}"

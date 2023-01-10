@@ -1,0 +1,6 @@
+name: me/plex-whitelist
+description: "Whitelist Plex traffic"
+whitelist:
+  reason: "Plex traffic"
+  expression:
+    - evt.Line.Labels.traefik_router_name matches "plex-rtr-bypass@file"

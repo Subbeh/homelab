@@ -1,0 +1,31 @@
+---
+version: "3"
+
+env:
+  TERRAFORM_DIR: "{{.ROOT_DIR}}/tf"
+
+tasks:
+
+  init:
+    desc: terraform init
+    dir: "{{.USER_WORKING_DIR}}"
+    cmds:
+      - terraform init
+
+  plan:
+    desk: terraform plan
+    dir: "{{.USER_WORKING_DIR}}"
+    cmds:
+      - terraform plan -var-file="{{.DIR}}.tfvars"
+    vars:
+      DIR:
+        sh: basename {{.USER_WORKING_DIR}}
+
+  apply:
+    desk: terraform apply
+    dir: "{{.USER_WORKING_DIR}}"
+    cmds:
+      - terraform apply -parallelism=1 -var-file="{{.DIR}}.tfvars"
+    vars:
+      DIR:
+        sh: basename {{.USER_WORKING_DIR}}

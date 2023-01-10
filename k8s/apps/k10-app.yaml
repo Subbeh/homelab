@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k10
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: k10
+      repoURL: https://charts.kasten.io
+      targetRevision: 5.5.7
+    - repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+      targetRevision: HEAD
+      path: k8s/k10
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kasten-io
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    # automated:
+    #   selfHeal: true
+    #   prune: true

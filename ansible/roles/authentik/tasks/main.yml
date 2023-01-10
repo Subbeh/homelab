@@ -1,0 +1,31 @@
+---
+
+- name: Create postgres container
+  ansible.builtin.include_tasks:
+    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  vars:
+    run_container: "postgres"
+
+- name: Create redis container
+  ansible.builtin.include_tasks:
+    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  vars:
+    run_container: "redis"
+
+- name: Create authentik-server container
+  ansible.builtin.include_tasks:
+    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  vars:
+    run_container: "authentik-server"
+
+- name: Create authentik-worker container
+  ansible.builtin.include_tasks:
+    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  vars:
+    run_container: "authentik-worker"
+
+- name: Create authentik database
+  ansible.builtin.command: docker exec postgres createdb -U {{ common_user }} authentik
+  register: _postgres
+  failed_when: "_postgres.rc != 0 and 'already exists' not in _postgres.stderr"
+  changed_when: false

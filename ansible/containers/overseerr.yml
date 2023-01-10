@@ -1,0 +1,9 @@
+---
+
+overseerr:
+  host: hl-services
+  image: sctx/overseerr:1.32.5
+  ports:
+    - "{{ network_svc.overseerr.port }}:5055"
+  volumes:
+    - "{{ common_dir }}/overseerr/config:/config"

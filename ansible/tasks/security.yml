@@ -1,0 +1,18 @@
+---
+
+- name: Configure sshd
+  ansible.builtin.lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regex: "^(#)?{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+    state: present
+  loop: "{{ sshd_config }}"
+  notify: restart sshd
+
+- name: Add user to sudoers file
+  community.general.sudoers:
+    name: "{{ common_user }}"
+    user: "{{ common_user }}"
+    nopassword: true
+    commands: ALL
+    state: present

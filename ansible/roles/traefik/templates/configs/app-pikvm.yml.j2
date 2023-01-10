@@ -1,0 +1,20 @@
+---
+
+http:
+  routers:
+    pikvm-rtr:
+      rule: "Host(`kvm.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+      service: pikvm-svc
+  services:
+    pikvm-svc:
+      loadBalancer:
+        serversTransport: "pikvm"
+        servers:
+          - url: "https://{{ network_svc.pikvm.ip }}"
+  serversTransports:
+    pikvm:
+      insecureSkipVerify: true

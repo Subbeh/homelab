@@ -1,0 +1,11 @@
+---
+
+readarr:
+  host: nas
+  image: lscr.io/linuxserver/readarr:0.1.4-develop
+  ports:
+    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.readarr.port }}:8787"
+  volumes:
+    - "{{ common_dir }}/readarr/config:/config"
+    - "{{ common_media_dir }}:/data"
+    

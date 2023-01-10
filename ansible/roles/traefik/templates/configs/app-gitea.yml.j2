@@ -1,0 +1,14 @@
+http:
+  routers:
+    gitea-rtr:
+      rule: "Host(`git.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: gitea-svc
+  services:
+    gitea-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.gitea.host }}:{{ network_svc.gitea.port }}"

@@ -1,0 +1,18 @@
+---
+
+- name: Copy traefik.yaml config file
+  ansible.builtin.template:
+    src: "traefik.yaml.j2"
+    dest: "{{ common_dir }}/traefik/traefik.yaml"
+    mode: 0644
+    variable_start_string: "[["
+    variable_end_string: "]]"
+
+- name: Copy config files
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ common_dir }}/traefik/configs/{{ item | basename | regex_replace('.j2$', '') }}"
+    mode: 0644
+  with_fileglob:
+    - "templates/configs/*yml"
+    - "templates/configs/*yml.j2"

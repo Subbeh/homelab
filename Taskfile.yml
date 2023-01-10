@@ -1,0 +1,52 @@
+---
+version: "3"
+
+vars:
+  KUBERNETES_DIR: "{{.ROOT_DIR}}/k8s"
+  ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
+  TERRAFORM_DIR: "{{.ROOT_DIR}}/tf"
+
+dotenv: [".config.env"]
+
+env:
+  KUBECONFIG: "{{.ROOT_DIR}}/kubeconfig"
+
+includes:
+  precommit: .taskfiles/precommit.yml
+  ansible: .taskfiles/ansible.yml
+  tf: .taskfiles/terraform.yml
+
+tasks:
+
+  init:
+    desc: Initialize workstation dependencies with Yay
+    cmds:
+      - yay -S {{.DEPS}}
+    preconditions:
+      - sh: command -v yay
+        msg: |
+          yay is not installed
+    vars:
+      DEPS: >-
+        age
+        ansible
+        ansible-core
+        ansible-lint
+        direnv
+        flux-bin
+        go-task-bin
+        go-yq
+        helm
+        ipcalc
+        jq
+        kubectl
+        kustomize
+        molecule
+        molecule-docker
+        python-pre-commit
+        sops
+        stern
+        terraform
+        tflint
+        weave-gitops-bin
+        yamllint

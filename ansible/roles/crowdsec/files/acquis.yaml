@@ -1,0 +1,22 @@
+---
+filenames:
+  - /logs/var/auth.log
+  - /logs/var/syslog
+  - /logs/var/kern.log
+labels:
+  type: syslog
+---
+filenames:
+  - /logs/svc/traefik/*.log
+labels:
+  type: traefik
+---
+filename: /logs/svc/endlessh/current
+labels:
+  type: endlessh
+---
+source: syslog
+listen_addr: 0.0.0.0
+listen_port: 4242
+labels:
+  type: unifi

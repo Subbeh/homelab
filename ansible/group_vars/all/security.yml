@@ -1,0 +1,7 @@
+---
+
+security_ssh_port: 22
+security_sudoers_passwordless: "{{ common_user }}"
+security_autoupdate_enabled: false
+security_fail2ban_enabled: false
+security_keys: "https://raw.githubusercontent.com/Subbeh/dotfiles/master/keys"

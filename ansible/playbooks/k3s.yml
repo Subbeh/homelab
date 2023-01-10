@@ -1,0 +1,35 @@
+---
+
+- hosts: k3s
+  tags: [ never, reset ]
+  gather_facts: yes
+  become: yes
+  roles:
+    - role: k3s/reset
+      vars: {state: absent}
+  post_tasks:
+    - name: Reboot and wait for node to come back up
+      ansible.builtin.reboot:
+        reboot_timeout: 3600
+
+- hosts: k3s
+  gather_facts: true
+  become: true
+  roles:
+    - role: bootstrap
+    - role: k3s/common
+
+- hosts: k3s_masters
+  become: true
+  roles:
+    - role: k3s/master
+
+- hosts: k3s_workers
+  become: true
+  roles:
+    - role: k3s/worker
+
+- hosts: k3s_masters
+  become: true
+  roles:
+    - role: k3s/post

@@ -1,0 +1,28 @@
+---
+
+http:
+  middlewares:
+    chain-no-auth:
+      chain:
+        middlewares:
+          - crowdsec-bouncer
+          - rate-limit
+          - secure-headers
+          - compress
+
+    chain-basic-auth:
+      chain:
+        middlewares:
+          - rate-limit
+          - secure-headers
+          - basic-auth
+          - compress
+
+    chain-auth:
+      chain:
+        middlewares:
+          - crowdsec-bouncer
+          - rate-limit
+          - secure-headers
+          - authentik
+          - compress

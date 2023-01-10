@@ -1,0 +1,9 @@
+---
+
+common_user_id: "1026"
+common_group_id: "101"
+
+common_dir: "/volume1/docker/app_data"
+common_data_dir: "/volume1"
+common_backup_dir: "/volume1/backups"
+common_media_dir: "/volume1/media"

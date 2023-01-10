@@ -1,0 +1,29 @@
+---
+
+- name: Check if cloud-init config exists
+  ansible.builtin.stat:
+    path: /etc/cloud/cloud.cfg
+  register: _stat_result
+
+- name: Disable preserve hostname for cloud-init
+  ansible.builtin.lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regexp: "^preserve_hostname: false"
+    line: "preserve_hostname: true"
+  when: _stat_result.stat.exists
+
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname_short }}.{{ network_domain.tld_local }}"
+  when: ansible_virtualization_type != "docker"
+  notify: restart rsyslog
+
+- name: Cleanup /etc/hosts
+  ansible.builtin.template:
+    src: etc/hosts.j2
+    dest: /etc/hosts
+    mode: 0644
+    owner: root
+    group: root
+  when: ansible_virtualization_type != "docker"
+  notify: restart rsyslog

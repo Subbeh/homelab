@@ -1,0 +1,32 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+driver:
+  name: delegated
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: test
+provisioner:
+  name: ansible
+  ansible_args:
+    - --connection=local
+  config_options:
+    defaults:
+      vault_password_file: ~/.ansible_vault
+  inventory:
+    hosts:
+      all:
+        hosts:
+          test:
+            ansible_connection: local
+    links:
+      hosts: ../../inventory.ini
+      group_vars: ../../group_vars/
+      host_vars: ../../host_vars/
+verifier:
+  name: ansible

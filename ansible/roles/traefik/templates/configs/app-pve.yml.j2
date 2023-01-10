@@ -1,0 +1,25 @@
+---
+
+http:
+  routers:
+    pve-rtr:
+      rule: "Host(`pve.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - local-only
+      service: pve-svc
+  services:
+    pve-svc:
+      loadBalancer:
+        serversTransport: "pve"
+        servers:
+          - url: "https://{{ network_svc.pve.ip[0] }}:{{ network_svc.pve.port }}"
+          - url: "https://{{ network_svc.pve.ip[1] }}:{{ network_svc.pve.port }}"
+          - url: "https://{{ network_svc.pve.ip[2] }}:{{ network_svc.pve.port }}"
+        sticky:
+         cookie: {}
+  serversTransports:
+    pve:
+      insecureSkipVerify: true
+      rootCAs: "/pve.pem"

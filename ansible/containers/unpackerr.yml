@@ -1,0 +1,15 @@
+---
+
+unpackerr:
+  host: nas
+  image: golift/unpackerr:0.11.1
+  volumes:
+    - "{{ common_dir }}/unpackerr/config:/config"
+    - "{{ common_media_dir }}:/data"
+  environment:
+    UN_SONARR_0_URL: "http://sonarr:{{ network_svc.sonarr.port }}"
+    UN_SONARR_0_API_KEY: "{{ media_sonarr_api }}"
+    UN_SONARR_0_PATHS_0: "/data/downloads/torrents"
+    UN_RADARR_0_URL: "http://radarr:{{ network_svc.radarr.port }}"
+    UN_RADARR_0_API_KEY: "{{ media_radarr_api }}"
+    UN_RADARR_0_PATHS_0: "/data/downloads/torrents"

@@ -1,0 +1,16 @@
+---
+
+- hosts: nas
+  gather_facts: true
+  become: true
+
+  handlers:
+    - name: Import common handlers
+      ansible.builtin.import_tasks: ../tasks/handlers.yml
+
+  tasks:
+    - name: Create Deluge container
+      tags: deluge
+      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      vars:
+        run_container: "deluge"
