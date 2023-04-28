@@ -2,7 +2,7 @@
 
 qbittorrent:
   host: nas
-  image: linuxserver/qbittorrent:4.5.2
+  image: lscr.io/linuxserver/qbittorrent:4.5.2
   network_mode: "container:gluetun"
   networks: 
   volumes:
