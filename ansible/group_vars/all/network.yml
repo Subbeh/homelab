@@ -59,8 +59,13 @@ network_svc:
   nas_srv:
     host: nas-srv
     ip: "10.0.10.21"
+  bastion:
+    ip: "10.0.10.2"
   hl_services:
     ip: "10.0.10.5"
+  k8s:
+    lb_ip: "10.0.10.71"
+  # services
   authentik:
     host: hl-services
     port: "9000"

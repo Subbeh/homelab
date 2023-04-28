@@ -1,0 +1,14 @@
+tcp:
+  routers:
+    k8s-passthrough:
+      rule: "HostSNIRegexp(`k8s.{{ network_domain.tld }}`, `{subdomain:[a-z]+}.k8s.{{ network_domain.tld }}`)"
+      service: k8s-passthrough
+      tls:
+        passthrough: true
+
+  services:
+    k8s-passthrough:
+      loadbalancer:
+        servers:
+          - address: "{{ network_svc.k8s.lb_ip }}:443"
+
