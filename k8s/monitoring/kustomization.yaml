@@ -2,6 +2,5 @@ resources:
   - namespace.yaml
   - grafana-ingress.yaml
   - prometheus-ingress.yaml
-  - loki-ingress.yaml
 
 namespace: monitoring
