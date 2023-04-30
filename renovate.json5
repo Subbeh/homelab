@@ -14,7 +14,7 @@
 
   reviewers: ["sysadm"],
 
-  commitMessagePrefix: "{{depName}}:",
+  commitMessagePrefix: "renovate: {{depName}}:",
   commitMessageAction: "update",
   commitMessageTopic: "version",
   commitMessageExtra: "to {{#if isMajor}}{{{prettyNewMajor}}}{{else}}{{{prettyNewVersion}}}{{/if}}",
