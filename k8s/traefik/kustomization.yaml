@@ -1,7 +1,5 @@
 resources:
   - namespace.yaml
-  - default-headers.yaml
+  - middlewares.yaml
   - tlsstore.yaml
   - ingress.yaml
-
-# namespace: traefik
