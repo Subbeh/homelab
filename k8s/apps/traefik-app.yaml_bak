@@ -17,33 +17,33 @@ spec:
           additionalArguments:
             - "--serversTransport.insecureSkipVerify=true"
             - "--log.level=DEBUG"
-          additionalVolumeMounts:
-            - name: logs
-              mountPath: /var/log/traefik
+          # additionalVolumeMounts:
+          #   - name: logs
+          #     mountPath: /var/log/traefik
           logs:
             access:
               enabled: true
-              format: json
-              bufferingSize: 1000
-              filePath: "/var/log/traefik/access.log"
-              fields:
-                headers:
-                  defaultmode: keep
+              # format: json
+              # bufferingSize: 1000
+              # filePath: "/var/log/traefik/access.log"
+              # fields:
+              #   headers:
+              #     defaultmode: keep
           deployment:
             enabled: true
             replicas: 2
             annotations: {}
             podAnnotations: {}
             initContainers: []
-            additionalContainers:
-              - name: tail-accesslogs
-                image: busybox
-                args: [ "/bin/sh", "-c", "tail -n+1 -F /var/log/traefik/access.log" ]
-                volumeMounts:
-                  - name: logs
-                    mountPath: /var/log/traefik
-            additionalVolumes:
-              - name: logs
+            # additionalContainers:
+            #   - name: tail-accesslogs
+            #     image: busybox
+            #     args: [ "/bin/sh", "-c", "tail -n+1 -F /var/log/traefik/access.log" ]
+            #     volumeMounts:
+            #       - name: logs
+            #         mountPath: /var/log/traefik
+            # additionalVolumes:
+            #   name: logs
           ports:
             web:
               redirectTo: websecure
@@ -72,9 +72,9 @@ spec:
               loadBalancerIP: 10.0.10.71
             loadBalancerSourceRanges: []
             externalIPs: []
-            env:
-              - name: TZ
-                value: "Australia/Melbourne"
+            # env:
+            #   - name: TZ
+            #     value: "Australia/Melbourne"
     - repoURL: https://git.sbbh.cloud/sysadm/homelab.git
       targetRevision: main
       path: k8s/traefik
