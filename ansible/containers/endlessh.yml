@@ -2,7 +2,8 @@
 
 endlessh:
   host: bastion
-  image: lscr.io/linuxserver/endlessh:dfe44eb2-ls50
+  image: lscr.io/linuxserver/endlessh:latest
+  pull: true
   environment:
     LOGFILE: "true"
   volumes:
