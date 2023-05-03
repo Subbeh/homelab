@@ -12,7 +12,7 @@
 - name: Create container {{ run_container }}
   community.docker.docker_container:
     # use defaults
-    name: "{{ run_container }}"
+    name: "{{ containers[run_container].name | default(run_container) }}"
     image: "{{ containers[run_container].image }}"
     networks: "{{ containers[run_container].networks | default(containers['defaults'].networks) }}"
     restart_policy: "{{ containers[run_container].restart_policy | default(containers['defaults'].restart_policy) }}"
