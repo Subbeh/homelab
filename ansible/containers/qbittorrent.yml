@@ -7,5 +7,6 @@ qbittorrent:
   networks: 
   volumes:
     - "{{ common_dir }}/qbittorrent/config:/config"
+    - "{{ common_dir }}/qbittorrent/mam_id:/mam_id"
     - "{{ common_media_dir }}/downloads/torrents:/downloads"
-  command: bash -c "curl -c /config/mam.cookies -b 'mam_id={{ media_mam_id }}' https://t.myanonamouse.net/json/dynamicSeedbox.php ; sleep infinity"
+  command: bash -c "curl -c /config/mam.cookies -b mam_id=$(</mam_id) https://t.myanonamouse.net/json/dynamicSeedbox.php ; sleep infinity"
