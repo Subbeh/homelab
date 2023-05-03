@@ -2,7 +2,7 @@
 
 traefik:
   host: bastion
-  image: traefik:v2.10.0
+  image: traefik:v2.10.1
   restart_policy: always
   ports:
     - "80:80"
