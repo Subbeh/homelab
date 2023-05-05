@@ -89,9 +89,6 @@ network_svc:
     host: hl-services
     port_web: "8100"
     port_agent: "9100"
-  ghost:
-    host: hl-services
-    port: "2368"
   gitea:
     host: hl-services
     port: "3000"
