@@ -1,0 +1,8 @@
+---
+
+mysql:
+  host: hl-services
+  image: mysql:8.0
+  restart_policy: always
+  environment:
+    MYSQL_ROOT_PASSWORD: "{{ mysql_pass }}"

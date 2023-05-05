@@ -1,0 +1,14 @@
+http:
+  routers:
+    ghost-rtr:
+      rule: "Host(`{{ network_domain.tld }}`) || Host(`www.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-auth
+      service: ghost-svc
+  services:
+    ghost-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc.ghost.host }}:{{ network_svc.ghost.port }}"
