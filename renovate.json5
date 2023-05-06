@@ -21,7 +21,7 @@
   prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}",
 
   ansible: {
-    fileMatch: ["ansible/containers/.+\\.yml$"],
+    fileMatch: ["ansible/apps/.+\\.yml$"],
   },
 
   kubernetes: {
