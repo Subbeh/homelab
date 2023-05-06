@@ -45,11 +45,11 @@ tasks:
     cmds:
       - ansible-playbook -f 5 {{.ANSIBLE_PLAYBOOK_DIR}}/update.yml {{.CLI_ARGS}}
 
-  container:
-    desc: Run Docker container
+  app:
+    desc: Run app
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/container.yml --tags {{.CLI_ARGS}}
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags {{.CLI_ARGS}}
 
   bastion:
     desc: Run bastion playbook

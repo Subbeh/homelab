@@ -1,15 +1,9 @@
 ---
 
-- name: Load container network manifest
-  ansible.builtin.include_vars:
-    file: "{{ common_ansible_root }}/containers/networks.yml"
-    name: networks
-  no_log: true
-
 - name: Create Docker network
   community.docker.docker_network:
     name: "{{ item }}"
-    driver: "{{ networks[item].driver }}"
+    driver: "{{ network_docker.[item].driver }}"
     ipam_config:
       - "{{ networks[item].ipam_config }}"
   loop: "{{ create_network }}"

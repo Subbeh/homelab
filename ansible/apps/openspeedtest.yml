@@ -1,0 +1,16 @@
+---
+
+openspeedtest:
+  image: openspeedtest/latest:v0.0.1
+  ports:
+    - "{{ network_svc.openspeedtest.port }}:3000"
+
+  traefik:
+    name: speedtest
+    rtr_middlewares:
+      - chain-auth
+      - buffer-limit
+    middlewares: |
+      buffer-limit:
+        buffering:
+          maxRequestBodyBytes: 10000000000

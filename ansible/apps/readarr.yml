@@ -1,0 +1,18 @@
+---
+
+readarr:
+  image: lscr.io/linuxserver/readarr:0.1.4-develop
+  ports:
+    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.readarr.port }}:8787"
+  volumes:
+    - "{{ common_dir }}/readarr/config:/config"
+    - "{{ common_media_dir }}:/data"
+    
+  traefik:
+    routers:
+    - name: "readarr"
+      rule: "Host(`readarr.{{ network_domain.tld }}`)"
+    - name: "readarr-bypass"
+      rule: "Host(`readarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_api }}`)"
+      middlewares:
+        - chain-no-auth

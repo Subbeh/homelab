@@ -1,0 +1,19 @@
+---
+
+sonarr:
+  image: lscr.io/linuxserver/sonarr:3.0.10
+  ports:
+    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.sonarr.port }}:8989"
+  volumes:
+    - "{{ common_dir }}/sonarr/config:/config"
+    - "{{ common_dir }}/sonarr/MediaCover:/config/MediaCover"
+    - "{{ common_media_dir }}:/data"
+
+  traefik:
+    routers:
+    - name: "sonarr"
+      rule: "Host(`sonarr.{{ network_domain.tld }}`)"
+    - name: "sonarr-bypass"
+      rule: "Host(`sonarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_sonarr_api }}`)"
+      middlewares:
+        - chain-no-auth

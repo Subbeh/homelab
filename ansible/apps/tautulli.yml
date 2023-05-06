@@ -1,0 +1,10 @@
+---
+
+tautulli:
+  image: tautulli/tautulli:v2.12.3
+  ports:
+    - "{{ network_svc.tautulli.port }}:8181"
+  volumes:
+    - "{{ common_dir }}/tautulli/config:/config"
+
+  traefik:

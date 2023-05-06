@@ -1,0 +1,12 @@
+---
+
+endlessh:
+  image: lscr.io/linuxserver/endlessh:latest
+  pull: true
+  environment:
+    LOGFILE: "true"
+  volumes:
+    - "{{ common_dir }}/endlessh:/config"
+    - "{{ common_dir }}/logs/endlessh:/config/logs/endlessh"
+  ports:
+    - 22:2222

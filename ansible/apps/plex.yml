@@ -1,0 +1,6 @@
+---
+
+plex:
+  traefik:
+    rtr_middlewares:
+      - chain-no-auth

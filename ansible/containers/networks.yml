@@ -1,6 +1,0 @@
----
-
-mesh:
-  driver: bridge
-  ipam_config:
-    subnet: "{{ network_cidr.docker.mesh }}"

@@ -1,0 +1,53 @@
+#jinja2: lstrip_blocks: True
+http:
+  routers:
+  {% if container.traefik.routers is defined %}
+    {% for route in container.traefik.routers %}
+    {{ route.name }}-rtr:
+      rule: "{{ route.rule }}"
+      entryPoints:
+        - websecure
+      middlewares:
+      {% if route.middlewares is defined %} 
+        {%- for middleware in route.middlewares %}
+        - {{ middleware }}
+        {% endfor %}
+      {% else %}
+        - chain-auth
+      {% endif %}
+      {% if route.service is defined %}
+      service: {{ route.service }}
+      {% else %}
+      service: {{ container.name }}-svc
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    {{ container.name }}-rtr:
+      rule: "Host(`{{ container.traefik.name | default(container.name) }}.{{ network_domain.tld }}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+      {% if container.traefik.rtr_middlewares is defined %} 
+        {%- for middleware in container.traefik.rtr_middlewares %}
+        - {{ middleware }}
+        {% endfor %}
+      {% else %}
+        - chain-auth
+      {% endif %}
+      service: {{ container.name }}-svc
+  {% endif %}
+
+  {% if container.traefik.middlewares is defined %}
+  middlewares:
+    {{ container.traefik.middlewares | indent(width=4) }}
+  {%- endif %}
+
+  services:
+  {% if container.traefik.services is defined %}
+    {{ container.traefik.services | indent(width=4) }}
+  {% else %}
+    {{ container.name }}-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{ network_svc[container.name].host }}:{{ network_svc[container.name].port }}"
+  {%- endif %}

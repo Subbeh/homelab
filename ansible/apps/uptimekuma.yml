@@ -1,0 +1,23 @@
+---
+
+uptimekuma:
+  image: louislam/uptime-kuma:1.21.2
+  ports:
+    - "{{ network_svc.uptimekuma.port }}:3001"
+  volumes:
+    - "{{ common_dir }}/uptimekuma:/app/data"
+
+  traefik:
+    routers:
+    - name: "uptime"
+      rule: "Host(`uptime.{{ network_domain.tld }}`)"
+    - name: "status"
+      rule: "Host(`status.{{ network_domain.tld }}`)"
+      middlewares:
+        - chain-no-auth
+        - uptimekuma-status
+    middlewares: |
+      uptimekuma-status:
+        replacePathRegex:
+          regex: "^/$"
+          replacement: "/status/homelab"

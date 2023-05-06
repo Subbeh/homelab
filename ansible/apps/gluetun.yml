@@ -1,0 +1,23 @@
+---
+
+gluetun:
+  image: qmcgaw/gluetun:v3.33.0
+  capabilities:
+    - net_admin
+  ports:
+    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.gluetun.port }}:8888"
+    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.deluge.port }}:8112"
+    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.qbittorrent.port }}:8080"
+  volumes:
+    - "{{ common_dir }}/gluetun:/gluetun"
+  environment:
+    VPN_SERVICE_PROVIDER: "mullvad"
+    VPN_TYPE: "wireguard"
+    VPN_ENDPOINT_PORT: "{{ network_svc.gluetun.port_wg | string }}"
+    WIREGUARD_PRIVATE_KEY: "{{ network_svc.gluetun.wg_key }}"
+    WIREGUARD_ADDRESSES: "{{ network_svc.gluetun.wg_addr }}"
+    SERVER_CITIES: "Melbourne"
+    FIREWALL_OUTBOUND_SUBNETS: "{{ network_cidr.lan }}"
+    HTTPPROXY: "on"
+    HTTPPROXY_LOG: "on"
+    FIREWALL_VPN_INPUT_PORTS: "{{ network_svc.gluetun.port_mullvad | string }}"

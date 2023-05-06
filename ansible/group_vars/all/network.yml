@@ -38,6 +38,12 @@ network_cidr:
     mesh: "192.168.100.0/24"
   all: ["127.0.0.1/32", "10.0.0.0/8", "192.168.0.0/16", "172.16.0.0/12", "100.64.0.0/10"]
 
+network_docker:
+  mesh:
+    driver: bridge
+    ipam_config:
+      subnet: "{{ network_cidr.docker.mesh }}"
+
 network_svc:
   dns:
     host: "pi.hole"
@@ -66,7 +72,7 @@ network_svc:
   k8s:
     lb_ip: "10.0.10.71"
   # services
-  authentik:
+  authentik_server:
     host: hl-services
     port: "9000"
   audiobookshelf:
@@ -75,9 +81,13 @@ network_svc:
   bazarr:
     host: nas-srv
     port: "6767"
+  borgmatic:
+    host: nas-srv
   calibre:
     host: nas-srv
     port: "8083"
+  cloudflare_ddns:
+    host: hl-services
   crowdsec:
     host: bastion
     port: "8888"
@@ -89,11 +99,14 @@ network_svc:
     host: hl-services
     port_web: "8100"
     port_agent: "9100"
+  endlessh:
+    host: bastion
   gitea:
     host: hl-services
     port: "3000"
     port_ssh: "222"
   gluetun:
+    host: nas-srv
     ip: "192.168.100.100"
     port: "8888"
     port_wg: "51820"
@@ -127,6 +140,10 @@ network_svc:
     host: hl-services
     port: "8000"
     agent_port: "9001"
+  portainer_agent_bastion:
+    host: bastion
+  portainer_agent_nas:
+    host: nas-srv
   postgres:
     host: hl-services
     port: "5432"
@@ -146,6 +163,8 @@ network_svc:
   readarr:
     host: nas-srv
     port: "8787"
+  redis:
+    host: hl-services
   sabnzbd:
     host: nas-srv
     port: "8080"
@@ -155,6 +174,14 @@ network_svc:
   tautulli:
     host: hl-services
     port: "8181"
+  traefik:
+    host: hl-services
+  traefik_cs_bouncer:
+    host: bastion
+  unpackerr:
+    host: nas-srv
   uptimekuma:
     host: hl-services
     port: "3001"
+  whoami:
+    host: hl-services

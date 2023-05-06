@@ -1,9 +1,0 @@
----
-
-cloudflare-ddns:
-  host: hl-services
-  image: oznu/cloudflare-ddns
-  environment:
-    API_KEY: "{{ cloudflare_api_dns }}"
-    ZONE: "{{ network_domain.tld }}"
-    PROXIED: "true"

@@ -1,0 +1,8 @@
+---
+
+- name: Create Traefik config for {{ container.name }}
+  delegate_to: bastion
+  ansible.builtin.template:
+    src: traefik-app.yml.j2
+    dest: "{{ common_dir }}/traefik/configs/app-{{ container.name }}.yml"
+  when: container.traefik is defined
