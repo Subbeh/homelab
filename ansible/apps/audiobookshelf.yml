@@ -1,7 +1,7 @@
 ---
 
 audiobookshelf:
-  image: ghcr.io/advplyr/audiobookshelf:2.2.19
+  image: ghcr.io/advplyr/audiobookshelf:2.2.20
   ports:
     - "{{ network_svc.nas_srv.ip }}:{{ network_svc.audiobookshelf.port }}:80"
   volumes:
