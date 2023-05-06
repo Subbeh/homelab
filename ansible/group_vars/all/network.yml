@@ -193,3 +193,6 @@ network_svc:
     port: "3001"
   whoami:
     host: hl-services
+  wizarr:
+    host: hl-services
+    port: "5690"
