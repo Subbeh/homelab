@@ -1,15 +1,15 @@
 ---
 
-- name: load all container manifests
+- name: load all app manifests
   ansible.builtin.include_vars:
     dir: "{{ common_ansible_root }}/apps"
     extensions:
       - "yml"
     ignore_unknown_extensions: true
-    name: containers
+    name: apps
   no_log: true
 
-- name: Set container variables
+- name: Set app variables
   ansible.builtin.set_fact:
-    container: "{{ containers[run_container] | combine({'name': containers[run_container].name | default(run_container)}) }}"
-  when: run_container is defined
+    app: "{{ apps[run_app] | combine({'name': apps[run_app].name | default(run_app)}) }}"
+  when: run_app is defined

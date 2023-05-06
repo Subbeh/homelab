@@ -1,0 +1,16 @@
+---
+
+pikvm:
+  traefik:
+    name: kvm
+    rtr_middlewares:
+      - local-only
+    services: |
+      pikvm-svc:
+        loadBalancer:
+          serversTransport: "pikvm"
+          servers:
+            - url: "https://{{ network_svc.pikvm.host }}"
+    serversTransports: |
+      pikvm:
+        insecureSkipVerify: true

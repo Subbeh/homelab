@@ -3,3 +3,4 @@
 - ansible.builtin.include_tasks: load_vars.yml
 - ansible.builtin.include_tasks: create_container.yml
 - ansible.builtin.include_tasks: generate_traefik_config.yml
+  when: generate_traefik

@@ -45,6 +45,8 @@ network_docker:
       subnet: "{{ network_cidr.docker.mesh }}"
 
 network_svc:
+  udmp:
+    ip: "10.0.0.1"
   dns:
     host: "pi.hole"
     ip: "10.10.10.10"
@@ -71,10 +73,13 @@ network_svc:
     ip: "10.0.10.5"
   k8s:
     lb_ip: "10.0.10.71"
+
   # services
   authentik_server:
     host: hl-services
     port: "9000"
+  authentik_worker:
+    host: hl-services
   audiobookshelf:
     host: nas-srv
     port: "13378"
@@ -129,6 +134,9 @@ network_svc:
   overseerr:
     host: hl-services
     port: "5055"
+  pihole:
+    host: "10.10.10.10"
+    port: "80"
   pikvm:
     host: pikvm
     ip: "10.0.10.254"

@@ -5,7 +5,12 @@
   gather_facts: false
 
   tasks:
-    - name: Load all container manifests
+    - name: Set fact with tags
+      tags: always
+      ansible.builtin.set_fact:
+        run_app: "{{ ansible_run_tags[0] }}"
+
+    - name: Load all app / container manifests
       tags: always
       ansible.builtin.include_role:
         name: apps
@@ -13,40 +18,45 @@
         apply:
           tags: always
 
-    - name: Set fact with tags
+    - name: Generate Traefik config
       tags: always
-      ansible.builtin.set_fact:
-        run_container: "{{ ansible_run_tags[0] }}"
+      ansible.builtin.include_role:
+        name: apps
+        tasks_from: generate_traefik_config
+        apply:
+          tags: always
 
     - name: Add container host to temporary host group
       tags: always
       ansible.builtin.add_host:
-        name: "{{ network_svc[run_container].host }}"
+        name: "{{ network_svc[run_app].host }}"
         groups: temp_group
+      when: apps[run_app].image is defined
       changed_when: false
 
 - hosts: temp_group
   become: true
   gather_facts: true
 
-  pre_tasks:
-    - name: Verify SSH port
-      tags: always
-      ansible.builtin.include_tasks:
-        file: ../tasks/ssh_port.yml
-      vars:
-        ansible_become: false
-
-    - name: Gathering facts
-      tags: always
-      ansible.builtin.setup:
-
   tasks:
+    - name: Reload all app / container manifests
+      tags: always
+      ansible.builtin.include_role:
+        name: apps
+        tasks_from: load_vars
+        apply:
+          tags: always
+      vars:
+        run_app: "{{ hostvars['localhost']['run_app'] }}"          
+
     - name: Include apps role
       tags: always
       ansible.builtin.include_role:
         name: apps
+        tasks_from: create_container
         apply:
           tags: always
-      vars:
-        run_container: "{{ hostvars['localhost']['run_container'] }}"          
+      # vars:
+      #   run_app: "{{ hostvars['localhost']['run_app'] }}"          
+      #   apps: "{{ hostvars['localhost']['apps'] }}"          
+      #   app: "{{ hostvars['localhost']['app'] }}"          

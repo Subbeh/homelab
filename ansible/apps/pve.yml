@@ -1,0 +1,20 @@
+---
+
+pve:
+  traefik:
+    rtr_middlewares:
+      - local-only
+    services: |
+      pve-svc:
+        loadBalancer:
+          serversTransport: "pve"
+          servers:
+            - url: "https://{{ network_svc.pve.ip[0] }}:{{ network_svc.pve.port }}"
+            - url: "https://{{ network_svc.pve.ip[1] }}:{{ network_svc.pve.port }}"
+            - url: "https://{{ network_svc.pve.ip[2] }}:{{ network_svc.pve.port }}"
+          sticky:
+            cookie: {}
+    serversTransports: |
+      pve:
+        insecureSkipVerify: true
+        rootCAs: "/pve.pem"

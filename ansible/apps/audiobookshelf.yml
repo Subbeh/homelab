@@ -10,6 +10,5 @@ audiobookshelf:
     - "{{ common_media_dir }}:/data"
 
   traefik:
-    port: "{{ network_svc.audiobookshelf.port }}"
     rtr_middlewares:
       - chain-no-auth

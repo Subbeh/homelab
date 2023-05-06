@@ -1,0 +1,6 @@
+---
+
+nas:
+  traefik:
+    rtr_middlewares:
+      - local-only

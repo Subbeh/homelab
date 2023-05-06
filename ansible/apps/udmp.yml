@@ -1,0 +1,15 @@
+---
+
+udmp:
+  traefik:
+    rtr_middlewares:
+      - local-only
+    services: |
+      udmp-svc:
+        loadBalancer:
+          serversTransport: "udmp"
+          servers:
+            - url: "https://{{ network_svc.udmp.ip }}"
+    serversTransports: |
+      udmp:
+        insecureSkipVerify: true
