@@ -14,7 +14,7 @@ while read file ; do
   #   ansible-lint -c .ansible-lint "../$file"
   #   cd -
   # fi
-  if [[ "$file" =~ ansible/.*\.ya?ml ]] ; then
+  if [[ "$file" =~ ansible/.*\.ya?ml$ ]] ; then
     yamllint -s -c .yamllint "$file"
   fi
 done <<< $(git diff --name-only --diff-filter=ACMR HEAD~1 main)
