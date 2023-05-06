@@ -88,4 +88,5 @@
     volumes_from: "{{ app.volumes_from | default(omit) }}"
     working_dir: "{{ app.working_dir | default(omit) }}"
   when: app.image is defined
+  no_log: true
   changed_when: false
