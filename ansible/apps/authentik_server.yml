@@ -1,7 +1,7 @@
 ---
 
 authentik_server:
-  image: ghcr.io/goauthentik/server:2023.4
+  image: ghcr.io/goauthentik/server:2023.4.0
   command: server
   ports:
     - "{{ network_svc.authentik_server.port }}:9000"
@@ -40,21 +40,3 @@ authentik_server:
         loadBalancer:
           servers:
             - url: "http://{{ network_svc.authentik_server.host }}:{{ network_svc.authentik_server.port }}/outpost.goauthentik.io"
-
-authentik_worker:
-  host: hl-services
-  image: ghcr.io/goauthentik/server:2023.4
-  command: worker
-  volumes:
-    - "{{ common_dir }}/authentik/media:/media"
-    - "{{ common_dir }}/authentik/custom-templates:/templates"
-    - "{{ common_dir }}/authentik/geoip/data:/geoip"
-  environment:
-    AUTHENTIK_REDIS__HOST: redis
-    AUTHENTIK_POSTGRESQL__HOST: postgres
-    AUTHENTIK_POSTGRESQL__NAME: authentik
-    AUTHENTIK_POSTGRESQL__USER: "{{ common_user }}"
-    AUTHENTIK_POSTGRESQL__PASSWORD: "{{ postgres_pass }}"
-    AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
-    AUTHENTIK_SECRET_KEY: "{{ authentik_key }}"
-    AUTHENTIK_COOKIE_DOMAIN: "{{ network_domain.tld }}"
