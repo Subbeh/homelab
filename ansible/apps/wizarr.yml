@@ -8,7 +8,13 @@ wizarr:
     - "{{ common_dir }}/wizarr/config:/data/database"
   environment:
     APP_URL: "https://wizarr.{{ network_domain.tld }}"
+    DISABLE_BUILTIN_AUTH: "true"
 
   traefik:
-    rtr_middlewares:
-      - chain-no-auth
+    routers:
+    - name: "wizarr"
+      rule: "Host(`wizarr.{{ network_domain.tld }}`)"
+    - name: "wizarr-bypass"
+      rule: "Host(`wizarr.{{ network_domain.tld }}`) && (Path(`/join`, `/setup`) || PathPrefix(`/j/`, `/setup/`, `/static/`))"
+      middlewares:
+        - chain-no-auth
