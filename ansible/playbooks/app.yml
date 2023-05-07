@@ -56,7 +56,3 @@
         tasks_from: create_container
         apply:
           tags: always
-      # vars:
-      #   run_app: "{{ hostvars['localhost']['run_app'] }}"          
-      #   apps: "{{ hostvars['localhost']['apps'] }}"          
-      #   app: "{{ hostvars['localhost']['app'] }}"          
