@@ -52,7 +52,7 @@ gitea:
     GITEA__repository__DEFAULT_PRIVATE: "true"
     GITEA__repository__DISABLE_STARS: "true"
 
-    GITEA__packages__ENABLED: "false"
+    GITEA__packages__ENABLED: "true"
 
     GITEA__log__MODE: "console,file"
     GITEA__log__ENABLE_XORM_LOG: "false"
