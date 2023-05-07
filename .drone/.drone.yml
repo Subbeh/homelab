@@ -10,7 +10,9 @@ trigger:
 steps:
   - name: lint
     image: sterwindt/ansible-runner:latest
+    privileged: true
     commands:
+      - ip link set dev eth0 mtu 1450
       - .drone/lint.sh
 
   - name: renovate
