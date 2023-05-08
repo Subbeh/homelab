@@ -30,11 +30,18 @@ spec:
             DRONE_RUNNER_NETWORK_OPTS: com.docker.network.drive.mtu:1450
           extraSecretNamesForEnvFrom:
             - drone-doppler-secret
+          extraVolumes:
+            - name: docker-cache
+              persistentVolumeClaim:
+                claimName: docker-cache-pvc
           dind:
             commandArgs:
               - "--host"
               - "tcp://localhost:2375"            
               - "--mtu=1450"
+            extraVolumeMounts:
+              - name: docker-cache
+                mountPath: /var/cache/
     - chart: drone-kubernetes-secrets
       repoURL: https://charts.drone.io
       targetRevision: 0.1.4

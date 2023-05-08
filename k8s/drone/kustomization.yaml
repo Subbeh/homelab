@@ -4,6 +4,7 @@ resources:
   # - kube-runner-deployment.yaml
   # - kube-runner-rbac.yaml
   # - kube-secrets-deployment.yaml
+  - cache-pvc.yaml
   - ingress.yaml
 
 # namespace: drone
