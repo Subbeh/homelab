@@ -60,6 +60,10 @@ gitea:
     GITEA__log__ENABLE_ACCESS_LOG: "false"
 
   traefik:
-    name: git
-    rtr_middlewares:
-      - chain-no-auth
+    routers:
+    - name: "gitea"
+      rule: "Host(`git.{{ network_domain.tld }}`)"
+    - name: "gitea-local"
+      rule: "Host(`git.{{ network_domain.tld }}`) && ClientIP(`127.0.0.1/32`, `10.0.0.0/8`, `192.168.0.0/16`, `172.16.0.0/12`, `100.64.0.0/10`)"
+      middlewares:
+        - chain-no-auth
