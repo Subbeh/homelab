@@ -4,16 +4,32 @@ pve:
   traefik:
     rtr_middlewares:
       - local-only
+
     services: |
       pve-svc:
+        failover:
+          healthCheck: {}
+          service: pve-main-svc
+          fallback: pve-backup-svc
+
+      pve-main-svc:
         loadBalancer:
           serversTransport: "pve"
+          healthCheck:
+            interval: 10s
+            timeout: 3s
           servers:
             - url: "https://{{ network_svc.pve.ip[0] }}:{{ network_svc.pve.port }}"
+
+      pve-backup-svc:
+        loadBalancer:
+          serversTransport: "pve"
+          healthCheck:
+            interval: 10s
+            timeout: 3s
+          servers:
             - url: "https://{{ network_svc.pve.ip[1] }}:{{ network_svc.pve.port }}"
-            - url: "https://{{ network_svc.pve.ip[2] }}:{{ network_svc.pve.port }}"
-          sticky:
-            cookie: {}
+
     serversTransports: |
       pve:
         insecureSkipVerify: true
