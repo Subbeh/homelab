@@ -39,11 +39,6 @@
     dest: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
   changed_when: false
 
-- name: Copy firewall bouncer service config over
-  ansible.builtin.copy:
-    src: crowdsec-firewall-bouncer.service
-    dest: /etc/systemd/system/crowdsec-firewall-bouncer.service
-
 - name: Enable and restart firewall bouncer
   ansible.builtin.service:
     name: crowdsec-firewall-bouncer
