@@ -33,4 +33,3 @@ pve:
     serversTransports: |
       pve:
         insecureSkipVerify: true
-        rootCAs: "/pve.pem"

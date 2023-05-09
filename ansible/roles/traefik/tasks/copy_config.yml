@@ -5,8 +5,6 @@
     src: "traefik.yaml.j2"
     dest: "{{ common_dir }}/traefik/traefik.yaml"
     mode: 0644
-    variable_start_string: "[["
-    variable_end_string: "]]"
 
 - name: Copy config files
   ansible.builtin.template:

@@ -1,4 +1,6 @@
+#jinja2:variable_start_string:'[[', variable_end_string:']]', trim_blocks: False
 ---
+
 global:
   checkNewVersion: true
   sendAnonymousUsage: true
@@ -44,7 +46,7 @@ certificatesResolvers:
   dns-cloudflare:
     acme:
 {% if testing is defined %}
-      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # UNCOMMENT FOR STAGING SERVER
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory
 {% endif %}
       email: [[ common_email ]]
       storage: acme.json
