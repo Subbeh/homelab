@@ -40,8 +40,9 @@ steps:
       webhook_token:
         from_secret: DISCORD_TOKEN
       message: >
-        {{#success build.status}}✅{{else}}❌{{/success}}
-        Repository `[{{repo.name}}/{{commit.branch}}]` triggered by event `[{{uppercase build.event}}]` for build.
+        {{#success build.status}}✅{{else}}⚠️{{/success}}
+        repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
+               commit: `{{commit.message}}` 
     when:
       status: [ success, failure, changed ]
       event: [ push ]
