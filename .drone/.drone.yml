@@ -7,9 +7,12 @@ trigger:
   branch:
     - main
 
+image_pull_secrets:
+  - DOCKER_CONF
+
 steps:
   - name: lint
-    image: sterwindt/ansible-runner:latest
+    image: git.sbbh.cloud/sysadm/ansible-runner:latest
     privileged: true
     commands:
       - ip link set dev eth0 mtu 1450
@@ -19,7 +22,7 @@ steps:
         from_secret: ANSIBLE_VAULT_PASSWORD
 
   - name: apps
-    image: sterwindt/ansible-runner:latest
+    image: git.sbbh.cloud/sysadm/ansible-runner:latest
     commands:
       - .drone/apps.sh
     environment:
@@ -46,6 +49,15 @@ steps:
     when:
       status: [ success, failure, changed ]
       event: [ push ]
+
+---
+
+kind: secret
+name: DOCKER_CONF
+get:
+  path: drone-doppler-secret
+  name: DOCKER_CONF
+
 ---
 
 kind: secret
