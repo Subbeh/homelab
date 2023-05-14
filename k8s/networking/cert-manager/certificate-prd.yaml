@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: k8s-sbbh-cloud-prd
+  namespace: default
+spec:
+  secretName: k8s-sbbh-cloud-prd-tls
+  issuerRef:
+    name: letsencrypt-prd
+    kind: ClusterIssuer
+  commonName: "*.k8s.sbbh.cloud"
+  dnsNames:
+    - "k8s.sbbh.cloud"
+    - "*.k8s.sbbh.cloud"

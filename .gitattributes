@@ -1,2 +1,4 @@
+* text=auto eol=lf
 .gitattributes !filter !diff
 *-secret.yaml filter=git-crypt diff=git-crypt
+*.sops.* diff=sopsdiffer

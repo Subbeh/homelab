@@ -1,6 +1,0 @@
-resources:
-  - namespace.yaml
-  - minio-ingress.yaml
-  - minio-console-ingress.yaml
-
-namespace: minio

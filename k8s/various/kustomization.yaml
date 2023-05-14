@@ -1,5 +1,0 @@
-resources:
-- namespace.yaml
-- renovate.yaml
-
-namespace: various

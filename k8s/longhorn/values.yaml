@@ -1,0 +1,10 @@
+persistence:
+  defaultClassReplicaCount: 3
+defaultSettings:
+  defaultReplicaCount: 3
+  defaultLonghornStaticStorageClass: longhorn
+  defaultDataPath: /data
+  createDefaultDiskLabeledNodes: true
+  backupTarget: nfs://nas.int.sbbh.cloud:/volume1/backups/longhorn
+  backupTargetCredentialSecret: longhorn-secret
+  storageMinimalAvailablePercentage: 10

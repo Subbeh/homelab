@@ -4,18 +4,10 @@ kind: Kustomization
 namespace: drone
 
 helmCharts:
-- name: drone
+- name: drone-runner-docker
   namespace: drone
   repo: https://charts.drone.io
   valuesFile: values.yaml
-  version: 0.6.4
+  version: 0.6.1
   includeCRDs: true
-  releaseName: drone
-
-resources:
-- namespace.yaml
-- external-secrets.yaml
-- cache-pvc.yaml
-- ingress-route.yaml
-- kubernetes-secrets
-- runner
+  releaseName: drone-runner-docker

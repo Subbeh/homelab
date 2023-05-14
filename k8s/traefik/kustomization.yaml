@@ -1,5 +1,0 @@
-resources:
-  - namespace.yaml
-  - middlewares.yaml
-  - tlsstore.yaml
-  - ingress.yaml

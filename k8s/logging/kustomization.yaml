@@ -1,5 +1,0 @@
-resources:
-  - namespace.yaml
-  - loki-ingress.yaml
-
-namespace: logging

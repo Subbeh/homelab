@@ -1,8 +1,0 @@
-resources:
-  - namespace.yaml
-  - clusterissuer-letsencrypt-staging.yaml
-  - certificate-staging.yaml
-  - clusterissuer-letsencrypt-prod.yaml
-  - certificate-prod.yaml
-
-# namespace: cert-manager

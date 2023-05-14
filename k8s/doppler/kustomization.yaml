@@ -1,8 +1,0 @@
-resources:
-  - doppler-operator.yaml
-  - cert-manager-doppler.yaml
-  - drone-doppler.yaml
-  - argocd-doppler.yaml
-  - minio-doppler.yaml
-  - monitoring-doppler.yaml
-  - various-doppler.yaml

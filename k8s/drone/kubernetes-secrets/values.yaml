@@ -1,0 +1,6 @@
+extraSecretNamesForEnvFrom:
+  - doppler-drone
+rbac:
+  secretNamespace: drone
+env:
+  KUBERNETES_NAMESPACE: drone

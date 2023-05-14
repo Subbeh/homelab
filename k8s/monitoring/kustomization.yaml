@@ -1,6 +1,0 @@
-resources:
-  - namespace.yaml
-  - grafana-ingress.yaml
-  - prometheus-ingress.yaml
-
-namespace: monitoring

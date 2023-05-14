@@ -1,9 +1,23 @@
-resources:
-- namespace.yaml
-- https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-- ingress.yaml
-
-patchesStrategicMerge:
-- argocd-cmd-params-cm.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
 
 namespace: argocd
+
+helmCharts:
+- includeCRDs: true
+  name: argo-cd
+  namespace: argocd
+  repo: https://argoproj.github.io/argo-helm
+  valuesFile: values.yaml
+  version: 5.33.0
+
+generators:
+- secret-generator.yaml
+
+resources:
+- namespace.yaml
+- external-secrets.yaml
+- ingress-route.yaml
+
+patches:
+- path: overlays/argocd-cmd-params-cm.yaml

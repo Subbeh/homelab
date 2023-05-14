@@ -1,0 +1,7 @@
+---
+
+creation_rules:
+  - path_regex: \.sops\.ya?ml
+    key_groups:
+      - age:
+          - age10cel4a0p36k2rq8wr5n6x7ewc2hw76m2d60wkvl20jpu5zm7lcnsqvexwc

@@ -49,43 +49,33 @@ steps:
     when:
       status: [ success, failure, changed ]
       event: [ push ]
-
 ---
-
 kind: secret
 name: DOCKER_CONF
 get:
-  path: drone-doppler-secret
+  path: doppler-drone
   name: DOCKER_CONF
-
 ---
-
 kind: secret
 name: DISCORD_ID
 get:
-  path: drone-doppler-secret
+  path: doppler-drone
   name: DISCORD_ID
-
 ---
-
 kind: secret
 name: DISCORD_TOKEN
 get:
-  path: drone-doppler-secret
+  path: doppler-drone
   name: DISCORD_TOKEN
-
 ---
-
 kind: secret
 name: ANSIBLE_VAULT_PASSWORD
 get:
-  path: drone-doppler-secret
+  path: drone-doppler
   name: ANSIBLE_VAULT_PASSWORD
-
 ---
-
 kind: secret
 name: SSH_KEY
 get:
-  path: drone-doppler-secret
+  path: drone-doppler
   name: SSH_KEY

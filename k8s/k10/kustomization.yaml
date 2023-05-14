@@ -1,6 +1,0 @@
-resources:
-- crd
-- snapshot-controller
-- ingress.yaml
-- nfs-storage.yaml
-- volumesnapshot.yaml
