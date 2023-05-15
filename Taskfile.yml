@@ -33,20 +33,19 @@ tasks:
         ansible-core
         ansible-lint
         direnv
-        flux-bin
-        go-task-bin
         go-yq
         helm
-        ipcalc
         jq
         kubectl
         kustomize
         molecule
+        git-crypt
         molecule-docker
         python-pre-commit
         sops
-        stern
         terraform
         tflint
-        weave-gitops-bin
         yamllint
+        argocd
+        doppler-cli-bin
+        k9s
