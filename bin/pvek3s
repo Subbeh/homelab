@@ -5,7 +5,7 @@ _DISK=/dev/disk/by-label/longhorn
 _SSH="ssh -q ${_SERVER:?not set} -- "
 
 _status_vm() {
-  for _vm in "${_vms[@]}" ; do 
+  for _vm in "${_vms[@]}" ; do
     read -r _id _node _name <<< "$_vm"
     echo getting status of VM $_id...
     $_SSH pvesh get /nodes/$_node/$_id/status/current
@@ -13,7 +13,7 @@ _status_vm() {
 }
 
 _stop_vm() {
-  for _vm in "${_vms[@]}" ; do 
+  for _vm in "${_vms[@]}" ; do
     read -r _id _node _name <<< "$_vm"
     echo stopping VM $_id...
     $_SSH pvesh create /nodes/$_node/$_id/status/stop
@@ -29,7 +29,7 @@ _shutdown_vm() {
 }
 
 _start_vm() {
-  for _vm in "${_vms[@]}" ; do 
+  for _vm in "${_vms[@]}" ; do
     read -r _id _node _name <<< "$_vm"
     echo starting VM $_id...
     $_SSH pvesh create /nodes/$_node/$_id/status/start
@@ -37,7 +37,7 @@ _start_vm() {
 }
 
 _create_snapshot() {
-  for _vm in "${_vms[@]}" ; do 
+  for _vm in "${_vms[@]}" ; do
     read -r _id _node _name <<< "$_vm"
     echo creating snapshot for VM $_id...
     $_SSH pvesh create /nodes/$_node/$_id/snapshot -snapname "$1" -description \"automatically created\" -vmstate false
@@ -52,8 +52,16 @@ _rollback_snapshot() {
   done
 }
 
+_delete_snapshot() {
+  for _vm in "${_vms[@]}" ; do
+    read -r _id _node _name <<< "$_vm"
+    echo deleting snapshot "$1" for VM $_id...
+    $_SSH pvesh delete /nodes/$_node/$_id/snapshot/$1
+  done
+}
+
 _move_disk() {
-  for _vm in "${_vms[@]}" ; do 
+  for _vm in "${_vms[@]}" ; do
     read -r _id _node _name <<< "$_vm"
     echo moving disk scsi0 on VM $_id to local-lvm...
     $_SSH pvesh create /nodes/$_node/$_id/move_disk -disk "scsi0" -storage "local-lvm" -delete 1
@@ -61,27 +69,27 @@ _move_disk() {
 }
 
 _detach_disk() {
-  for _vm in "${_vms[@]}" ; do 
+  for _vm in "${_vms[@]}" ; do
     read -r _id _node _name <<< "$_vm"
     if [[ "$_name" =~ ^k3s-worker ]] ; then
       echo detaching disk from VM $_id: $_DISK
-      $_SSH pvesh set /nodes/$_node/$_id/config -delete scsi2
+      $_SSH pvesh set /nodes/$_node/$_id/config -delete scsi1
     fi
   done
 }
 
 _attach_disk() {
-  for _vm in "${_vms[@]}" ; do 
+  for _vm in "${_vms[@]}" ; do
     read -r _id _node _name <<< "$_vm"
     if [[ "$_name" =~ ^k3s-worker ]] ; then
       echo attaching disk to VM $_id: $_DISK
-      $_SSH pvesh create /nodes/$_node/$_id/config -scsi2 "$_DISK"
+      $_SSH pvesh create /nodes/$_node/$_id/config -scsi1 "$_DISK"
     fi
   done
 }
 
 _resize_disk() {
-  for _vm in "${_vms[@]}" ; do 
+  for _vm in "${_vms[@]}" ; do
     read -r _id _node _name <<< "$_vm"
     echo resizing disk on VM $_id to $1...
     $_SSH pvesh set /nodes/$_node/$_id/resize -disk scsi0 -size $1
@@ -117,10 +125,11 @@ main() {
       ;;
     snapshot)
       [[ -z "$2" ]] && echo no snapshot name given... && return 1
-      # _shutdown_vm
+      _shutdown_vm
       _detach_disk
       _create_snapshot $2
       _attach_disk
+      _start_vm
       ;;
     rollback)
       [[ -z "$2" ]] && echo no snapshot name given... && return 1
@@ -128,6 +137,11 @@ main() {
       _detach_disk
       _rollback_snapshot $2
       _attach_disk
+      _start_vm
+      ;;
+    delete_snapshot)
+      [[ -z "$2" ]] && echo no snapshot name given... && return 1
+      _delete_snapshot $2
       ;;
     move_disk)
       _move_disk
@@ -142,7 +156,8 @@ main() {
       [[ -z "$2" ]] && echo no size given... && return 1
       _resize_disk $2
       ;;
-    delete)
+    destroy)
+      _stop_vm
       _delete_vm
       ;;
   esac

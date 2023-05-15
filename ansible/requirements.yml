@@ -1,11 +1,12 @@
 ---
 
 roles:
-  - name: m3nu.ansible_role_borgbackup
   - name: geerlingguy.pip
   - name: geerlingguy.docker
   - name: geerlingguy.security
   - name: geerlingguy.firewall
+  - name: borgbase.ansible_role_borgbackup
+  - name: xanmanning.k3s
 
 collections:
   - name: community.general
@@ -13,3 +14,4 @@ collections:
   - name: community.docker
   - name: ansible.posix
   - name: kubernetes.core
+  - name: community.sops

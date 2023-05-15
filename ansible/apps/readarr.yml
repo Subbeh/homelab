@@ -7,7 +7,7 @@ readarr:
   volumes:
     - "{{ common_dir }}/readarr/config:/config"
     - "{{ common_media_dir }}:/data"
-    
+
   traefik:
     routers:
     - name: "readarr"

@@ -47,7 +47,7 @@
         apply:
           tags: always
       vars:
-        run_app: "{{ hostvars['localhost']['run_app'] }}"          
+        run_app: "{{ hostvars['localhost']['run_app'] }}"
 
     - name: Include apps role
       tags: always

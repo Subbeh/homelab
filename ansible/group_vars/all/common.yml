@@ -20,11 +20,22 @@ common_country_iso_3166: "US"
 common_locale: "{{ common_language_iso_639 }}-{{ common_country_iso_3166 }}"
 
 common_dir: "/opt/app_data"
-common_ansible_root: "{{ playbook_dir }}/.."
+common_repo_root: "{{ lookup('lines', 'git rev-parse --show-toplevel') }}"
+common_ansible_root: "{{ common_repo_root }}/ansible"
+common_k8s_root: "{{ common_repo_root }}/k8s"
 common_data_dir: "/data"
 common_media_dir:
 
 common_vault: "{{ lookup('file', '.ansible_vault') }}"
+
+common_git_user: "sysadm"
+common_git_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62643536636261613763666635356163393639663539373037616533393764393463313130663635
+          3835363537656139353061306466343330313431663838640a646237653264373262656135633438
+          65376561653731636462353334373236626435623739333832613037653135613431376333333566
+          3939316137373861620a313231303838356130333131636664326138613465636363336364343361
+          3139
 
 common_email_server: "smtp.gmail.com"
 common_email_port: "587"

@@ -1,0 +1,73 @@
+---
+
+- name: Disable swap at runtime
+  ansible.builtin.command: swapoff -a
+  when:
+    - ansible_swaptotal_mb > 0
+
+- name: Disable swap at runtime
+  when: ansible_swaptotal_mb > 0
+  ansible.builtin.command: swapoff -a
+
+- name: Disable swap at boot
+  ansible.posix.mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  loop: ["none", "swap"]
+
+- name: Stop and disable systemd-networkd-wait-online service
+  ansible.builtin.service:
+    name: systemd-networkd-wait-online
+    enabled: false
+    state: stopped
+    masked: true
+  register: _systemd_networkd_wait_online_result
+  failed_when: "_systemd_networkd_wait_online_result is failed and 'Could not find the requested service' not in _systemd_networkd_wait_online_result.msg"
+
+- name: Disable systemd-resolved
+  block:
+    - name: Stop and disable service
+      ansible.builtin.service:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+    - name: Delete link to the systemd-resolved resolv.conf
+      ansible.builtin.file:
+        path: /etc/resolv.conf
+        state: absent
+    - name: Create empty resolv.conf
+      ansible.builtin.file:
+        path: /etc/resolv.conf
+        state: touch
+    - name: Setup nameserver
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver {{ network_svc.dns.ip }}
+          search {{ network_domain.tld_local }}
+
+- name: Disable cloud-init
+  ansible.builtin.file:
+    dest: /etc/cloud/cloud-init.disabled
+    state: touch
+    owner: root
+    mode: "0775"
+    modification_time: preserve
+    access_time: preserve
+
+- name: Disable mitigations
+  ansible.builtin.replace:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ item.key | regex_escape }}=).)*)(?:[" ]{{ item.key | regex_escape }}=\S+)?(.*")$'
+    replace: '\1 {{ item.key }}={{ item.value }}\2'
+  with_dict: "{{ grub_config }}"
+  vars:
+    grub_config:
+      apparmor: "0"
+      mitigations: "off"
+  register: _grub_status
+
+- name: Reconfigure grub and initramfs
+  when: _grub_status.changed
+  ansible.builtin.command: update-grub

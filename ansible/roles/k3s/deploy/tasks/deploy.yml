@@ -1,0 +1,15 @@
+---
+
+- name: Deploy manifests
+  ansible.builtin.shell: |
+    kubectl apply --kubeconfig /etc/rancher/k3s/k3s.yaml -f "{{ item }}"
+  loop: "{{ k3s_server_manifests }}"
+
+- name: Deploy app to cluster
+  ansible.builtin.shell: |
+    kubectl kustomize --enable-alpha-plugins /tmp/homelab/k8s/apps/{{ item }} | kubectl apply --kubeconfig /etc/rancher/k3s/k3s.yaml -f -
+  environment:
+    SOPS_AGE_KEY_FILE: /tmp/homelab/.agekey
+  loop:
+    - security/external-secrets
+    - argocd/argocd

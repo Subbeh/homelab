@@ -18,35 +18,24 @@
 
     - block:
         - name: Sync time
+          tags: always
           ansible.builtin.command: hwclock --hctosys
           failed_when: false
+          changed_when: false
 
         - name: Update repo and cache
+          tags: always
           ansible.builtin.apt: update_cache=yes force_apt_get=yes
           changed_when: false
 
         - name: Update packages
+          tags: always
           ansible.builtin.apt: upgrade=dist force_apt_get=yes
 
-        - name: Check if the reboot-required file exists
-          tags: always
-          ansible.builtin.stat: path=/var/run/reboot-required get_md5=no
-          register: reboot_required_file
-
-        - name: Servers requiring reboot
-          tags: always
-          ansible.builtin.debug: var=reboot_required_file.stat.exists
-
-        - name: Reboot the Debian or Ubuntu server
-          tags: [ never, reboot ]
-          ansible.builtin.reboot:
-            msg: "Reboot initiated by Ansible due to kernel updates"
-            connect_timeout: 5
-            reboot_timeout: 300
-            pre_reboot_delay: 0
-            post_reboot_delay: 30
-            test_command: uptime
-          when: reboot_required_file.stat.exists
+        - name: Include check_reboot task
+          tags: [ reboot, force ]
+          ansible.builtin.include_tasks:
+            file: ../tasks/check_reboot.yml
 
         - name: Clean up system
           tags: [ never, clean ]

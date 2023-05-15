@@ -3,17 +3,20 @@
 - ansible.builtin.import_tasks: prereq.yml
   tags: prereq
 
-- ansible.builtin.import_tasks: apt.yml
-  tags: apt
+- ansible.builtin.import_tasks: user.yml
+  tags: user
 
-- ansible.builtin.import_tasks: hostname.yml
-  tags: hostname
+- ansible.builtin.import_tasks: system.yml
+  tags: system
+
+- ansible.builtin.import_tasks: packages.yml
+  tags: packages
+
+- ansible.builtin.import_tasks: network.yml
+  tags: network
 
 - ansible.builtin.import_tasks: dotfiles.yml
   tags: dotfiles
-
-- ansible.builtin.import_tasks: defaults.yml
-  tags: defaults
 
 - ansible.builtin.import_tasks: ssh.yml
   tags: ssh
@@ -31,6 +34,3 @@
     - ansible.builtin.include_tasks: ../tasks/ssh_port.yml
       vars:
         ansible_become: false
-
-- ansible.builtin.import_tasks: docker.yml
-  tags: docker

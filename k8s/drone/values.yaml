@@ -1,7 +1,0 @@
-env:
-  DRONE_SERVER_HOST: drone.k8s.sbbh.cloud
-  DRONE_SERVER_PROTO: https
-  DRONE_GITEA_SERVER: https://git.sbbh.cloud
-  DRONE_USER_CREATE: username:sysadm,admin:true
-extraSecretNamesForEnvFrom:
-  - doppler-drone

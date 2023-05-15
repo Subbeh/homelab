@@ -8,7 +8,7 @@ http:
       entryPoints:
         - websecure
       middlewares:
-      {% if route.middlewares is defined %} 
+      {% if route.middlewares is defined %}
         {%- for middleware in route.middlewares %}
         - {{ middleware }}
         {% endfor %}
@@ -27,7 +27,7 @@ http:
       entryPoints:
         - websecure
       middlewares:
-      {% if app.traefik.rtr_middlewares is defined %} 
+      {% if app.traefik.rtr_middlewares is defined %}
         {%- for middleware in app.traefik.rtr_middlewares %}
         - {{ middleware }}
         {% endfor %}

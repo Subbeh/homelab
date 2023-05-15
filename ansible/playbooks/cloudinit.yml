@@ -1,9 +1,10 @@
 ---
 
-- hosts: "pve-nuc-01"
+- hosts: "{{ groups['pve'][0] }}"
   gather_facts: false
 
   vars:
+    nodes: ['pve-opti-01', 'pve-opti-02']
     cloudimg_src: https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img
     cloudimg: "{{ cloudimg_src | basename }}"
     iso_dir: /mnt/pve/nas/template/iso
@@ -116,3 +117,15 @@
 
     - name: Create vm - convert to template
       ansible.builtin.command: "qm template {{ vm_id }}"
+
+    - name: Copy vm template
+      ansible.builtin.command: "qm clone {{ vm_id }} {{ vm_id | int + ansible_loop.index }} --target {{ item }} --name {{ vm_name }}"
+      loop: "{{ groups['pve'][1:] }}"
+      loop_control:
+        extended: true
+
+    - name: Copy vm template - convert to template
+      ansible.builtin.command: "pvesh create /nodes/{{ item }}/qemu/{{ vm_id | int + ansible_loop.index }}/template"
+      loop: "{{ groups['pve'][1:] }}"
+      loop_control:
+        extended: true

@@ -2,11 +2,9 @@
 
 - name: Set authorized keys from GitHub
   ansible.posix.authorized_key:
-    user: "{{ item }}"
+    user: "{{ common_user }}"
     state: present
     key: https://raw.githubusercontent.com/Subbeh/dotfiles/master/keys
-  loop:
-    - "{{ common_user }}"
 
 - name: Generate root OpenSSH keypair
   community.crypto.openssh_keypair:

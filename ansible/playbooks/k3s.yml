@@ -1,35 +1,44 @@
 ---
 
 - hosts: k3s
-  tags: [ never, reset ]
-  gather_facts: yes
-  become: yes
-  roles:
-    - role: k3s/reset
-      vars: {state: absent}
-  post_tasks:
-    - name: Reboot and wait for node to come back up
-      ansible.builtin.reboot:
-        reboot_timeout: 3600
-
-- hosts: k3s
+  tags: bootstrap
+  any_errors_fatal: true
+  serial: 3
   gather_facts: true
   become: true
   roles:
     - role: bootstrap
-    - role: k3s/common
 
-- hosts: k3s_masters
+- hosts: k3s
+  tags: install
+  any_errors_fatal: true
+  gather_facts: true
   become: true
   roles:
-    - role: k3s/master
+    - role: k3s/prereq
+    - role: k3s/install
 
-- hosts: k3s_workers
+- hosts: k3s_masters[0]
+  tags: deploy
+  any_errors_fatal: true
+  gather_facts: true
   become: true
   roles:
-    - role: k3s/worker
+    - role: k3s/deploy
 
-- hosts: k3s_masters
-  become: true
+- hosts: k3s
+  tags: [ never, nuke ]
+  any_errors_fatal: true
+  gather_facts: yes
+  become: yes
+  pre_tasks:
+    - ansible.builtin.debug: msg="NUKING SYSTEM..."
+    - name: Pausing for 5 seconds...
+      ansible.builtin.pause:
+        seconds: 5
   roles:
-    - role: k3s/post
+    - role: k3s/nuke
+  post_tasks:
+    - name: Reboot and wait for node to come back up
+      ansible.builtin.reboot:
+        reboot_timeout: 3600

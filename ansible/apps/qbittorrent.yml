@@ -3,7 +3,7 @@
 qbittorrent:
   image: lscr.io/linuxserver/qbittorrent:4.5.2-r2-ls259
   network_mode: "container:gluetun"
-  networks: 
+  networks:
   volumes:
     - "{{ common_dir }}/qbittorrent/config:/config"
     - "{{ common_dir }}/qbittorrent/mam_id:/mam_id"

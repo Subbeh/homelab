@@ -19,6 +19,7 @@ packages_global:
   - iperf3
   - iptraf-ng
   - iputils-ping
+  - ipvsadm
   - jq
   - locales
   - lsb-release
@@ -35,6 +36,7 @@ packages_global:
   - python3-pip
   - python3-setuptools
   - rsync
+  - socat
   - software-properties-common
   - strace
   - sudo

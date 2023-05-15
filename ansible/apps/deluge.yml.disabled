@@ -4,7 +4,7 @@ deluge:
   host: nas
   image: lscr.io/linuxserver/deluge:2.1.1-r6-ls202
   network_mode: "container:gluetun"
-  networks: 
+  networks:
   environment:
     "DELUGE_LOGLEVEL": "debug"
   volumes:

@@ -7,13 +7,12 @@ env:
 
 tasks:
 
-  init:
+  galaxy:
     desc: Install / Upgrade Ansible galaxy deps
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - pip3 install --user --requirement requirements.txt
       - ansible-galaxy install -r requirements.yml --force
-      - ansible-galaxy collection install -r requirements.yml --force
 
   list:
     desc: List all the hosts
@@ -32,6 +31,12 @@ tasks:
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible all --one-line -a 'uptime'
+
+  reboot:
+    desc: Reboot hosts
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible {{.CLI_ARGS}} --one-line -a 'reboot'
 
   playbook:
     desc: Run playbook

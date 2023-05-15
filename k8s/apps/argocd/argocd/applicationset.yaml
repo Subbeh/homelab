@@ -1,0 +1,42 @@
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: manifest-apps
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+        revision: dev
+        directories:
+          - path: "k8s/apps/*/*"
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      name: "{{path.basenameNormalized}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+        targetRevision: dev
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{path[2]}}"
+      ignoreDifferences:
+      - group: external-secrets.io
+        kind: ExternalSecret
+        jqPathExpressions:
+          - .spec.dataFrom[].find
+          - .spec.data[].remoteRef
+      syncPolicy:
+        syncOptions:
+          - RespectIgnoreDifferences=true
+          - CreateNamespace=true
+          - ServerSideApply=true
+        automated:
+          prune: true
+          selfHeal: true

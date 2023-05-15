@@ -1,0 +1,29 @@
+---
+
+- name: Uninstall k3s
+  ansible.builtin.include_role:
+    name: xanmanning.k3s
+    public: true
+  vars:
+    k3s_state: uninstalled
+
+- name: Gather list of CNI files
+  ansible.builtin.find:
+    paths: /etc/cni/net.d
+    patterns: "*"
+    hidden: true
+  register: _directory_contents
+
+- name: Delete CNI files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ _directory_contents.files }}"
+
+- name: wipe disks as needed
+  ansible.builtin.shell: |
+    wipefs -a {{ item }}
+    dd if=/dev/zero of={{ item }} bs=512 count=1 conv=notrunc
+  loop: "{{ disks | default([]) }}"
+  register: _wipe
+  changed_when: _wipe.stdout | length > 0

@@ -32,7 +32,8 @@ network_domain:
 
 network_cidr:
   lan: "10.0.0.0/16"
-  vlan: "10.0.10.0/24"
+  servers: "10.0.10.0/24"
+  k8s: "10.0.80.0/24"
   tailscale: "100.64.0.0/10"
   docker:
     mesh: "192.168.100.0/24"
@@ -43,6 +44,9 @@ network_docker:
     driver: bridge
     ipam_config:
       subnet: "{{ network_cidr.docker.mesh }}"
+
+network_k8s:
+  loadbalancer_ip: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
 
 network_svc:
   udmp:

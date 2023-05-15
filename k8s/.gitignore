@@ -1,3 +1,2 @@
-charts/
 kubeconfig
-*Secret.y?ml
+charts

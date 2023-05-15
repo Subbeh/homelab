@@ -6,10 +6,7 @@ vars:
   ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
   TERRAFORM_DIR: "{{.ROOT_DIR}}/tf"
 
-dotenv: [".config.env"]
-
-env:
-  KUBECONFIG: "{{.ROOT_DIR}}/kubeconfig"
+dotenv: [".envrc"]
 
 includes:
   precommit: .taskfiles/precommit.yml
@@ -19,9 +16,12 @@ includes:
 tasks:
 
   init:
-    desc: Initialize workstation dependencies with Yay
+    desc: Initialize workstation dependencies
     cmds:
       - yay -S {{.DEPS}}
+      - direnv allow {{.ROOT_DIR}}
+      - task: precommit:init
+      - task: ansible:galaxy
     preconditions:
       - sh: command -v yay
         msg: |

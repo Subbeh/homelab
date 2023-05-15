@@ -1,0 +1,94 @@
+---
+
+- name: Uninstall packages
+  ansible.builtin.apt:
+    pkg: "{{ packages_uninstall }}"
+    state: absent
+    autoremove: true
+
+- name: Update repo and cache
+  ansible.builtin.apt:
+    update_cache: yes
+    force_apt_get: yes
+  changed_when: false
+
+# https://bugs.launchpad.net/ubuntu/+source/grub2-signed/+bug/2006050
+- name: Hold grub-efi-amd64-signed
+  ansible.builtin.dpkg_selections:
+    name: grub-efi-amd64-signed
+    selection: hold
+
+- name: Update packages
+  ansible.builtin.apt:
+    upgrade: dist
+    force_apt_get: yes
+
+- name: Install packages
+  ansible.builtin.apt:
+    name: "{{ lookup('flattened', packages_global, packages_custom) }}"
+    state: present
+    install_recommends: false
+
+- name: Gather installed packages
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Uninstall Snap
+  when: "'snapd' in ansible_facts.packages"
+  block:
+    - name: Check if snap is installed
+      ansible.builtin.debug:
+        msg: "snapd is installed"
+      register: _snapd_check
+    - name: Remove snap packages
+      ansible.builtin.command: snap remove {{ item }}
+      loop: ["lxd", "core20", "snapd"]
+      when: _snapd_check.failed is defined
+    - name: Remove snap from packages
+      ansible.builtin.apt:
+        name: snapd
+        state: absent
+        autoremove: true
+
+- name: Install Intel microcode if needed
+  ansible.builtin.apt:
+    pkg: intel-microcode
+    state: present
+    default_release: '{{ ansible_distribution_release }}'
+  when: >
+    ansible_processor[0].find('Intel') != -1 and
+    ansible_architecture == 'x86_64'
+
+- name: Install AMD microcode if needed
+  ansible.builtin.apt:
+    pkg: amd64-microcode
+    state: present
+    default_release: '{{ ansible_distribution_release }}'
+  when: >
+    ansible_processor[0].find('AMD') != -1 and
+    ansible_architecture == 'x86_64'
+
+- name: Install unattended-upgrades
+  ansible.builtin.apt:
+    pkg: unattended-upgrades
+    state: present
+
+- name: Configure unattended-upgrades
+  ansible.builtin.lineinfile:
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    state: present
+    regex: "^{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }};"
+    validate: "echo %s && unattended-upgrades --dry-run"
+  loop: "{{ items | dict2items }}"
+  vars:
+    items:
+      "Unattended-Upgrade::MinimalSteps": "true"
+      "Unattended-Upgrade::Remove-Unused-Kernel-Packages": "true"
+      "Unattended-Upgrade::Remove-New-Unused-Dependencies": "true"
+      "Unattended-Upgrade::Remove-Unused-Dependencies": "true"
+  changed_when: false
+
+- name: Install Python pip packages
+  ansible.builtin.import_role:
+    name: geerlingguy.pip

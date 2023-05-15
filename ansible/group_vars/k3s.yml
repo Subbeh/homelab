@@ -1,52 +1,64 @@
 ---
 
-k3s_version: v1.25.7+k3s1
-kube_vip_tag_version: "v0.5.11"
-metal_lb_speaker_tag_version: "v0.13.9"
-metal_lb_controller_tag_version: "v0.13.9"
+pip_install_packages:
+  - kubernetes
+  - jsonpatch
+  - PyYAML
 
-systemd_dir: /etc/systemd/system
+#
+# Below vars are for the xanmanning.k3s role
+# ...see https://github.com/PyratLabs/ansible-role-k3s
+#
 
-flannel_iface: eth0
-apiserver_endpoint: 10.0.10.70
+# (string) Use a specific version of k3s
+# renovate: datasource=github-releases depName=k3s-io/k3s
+k3s_release_version: "v1.24.10+k3s1"
 
-# metallb ip range for load balancer
-metal_lb_ip_range: "10.0.10.71-10.0.10.79"
+# (bool) Install using hard links rather than symbolic links.
+k3s_install_hard_links: true
 
-k3s_token: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          30393937623534343665353365643233353561303532316263306238373066363735343333396633
-          3139616434336163343830353334343839646238303935350a633166646331333636336132313961
-          64623262613138633235313466326438323331353132343535666230343931346466326131373830
-          3261666161613964300a613834306362313962323335343163616439346233373833663464333864
-          6562
+# (bool) Escalate user privileges for all tasks
+k3s_become: true
 
-# The IP on which the node is reachable in the cluster.
-# Here, a sensible default is provided, you can still override
-# it for each of your hosts, though.
-k3s_node_ip: '{{ ansible_facts[flannel_iface]["ipv4"]["address"] }}'
+# (bool) Enable debug logging on the k3s service
+k3s_debug: false
 
-# Disable the taint manually by setting: k3s_master_taint = false
-k3s_master_taint: "{{ true if groups['workers'] | default([]) | length >= 1 else false }}"
+# (bool) Enable etcd embedded datastore
+k3s_etcd_datastore: true
 
-# these arguments are recommended for servers as well as agents:
-extra_args: >-
-  --flannel-iface={{ flannel_iface }}
-  --node-ip={{ k3s_node_ip }}
-  --resolv-conf /etc/k3s-resolv.conf
+# (bool) Allow the use of unsupported configurations in k3s
+k3s_use_unsupported_config: true
 
-# change these to your liking, the only required are: --disable servicelb, --tls-san {{ apiserver_endpoint }}
-extra_server_args: >-
-  {{ extra_args }}
-  {{ '--node-taint node-role.kubernetes.io/master=true:NoSchedule' if k3s_master_taint else '' }}
-  --tls-san {{ apiserver_endpoint }}
-  --disable servicelb
-  --disable traefik
-  --kube-controller-manager-arg bind-address=0.0.0.0
-  --kube-proxy-arg metrics-bind-address=0.0.0.0
-  --kube-scheduler-arg bind-address=0.0.0.0
-  --etcd-expose-metrics true
-  --kubelet-arg containerd=/run/k3s/containerd/containerd.sock
+# (string) Control Plane registration address
+k3s_registration_address: "{{ network_k8s.loadbalancer_ip }}"
 
-extra_agent_args: >-
-  {{ extra_args }}
+# (list) A list of URLs to deploy on the primary control plane. Read notes below.
+k3s_server_manifests_urls:
+  # Kube-vip
+  - url: https://raw.githubusercontent.com/kube-vip/kube-vip/main/docs/manifests/rbac.yaml
+    filename: kube-vip-rbac.yaml
+  # Tigera Operator
+  - url: https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
+    filename: calico-tigera-operator.yaml
+  # Prometheus Operator
+  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
+    filename: prometheus-operator.yaml
+
+k3s_server_manifests:
+  # kube-vip
+  - https://raw.githubusercontent.com/kube-vip/kube-vip/main/docs/manifests/rbac.yaml
+  # calico
+  - https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
+  # prometheus-operator
+  - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
+  # argocd
+  - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/application-crd.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/applicationset-crd.yaml
+  # external-secrets
+  - https://raw.githubusercontent.com/external-secrets/external-secrets/main/config/crds/bases/external-secrets.io_clustersecretstores.yaml
+
+# (list) A flat list of templates to deploy on the primary control plane
+# /var/lib/rancher/k3s/server/manifests
+k3s_server_manifests_templates:
+  - calico-installation.yml.j2
+  - kube-vip-daemonset.yml.j2

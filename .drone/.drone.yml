@@ -32,7 +32,7 @@ steps:
         from_secret: SSH_KEY
     when:
       event:
-      - push        
+      - push
 
   - name: discord notification
     image: appleboy/drone-discord
@@ -45,7 +45,7 @@ steps:
       message: >
         {{#success build.status}}✅{{else}}⚠️{{/success}}
         repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
-               commit: `{{commit.message}}` 
+               commit: `{{commit.message}}`
     when:
       status: [ success, failure, changed ]
       event: [ push ]

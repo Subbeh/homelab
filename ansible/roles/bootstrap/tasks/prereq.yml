@@ -19,20 +19,7 @@
     name: "{{ common_timezone }}"
     hwclock: "local"
 
-- name: Ensure user is created
-  ansible.builtin.user:
-    name: "{{ common_user }}"
-    createhome: true
-    state: present
-    password: "{{ common_pass | string | password_hash('sha512', 'mysecretsalt') }}"
-
-- name: Create common directory
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ common_user }}"
-    group: "{{ common_group }}"
-    mode: "0771"
-  loop:
-    - "{{ common_dir }}"
-    - "{{ common_data_dir }}"
+- name: Set defaults
+  community.general.alternatives:
+    name: editor
+    path: /usr/bin/vim

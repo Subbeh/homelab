@@ -1,0 +1,72 @@
+globalArguments:
+  - "--global.sendanonymoususage=false"
+  - "--global.checknewversion=false"
+additionalArguments:
+  - "--serversTransport.insecureSkipVerify=true"
+  # Tell Traefik to only trust incoming headers from the local network.
+  - "--entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1/32,10.0.0.0/16"
+  - "--entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1/32,10.0.0.0/16"
+  # Also whitelist the source of headers to trust, the private IPs on the load balancers displayed on the networking page of DO.
+  - "--entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,10.0.0.0/16"
+  - "--entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32,10.0.0.0/16"
+  - "--log.level=DEBUG"
+additionalVolumeMounts:
+  - name: logs
+    mountPath: /var/log/traefik
+logs:
+  access:
+    enabled: true
+    format: json
+    bufferingSize: 1000
+    filePath: "/var/log/traefik/access.log"
+    fields:
+      headers:
+        defaultmode: keep
+deployment:
+  enabled: true
+  replicas: 2
+  annotations: {}
+  podAnnotations: {}
+  initContainers: []
+  additionalContainers:
+    - name: tail-accesslogs
+      image: busybox
+      args: [ "/bin/sh", "-c", "tail -n+1 -F /var/log/traefik/access.log" ]
+      volumeMounts:
+        - name: logs
+          mountPath: /var/log/traefik
+  additionalVolumes:
+    - name: logs
+ports:
+  web:
+    redirectTo: websecure
+  websecure:
+    tls:
+      enabled: true
+ingressRoute:
+  dashboard:
+    enabled: false
+providers:
+  kubernetesCRD:
+    enabled: true
+    ingressClass: traefik-external
+  kubernetesIngress:
+    enabled: true
+    publishedService:
+      enabled: false
+rbac:
+  enabled: true
+service:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+  labels: {}
+  spec:
+    loadBalancerIP: 10.0.80.100
+    externalTrafficPolicy: Local
+  loadBalancerSourceRanges: []
+  externalIPs: []
+  env:
+    - name: TZ
+      value: "Australia/Melbourne"
