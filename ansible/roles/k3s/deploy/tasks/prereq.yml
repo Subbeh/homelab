@@ -33,7 +33,7 @@
   ansible.builtin.git:
     repo: "https://{{ common_git_user }}:{{ common_git_pass }}@git.sbbh.cloud/sysadm/homelab.git"
     dest: /tmp/homelab
-    version: dev
+    version: main
 
 - name: Copy SOPS AGE key file over
   ansible.builtin.copy:

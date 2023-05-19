@@ -9,7 +9,7 @@ spec:
   generators:
     - git:
         repoURL: https://git.sbbh.cloud/sysadm/homelab.git
-        revision: dev
+        revision: main
         directories:
           - path: "k8s/apps/*/*"
   syncPolicy:
@@ -21,7 +21,7 @@ spec:
       project: default
       source:
         repoURL: https://git.sbbh.cloud/sysadm/homelab.git
-        targetRevision: dev
+        targetRevision: main
         path: "{{path}}"
       destination:
         server: https://kubernetes.default.svc
