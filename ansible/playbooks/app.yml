@@ -10,7 +10,7 @@
       ansible.builtin.set_fact:
         run_app: "{{ ansible_run_tags[0] }}"
 
-    - name: Load all app / container manifests
+    - name: Load all manifests
       tags: always
       ansible.builtin.include_role:
         name: apps

@@ -19,3 +19,9 @@ defaults:
     PUID: "{{ common_user_id | string }}"
     PGID: "{{ common_group_id | string }}"
     TZ: "{{ common_timezone }}"
+
+networks:
+  mesh:
+    driver: bridge
+    ipam_config:
+      - subnet: "192.168.100.0/24"

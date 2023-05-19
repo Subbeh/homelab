@@ -39,12 +39,6 @@ network_cidr:
     mesh: "192.168.100.0/24"
   all: ["127.0.0.1/32", "10.0.0.0/8", "192.168.0.0/16", "172.16.0.0/12", "100.64.0.0/10"]
 
-network_docker:
-  mesh:
-    driver: bridge
-    ipam_config:
-      subnet: "{{ network_cidr.docker.mesh }}"
-
 network_k8s:
   loadbalancer_ip: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
 
@@ -139,7 +133,8 @@ network_svc:
     host: hl-services
     port: "5055"
   pihole:
-    host: "10.10.10.10"
+    host: bastion
+    ip: "10.10.10.9"
     port: "80"
   pikvm:
     host: pikvm

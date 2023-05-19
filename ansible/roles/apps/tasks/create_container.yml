@@ -1,5 +1,13 @@
 ---
 
+- name: Ensure docker network is present
+  community.docker.docker_network:
+    name: "{{ item.name }}"
+    driver: "{{ apps.networks[item.name].driver }}"
+    driver_options: "{{ apps.networks[item.name].driver_options | default(omit) }}"
+    ipam_config: "{{ apps.networks[item.name].ipam_config | default(omit) }}"
+  loop: "{{ app.networks | default(apps['defaults'].networks) }}"
+
 - name: Create container {{ app.name }}
   community.docker.docker_container:
     # use defaults
@@ -78,7 +86,6 @@
     tls_hostname: "{{ app.tls_hostname | default(omit) }}"
     tls_verify: "{{ app.tls_verify | default(omit) }}"
     tmpfs: "{{ app.tmpfs | default(omit) }}"
-    trust_image_content: "{{ app.trust_image_content | default(omit) }}"
     tty: "{{ app.tty | default(omit) }}"
     ulimits: "{{ app.ulimits | default(omit) }}"
     user: "{{ app.user | default(omit) }}"
@@ -88,5 +95,5 @@
     volumes_from: "{{ app.volumes_from | default(omit) }}"
     working_dir: "{{ app.working_dir | default(omit) }}"
   when: app.image is defined
-  no_log: true
+  # no_log: true
   changed_when: false

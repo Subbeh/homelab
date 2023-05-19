@@ -2,15 +2,15 @@
 
 - name: load all app manifests
   ansible.builtin.include_vars:
-    dir: "{{ common_ansible_root }}/apps"
-    extensions:
-      - "yml"
-    ignore_unknown_extensions: true
+    file: "{{ item }}"
+    hash_behaviour: merge
     name: apps
+  loop: "{{ lookup('fileglob', '{{ common_ansible_root }}/apps/*', wantlist=True) }}"
   no_log: true
+  vars:
+    apps: {}
 
 - name: Set app variables
   ansible.builtin.set_fact:
     app: "{{ apps[run_app] | combine({'name': apps[run_app].name | default(run_app)}) }}"
-  no_log: true
   when: run_app is defined
