@@ -15,3 +15,4 @@ resources:
   - middlewares.yaml
   - tlsstore.yaml
   - ingress-route.yaml
+  - metrics-service.yaml

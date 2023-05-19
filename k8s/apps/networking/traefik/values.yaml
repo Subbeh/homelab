@@ -1,6 +1,7 @@
 globalArguments:
   - "--global.sendanonymoususage=false"
   - "--global.checknewversion=false"
+
 additionalArguments:
   - "--serversTransport.insecureSkipVerify=true"
   # Tell Traefik to only trust incoming headers from the local network.
@@ -10,9 +11,13 @@ additionalArguments:
   - "--entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,10.0.0.0/16"
   - "--entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32,10.0.0.0/16"
   - "--log.level=DEBUG"
+  - "--accesslog.filepath=/var/log/traefik/access.log"
+  - "--metrics.prometheus=true"
+
 additionalVolumeMounts:
   - name: logs
     mountPath: /var/log/traefik
+
 logs:
   access:
     enabled: true
@@ -22,6 +27,7 @@ logs:
     fields:
       headers:
         defaultmode: keep
+
 deployment:
   enabled: true
   replicas: 2
@@ -37,15 +43,18 @@ deployment:
           mountPath: /var/log/traefik
   additionalVolumes:
     - name: logs
+
 ports:
   web:
     redirectTo: websecure
   websecure:
     tls:
       enabled: true
+
 ingressRoute:
   dashboard:
     enabled: false
+
 providers:
   kubernetesCRD:
     enabled: true
@@ -54,8 +63,10 @@ providers:
     enabled: true
     publishedService:
       enabled: false
+
 rbac:
   enabled: true
+
 service:
   enabled: true
   type: LoadBalancer
