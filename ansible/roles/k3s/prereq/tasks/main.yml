@@ -35,7 +35,22 @@
       fs.inotify.max_user_watches: 524288
       fs.inotify.max_user_instances: 512
 
-- name: Create resolv-conf
+- name: Create k3s config directory
+  ansible.builtin.file:
+    path: "/etc/rancher/k3s"
+    state: directory
+    recurse: true
+
+- name: Create resolv config
   ansible.builtin.copy:
-    dest: "/etc/k3s-resolv.conf"
+    dest: "/etc/rancher/k3s/resolv.conf"
     content: "nameserver {{ network_svc.dns.ip }}"
+
+- name: Create kubelet config
+  ansible.builtin.copy:
+    dest: "/etc/rancher/k3s/kubelet.config"
+    content: |
+      apiVersion: kubelet.config.k8s.io/v1beta1
+      kind: KubeletConfiguration
+      shutdownGracePeriod: 30s
+      shutdownGracePeriodCriticalPods: 10s

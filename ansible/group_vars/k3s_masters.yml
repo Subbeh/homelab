@@ -8,6 +8,7 @@ k3s_control_node: true
 # (dict) k3s settings for all control-plane nodes
 k3s_server:
   node-ip: "{{ ansible_host }}"
+  node-taint: "node-role.kubernetes.io/master=true:NoSchedule"
   tls-san:
     - "{{ network_k8s.loadbalancer_ip }}"
   # Disable Docker - this will use the default containerd CRI
@@ -33,10 +34,14 @@ k3s_server:
   service-cidr: "10.43.0.0/16"
   kubelet-arg:
     # Don't pull /etc/resolv.conf from host
-    - "resolv-conf=/etc/k3s-resolv.conf"
+    - "resolv-conf=/etc/rancher/k3s/resolv.conf"
+    # Enable graceful node shutdown
+    - "config=/etc/rancher/k3s/kubelet.config"
   kube-controller-manager-arg:
     # Required to monitor kube-controller-manager with kube-prometheus-stack
     - "bind-address=0.0.0.0"
+    # Set limit to 10 terminated pods that can exist before the terminated pod garbage collector starts deleting terminated pods
+    - "terminated-pod-gc-threshold=10"
   kube-proxy-arg:
     # Required to monitor kube-proxy with kube-prometheus-stack
     - "metrics-bind-address=0.0.0.0"

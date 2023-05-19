@@ -10,7 +10,14 @@ k3s_agent:
   node-ip: "{{ ansible_host }}"
   kubelet-arg:
     # Don't pull /etc/resolv.conf from host
-    - "resolv-conf=/etc/k3s-resolv.conf"
+    - "resolv-conf=/etc/rancher/k3s/resolv.conf"
+    # Enable graceful node shutdown
+    - "config=/etc/rancher/k3s/kubelet.config"
+  kube-proxy-arg:
+    # Required to monitor kube-proxy with kube-prometheus-stack
+    - "metrics-bind-address=0.0.0.0"
+  node-label:
+    - "node_type=worker"
 
 disks:
   - /dev/disk/by-label/longhorn
