@@ -6,7 +6,7 @@
     crowdsec_bouncer: traefik-bouncer
 
 - name: Create traefik-cs-bouncer container
-  ansible.builtin.include_tasks:
-    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  ansible.builtin.include_role:
+    name: apps
   vars:
-    run_container: "traefik-cs-bouncer"
+    run_app: "traefik-cs-bouncer"

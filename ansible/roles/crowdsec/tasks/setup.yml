@@ -1,10 +1,10 @@
 ---
 
 - name: Create crowdsec container
-  ansible.builtin.include_tasks:
-    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  ansible.builtin.include_role:
+    name: apps
   vars:
-    run_container: "crowdsec"
+    run_app: crowdsec
 
 - name: Enroll into CrowdSec hub
   ansible.builtin.shell: |

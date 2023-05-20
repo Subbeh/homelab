@@ -38,16 +38,16 @@
     mode: 0640
 
 - name: Create traefik container
-  ansible.builtin.include_tasks:
-    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  ansible.builtin.include_role:
+    name: apps
   vars:
-    run_container: "traefik"
+    run_app: traefik
 
 - name: Create whoami container
-  ansible.builtin.include_tasks:
-    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  ansible.builtin.include_role:
+    name: apps
   vars:
-    run_container: "whoami"
+    run_app: whoami
 
 - name: Restart Traefik logging
   ansible.builtin.command: docker kill --signal="USR1" traefik

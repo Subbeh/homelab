@@ -1,28 +1,28 @@
 ---
 
 - name: Create postgres container
-  ansible.builtin.include_tasks:
-    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  ansible.builtin.include_role:
+    name: apps
   vars:
-    run_container: "postgres"
+    run_app: postgres
 
 - name: Create redis container
-  ansible.builtin.include_tasks:
-    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  ansible.builtin.include_role:
+    name: apps
   vars:
-    run_container: "redis"
+    run_app: redis
 
 - name: Create authentik-server container
-  ansible.builtin.include_tasks:
-    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  ansible.builtin.include_role:
+    name: apps
   vars:
-    run_container: "authentik-server"
+    run_app: authentik-server
 
 - name: Create authentik-worker container
-  ansible.builtin.include_tasks:
-    file: "{{ common_ansible_root }}/tasks/run_container.yml"
+  ansible.builtin.include_role:
+    name: apps
   vars:
-    run_container: "authentik-worker"
+    run_app: authentik-worker
 
 - name: Create authentik database
   ansible.builtin.command: docker exec postgres createdb -U {{ common_user }} authentik

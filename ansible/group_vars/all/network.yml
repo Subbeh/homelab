@@ -133,8 +133,7 @@ network_svc:
     host: hl-services
     port: "5055"
   pihole:
-    host: bastion
-    ip: "10.10.10.9"
+    host: "10.10.10.10"
     port: "80"
   pikvm:
     host: pikvm

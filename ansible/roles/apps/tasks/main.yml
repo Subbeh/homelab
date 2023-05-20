@@ -1,5 +1,6 @@
 ---
-
+- fail: msg="Variable 'run_app' is not defined"
+  when: run_app is not defined
 - ansible.builtin.include_tasks: load_vars.yml
 - ansible.builtin.include_tasks: create_container.yml
 - ansible.builtin.include_tasks: generate_traefik_config.yml

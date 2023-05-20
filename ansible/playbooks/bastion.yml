@@ -66,9 +66,10 @@
 
     - name: Create Portainer agent container
       tags: portainer-agent
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "portainer_agent_bastion"
+        run_app: portainer_agent_bastion
 
     - name: Import Traefik role
       tags: traefik
@@ -83,9 +84,10 @@
 
     - name: Create Endlessh container
       tags: endlessh
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "endlessh"
+        run_app: endlessh
 
     - name: Import CrowdSec role
       tags: crowdsec

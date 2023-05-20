@@ -60,42 +60,49 @@
 
     - name: Create Portainer container
       tags: portainer
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "portainer"
+        run_app: portainer
 
     - name: Create Cloudflare ddns container
       tags: cloudflare
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "cloudflare-ddns"
+        run_app: cloudflare-ddns
 
     - name: Create Drone container
       tags: drone
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "drone"
+        run_app: drone
 
     - name: Create Gitea container
       tags: gitea
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "gitea"
+        run_app: gitea
 
     - name: Create Overseerr container
       tags: overseerr
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "overseerr"
+        run_app: overseerr
 
     - name: Create Tautulli container
       tags: tautulli
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "tautulli"
+        run_app: tautulli
 
     - name: Create Openspeedtest container
       tags: openspeedtest
-      ansible.builtin.import_tasks: ../tasks/run_container.yml
+      ansible.builtin.include_role:
+        name: apps
       vars:
-        run_container: "openspeedtest"
+        run_app: openspeedtest
