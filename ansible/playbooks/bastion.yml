@@ -13,7 +13,9 @@
       - 443
       - "{{ network_svc.portainer.agent_port }}"
     firewall_allowed_udp_ports:
-      - 4242
+      - 4242  # syslog
+      - 41641 # tailscale
+      - 3478  # tailscale
 
     borg_source_directories:
       - '{{ common_dir }}'
@@ -89,3 +91,23 @@
       tags: crowdsec
       ansible.builtin.import_role:
         name: crowdsec
+
+    - name: Set sysctls
+      tags: tailscale
+      ansible.posix.sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        reload: true
+      with_dict: "{{ sysctl_config }}"
+      vars:
+        sysctl_config:
+          net.ipv4.ip_forward: 1
+          net.ipv6.conf.all.forwarding: 1
+
+    - name: Import Tailscale role
+      tags: tailscale
+      ansible.builtin.import_role:
+        name: artis3n.tailscale
+      vars:
+        tailscale_authkey: "{{ network_svc.tailscale.key }}"
+        tailscale_args: "--hostname=bastion --accept-routes=true --advertise-routes=10.0.0.0/8 --advertise-exit-node"
