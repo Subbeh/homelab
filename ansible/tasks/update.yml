@@ -1,0 +1,38 @@
+---
+
+- block:
+    - name: Sync time
+      ansible.builtin.command: hwclock --hctosys
+      failed_when: false
+      changed_when: false
+
+    - name: Update repo and cache
+      ansible.builtin.apt: update_cache=yes force_apt_get=yes
+      changed_when: false
+
+    - name: Update packages
+      ansible.builtin.apt: upgrade=dist force_apt_get=yes
+
+    - name: Import reboot task
+      ansible.builtin.include_tasks:
+        file: ../tasks/check_reboot.yml
+
+    - name: Clean up system
+      tags: [ never, clean ]
+      block:
+        - name: Remove useless packages from the cache
+          ansible.builtin.apt:
+            autoclean: true
+
+        - name: Remove dependencies that are no longer required
+          ansible.builtin.apt:
+            autoremove: true
+
+        - name: Run the equivalent of "apt-get clean" as a separate step
+          ansible.builtin.apt:
+            clean: true
+
+  when:
+    - (ansible_os_family is defined) and (ansible_os_family == "Debian")
+    - inventory_hostname != 'localhost'
+    - inventory_hostname != 'ansible_controller_fqdn'

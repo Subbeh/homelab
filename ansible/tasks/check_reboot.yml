@@ -1,10 +1,8 @@
 - name: Check if the reboot-required file exists
-  tags: always
   ansible.builtin.stat: path=/var/run/reboot-required get_md5=no
   register: reboot_required_file
 
 - name: Servers requiring reboot
-  tags: always
   ansible.builtin.debug: var=reboot_required_file.stat.exists
 #
 - name: Reboot the Debian or Ubuntu server

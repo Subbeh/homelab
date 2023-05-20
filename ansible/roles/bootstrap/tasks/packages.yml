@@ -33,6 +33,10 @@
   ansible.builtin.package_facts:
     manager: auto
 
+- name: Install Python pip packages
+  ansible.builtin.import_role:
+    name: geerlingguy.pip
+
 - name: Uninstall Snap
   when: "'snapd' in ansible_facts.packages"
   block:
@@ -88,7 +92,3 @@
       "Unattended-Upgrade::Remove-New-Unused-Dependencies": "true"
       "Unattended-Upgrade::Remove-Unused-Dependencies": "true"
   changed_when: false
-
-- name: Install Python pip packages
-  ansible.builtin.import_role:
-    name: geerlingguy.pip

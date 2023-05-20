@@ -42,6 +42,7 @@ network_cidr:
 
 network_k8s:
   loadbalancer_ip: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
+  ingress: "{{ network_cidr.k8s | ansible.utils.nthhost(100) }}"
 
 network_svc:
   udmp:

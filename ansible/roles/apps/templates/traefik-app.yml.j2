@@ -49,7 +49,7 @@ http:
     {{ app.name }}-svc:
       loadBalancer:
         servers:
-          - url: "http://{{ network_svc[app.name].host }}:{{ network_svc[app.name].port }}"
+          - url: "http://{{ network_svc[app.name].host | default(network_svc[app.name].ip) }}:{{ network_svc[app.name].port }}"
   {%- endif %}
 
   {% if app.traefik.serversTransports is defined %}
