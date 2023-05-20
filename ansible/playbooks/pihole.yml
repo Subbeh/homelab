@@ -1,0 +1,114 @@
+---
+
+- hosts: "{{ groups['pve'][0] }}"
+  gather_facts: false
+
+  tasks:
+    - name: Remove container
+      tags: [ never, remove ]
+      community.general.proxmox:
+        vmid: "{{ pihole_server.vmid }}"
+        api_host: "{{ ansible_hostname }}"
+        api_user: "{{ pve_api_user }}"
+        api_token_id: "{{ pve_api_token_id }}"
+        api_token_secret: "{{ pve_api_token_secret }}"
+        state: "{{ item }}"
+      loop: [ stopped, absent ]
+
+    - name: Update list of available templates
+      command: pveam update
+      register: _update
+      failed_when: _update.stdout != "update successful"
+      changed_when: false
+
+    - name: Get template name
+      shell: |
+        pveam available --section system | grep -o {{ pihole_server.template}}-{{ pihole_server.template_version }}.*
+      register: _template
+      changed_when: false
+
+    - name: Download latest version of template {{ pihole_server.template }}
+      shell: |
+        pveam download {{ pihole_server.template_storage }} {{ _template.stdout }}
+      args:
+        creates: "/mnt/{{ pihole_server.template_storage }}/templates/cache/{{ _template.stdout }}"
+      register: _download
+      when: _template.stdout
+      changed_when: '"no need to download" not in _download.stdout'
+
+    - name: Create Pihole container
+      community.general.proxmox:
+        vmid: "{{ pihole_server.vmid }}"
+        api_host: "{{ ansible_hostname }}"
+        api_user: "{{ pve_api_user }}"
+        api_token_id: "{{ pve_api_token_id }}"
+        api_token_secret: "{{ pve_api_token_secret }}"
+        node: "{{ pihole_server.node | default(ansible_hostname) }}"
+        ostemplate: "{{ pihole_server.template_storage }}:vztmpl/{{ _template.stdout }}"
+        description: created with ansible
+        password: "{{ common_pass }}"
+        pubkey: "{{ lookup('url', '{{ security_keys }}', split_lines=False) | default(omit) }}"
+        hostname: "{{ pihole_server.name }}"
+        memory: "{{ pihole_server.memory }}"
+        cores: "{{ pihole_server.cores }}"
+        storage: "{{ pihole_server.storage }}"
+        swap: 0
+        netif: '{"net0":"name=eth0,gw={{ pihole_server.gateway }},ip={{ pihole_server.ip_address }},tag={{ pihole_server.vlan_tag }},bridge={{ pihole_server.network_bridge }}"}'
+        nameserver: "{{ pihole_server.nameserver | default('1.1.1.1') }}"
+        features:
+          - nesting=1
+
+    - name: Start Pihole Container
+      community.general.proxmox:
+        vmid: "{{ pihole_server.vmid }}"
+        api_host: "{{ ansible_hostname }}"
+        api_user: "{{ pve_api_user }}"
+        api_token_id: "{{ pve_api_token_id }}"
+        api_token_secret: "{{ pve_api_token_secret }}"
+        state: started
+
+- hosts: pihole
+  gather_facts: false
+
+  pre_tasks:
+    - name: Wait for container to start up
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+
+    - name: Gathering facts
+      ansible.builtin.setup:
+
+  tasks:
+    - name: Update host
+      ansible.builtin.import_tasks: ../tasks/update.yml
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - curl
+
+    - name: Create pihole config directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0775'
+      loop:
+        - /etc/pihole
+        - /etc/dnsmasq.d
+
+    - name: Create setupVars.conf file
+      ansible.builtin.copy:
+        content: "{{ pihole_setupvars }}"
+        dest: /etc/pihole/setupVars.conf
+
+    - name: Create dnsmasq.d config file
+      ansible.builtin.copy:
+        content: "{{ pihole_dnsmasq }}"
+        dest: /etc/dnsmasq.d/99-custom.conf
+
+    - name: Install Pihole
+      ansible.builtin.shell: |
+        curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
+      register: _result
+      failed_when: '"Update complete" not in _result.stdout'
+

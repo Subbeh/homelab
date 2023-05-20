@@ -1,0 +1,45 @@
+---
+
+pihole:
+#   image: pihole/pihole:2023.03.1
+#   networks:
+#     - name: dns
+#       ipv4_address: 10.0.66.100
+#   ports:
+#     - "{{ network_svc.pihole.port }}:80"
+#     - "53:53/tcp"
+#     - "53:53/udp"
+#   volumes:
+#     - "{{ common_dir }}/pihole/config:/etc/pihole"
+#     - "{{ common_dir }}/pihole/dnsmasq:/etc/dnsmasq.d"
+#
+# networks:
+#   dns:
+#     driver: macvlan
+#     driver_options:
+#       parent: eth0
+#     ipam_config:
+#       - subnet: "10.0.66.0/24"
+#         iprange: "10.0.66.100/28"
+#         gateway: "10.0.66.1"
+
+  traefik:
+    routers:
+    - name: "pihole"
+      rule: "Host(`pihole.{{ network_domain.tld }}`)"
+      middlewares:
+        - chain-auth
+        - pihole-strip-admin
+        - pihole-add-admin
+    - name: "pihole-bypass"
+      rule: "Host(`pihole.{{ network_domain.tld }}`) && Query(`auth={{ pihole_api }}`)"
+      middlewares:
+        - chain-no-auth
+    middlewares: |
+      pihole-strip-admin:
+        stripPrefix:
+          prefixes:
+            - "/admin"
+      pihole-add-admin:
+        addPrefix:
+          prefix: "/admin"

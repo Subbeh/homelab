@@ -97,3 +97,9 @@ tasks:
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/bastion.yml --tags traefik-config
+
+  pihole:
+    desc: Run Pihole playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/pihole.yml {{.CLI_ARGS}}
