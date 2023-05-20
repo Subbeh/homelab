@@ -147,6 +147,9 @@ network_svc:
   prowlarr:
     host: nas-srv
     port: "9696"
+  pbk:
+    ip: 10.0.10.25
+    port: 8007
   pve:
     host: ["pve-nuc-01", "pve-opti-01", "pve-opti-02"]
     ip: ["10.0.10.11", "10.0.10.12", "10.0.10.13"]

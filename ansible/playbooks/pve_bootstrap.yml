@@ -4,12 +4,14 @@
 
   tasks:
     - name: Disable Enterprise Repository
+      tags: repo
       ansible.builtin.replace:
         path: /etc/apt/sources.list.d/pve-enterprise.list
         regexp: '^deb'
         replace: '#deb'
 
     - name: Add correct PVE sources to sources.list
+      tags: repo
       ansible.builtin.copy:
         content: |
           deb http://ftp.debian.org/debian bullseye main contrib
@@ -18,22 +20,30 @@
           deb http://download.proxmox.com/debian/pve bullseye pve-no-subscription
         dest: /etc/apt/sources.list
 
-    - name: Disable subscription nag
-      ansible.builtin.shell: |
-        echo "DPkg::Post-Invoke { \"dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ \$? -eq 1 ]; then { echo 'Removing subscription nag from UI...'; sed -i '/data.status/{s/\!//;s/Active/NoMoreNagging/}' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi\"; };" > /etc/apt/apt.conf.d/no-nag-script
-        apt --reinstall install proxmox-widget-toolkit &>/dev/null
-
     - name: Update apt repo and cache
+      tags: packages
       ansible.builtin.apt: update_cache=yes force_apt_get=yes
 
     - name: Upgrade packages
+      tags: packages
       ansible.builtin.apt: upgrade=dist force_apt_get=yes
 
     - name: Install required packages
+      tags: packages
       ansible.builtin.package:
         name:
           - libguestfs-tools
         state: present
+
+    - name: Install Python pip packages
+      tags: packages
+      ansible.builtin.import_role:
+        name: geerlingguy.pip
+
+    - name: Disable subscription nag
+      ansible.builtin.shell: |
+        echo "DPkg::Post-Invoke { \"dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ \$? -eq 1 ]; then { echo 'Removing subscription nag from UI...'; sed -i '/data.status/{s/\!//;s/Active/NoMoreNagging/}' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi\"; };" > /etc/apt/apt.conf.d/no-nag-script
+        apt --reinstall install proxmox-widget-toolkit &>/dev/null
 
     - name: Download dark theme
       ansible.builtin.get_url:
