@@ -1,5 +1,9 @@
 ---
 
+- name: reboot
+  ansible.builtin.reboot:
+    reboot_timeout: 3600
+
 - name: restart sshd
   ansible.builtin.service:
     name: sshd
