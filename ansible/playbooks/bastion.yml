@@ -26,7 +26,7 @@
     - name: Verify SSH port
       tags: [ always, pretasks ]
       ansible.builtin.import_tasks:
-        file: ../tasks/ssh_port.yml
+        file: ../tasks/check_port.yml
       vars:
         ansible_become: false
 

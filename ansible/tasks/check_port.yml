@@ -1,0 +1,28 @@
+---
+
+- name: Check SSH port
+  when:
+    - ansible_connection != 'community.docker.docker'
+    - ansible_connection != 'local'
+  block:
+    - name: Register configured port
+      ansible.builtin.set_fact:
+        _port: "{{ ansible_port | default(22) }}"
+
+    - name: "Test configured port"
+      ansible.builtin.wait_for_connection:
+      timeout: 5
+      register: _status
+      failed_when: false
+      ignore_errors: true
+
+    - block:
+      - ansible.builtin.set_fact:
+          ansible_port: 22
+      - name: "Test default port 22"
+        ansible.builtin.wait_for_connection:
+        timeout: 5
+        register: _status
+      when:
+        - _status.failed
+        - _port != 22

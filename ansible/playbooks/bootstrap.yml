@@ -8,7 +8,7 @@
     - name: Verify SSH port
       tags: always
       ansible.builtin.include_tasks:
-        file: ../tasks/ssh_port.yml
+        file: ../tasks/check_port.yml
       vars:
         ansible_become: false
 
