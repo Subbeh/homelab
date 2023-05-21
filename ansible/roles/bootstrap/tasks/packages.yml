@@ -37,23 +37,6 @@
   ansible.builtin.import_role:
     name: geerlingguy.pip
 
-- name: Uninstall Snap
-  when: "'snapd' in ansible_facts.packages"
-  block:
-    - name: Check if snap is installed
-      ansible.builtin.debug:
-        msg: "snapd is installed"
-      register: _snapd_check
-    - name: Remove snap packages
-      ansible.builtin.command: snap remove {{ item }}
-      loop: ["lxd", "core20", "snapd"]
-      when: _snapd_check.failed is defined
-    - name: Remove snap from packages
-      ansible.builtin.apt:
-        name: snapd
-        state: absent
-        autoremove: true
-
 - name: Install Intel microcode if needed
   ansible.builtin.apt:
     pkg: intel-microcode

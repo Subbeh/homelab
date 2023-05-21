@@ -8,12 +8,14 @@
 
 - ansible.builtin.import_tasks: system.yml
   tags: system
-
-- ansible.builtin.import_tasks: packages.yml
-  tags: packages
+  when: "'vps' not in group_names"
 
 - ansible.builtin.import_tasks: network.yml
   tags: network
+  when: "'vps' not in group_names"
+
+- ansible.builtin.import_tasks: packages.yml
+  tags: packages
 
 - ansible.builtin.import_tasks: dotfiles.yml
   tags: dotfiles
@@ -31,6 +33,6 @@
         ansible_user: "{{ common_user }}"
     - ansible.builtin.meta: flush_handlers
     - ansible.builtin.meta: reset_connection
-    - ansible.builtin.include_tasks: ../tasks/ssh_port.yml
+    - ansible.builtin.include_tasks: ../tasks/check_port.yml
       vars:
         ansible_become: false

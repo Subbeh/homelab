@@ -4,8 +4,9 @@
   ansible.builtin.user:
     name: "{{ common_user }}"
     createhome: true
-    state: present
     password: "{{ common_pass | string | password_hash('sha512', 'mysecretsalt') }}"
+    shell: /bin/bash
+    state: present
 
 - name: Add user to sudoers
   ansible.builtin.copy:

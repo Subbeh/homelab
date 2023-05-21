@@ -16,46 +16,6 @@
     state: absent
   loop: ["none", "swap"]
 
-- name: Stop and disable systemd-networkd-wait-online service
-  ansible.builtin.service:
-    name: systemd-networkd-wait-online
-    enabled: false
-    state: stopped
-    masked: true
-  register: _systemd_networkd_wait_online_result
-  failed_when: "_systemd_networkd_wait_online_result is failed and 'Could not find the requested service' not in _systemd_networkd_wait_online_result.msg"
-
-- name: Disable systemd-resolved
-  block:
-    - name: Stop and disable service
-      ansible.builtin.service:
-        name: systemd-resolved
-        state: stopped
-        enabled: false
-    - name: Delete link to the systemd-resolved resolv.conf
-      ansible.builtin.file:
-        path: /etc/resolv.conf
-        state: absent
-    - name: Create empty resolv.conf
-      ansible.builtin.file:
-        path: /etc/resolv.conf
-        state: touch
-    - name: Setup nameserver
-      ansible.builtin.copy:
-        dest: /etc/resolv.conf
-        content: |
-          nameserver {{ network_svc.dns.ip }}
-          search {{ network_domain.tld_local }}
-
-- name: Disable cloud-init
-  ansible.builtin.file:
-    dest: /etc/cloud/cloud-init.disabled
-    state: touch
-    owner: root
-    mode: "0775"
-    modification_time: preserve
-    access_time: preserve
-
 - name: Disable mitigations
   ansible.builtin.replace:
     path: /etc/default/grub
