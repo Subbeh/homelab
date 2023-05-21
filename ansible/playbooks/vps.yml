@@ -1,0 +1,49 @@
+---
+
+- hosts: oci
+  gather_facts: true
+  become: true
+
+  vars:
+    firewall_allowed_tcp_ports:
+      - 22
+      - 80
+      - 443
+    firewall_allowed_udp_ports:
+      - 41641 # tailscale
+      - 3478  # tailscale
+
+  handlers:
+    - name: Import common handlers
+      ansible.builtin.import_tasks: ../tasks/handlers.yml
+
+  tasks:
+    - name: Import bootstrap role
+      tags: bootstrap
+      ansible.builtin.import_role:
+        name: bootstrap
+
+    - name: Enable firewall
+      tags: firewall
+      ansible.builtin.import_role:
+        name: geerlingguy.firewall
+
+    - name: Install Docker
+      ansible.builtin.include_role:
+        name: "{{ item }}"
+      vars:
+        pip_install_packages:
+          - name: docker
+      loop:
+        - geerlingguy.pip
+        - geerlingguy.docker
+
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: Restart Docker service
+      tags: [ firewall, docker ]
+      ansible.builtin.service:
+        name: docker
+        state: restarted
+      changed_when: false
