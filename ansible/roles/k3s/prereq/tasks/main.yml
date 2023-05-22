@@ -1,5 +1,13 @@
 ---
 
+- name: Mount Longhorn disks
+  ansible.posix.mount:
+    path: /srv/longhorn
+    src: LABEL=longhorn
+    fstype: ext4
+    state: mounted
+  when: not k3s_control_node | default(false)
+
 - name: Enable kernel modules
   notify: Reboot
   community.general.modprobe:
