@@ -80,6 +80,10 @@ network_svc:
     host: nas-srv
   calibre:
     host: nas-srv
+    port: "8088"
+    port_server: "8099"
+  calibre_web:
+    host: nas-srv
     port: "8083"
   cloudflare_ddns:
     host: hl-services

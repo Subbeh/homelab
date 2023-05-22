@@ -1,15 +1,46 @@
 ---
-
 calibre:
+  image: lscr.io/linuxserver/calibre:6.17.0
+  ports:
+    - "{{ network_svc.calibre.port }}:8080"
+    - "{{ network_svc.calibre.port_server }}:8081"
+  volumes:
+    - "{{ common_dir }}/calibre:/config"
+    - "{{ common_media_dir }}/books/ebooks:/books"
+
+  traefik:
+    routers:
+    - name: "calibre"
+      rule: "Host(`calibre.{{ network_domain.tld }}`)"
+      middlewares:
+        - chain-auth
+      service: calibre-svc
+    - name: "calibre-server"
+      rule: "Host(`calibre-server.{{ network_domain.tld }}`)"
+      middlewares:
+        - local-only
+      service: calibre-server-svc
+    services: |
+      calibre-svc:
+        loadBalancer:
+          servers:
+            - url: "http://{{ network_svc.calibre.host }}:{{ network_svc.calibre.port }}"
+      calibre-server-svc:
+        loadBalancer:
+          servers:
+            - url: "http://{{ network_svc.calibre.host }}:{{ network_svc.calibre.port_server }}"
+
+calibre_web:
   image: lscr.io/linuxserver/calibre-web:0.6.20-ls206
   environment:
     DOCKER_MODS: linuxserver/mods:universal-calibre
   ports:
-    - "{{ network_svc.calibre.port }}:8083"
+    - "{{ network_svc.calibre_web.port }}:8083"
   volumes:
-    - "{{ common_dir }}/calibre:/config"
-    - "{{ common_media_dir }}/books/calibre:/books"
+    - "{{ common_dir }}/calibre-web:/config"
+    - "{{ common_media_dir }}/books/ebooks:/books"
 
   traefik:
+    name: books
     rtr_middlewares:
       - chain-no-auth
