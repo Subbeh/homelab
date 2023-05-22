@@ -1,14 +1,17 @@
 ---
 
 - name: Ensure docker network is present
+  no_log: true
   community.docker.docker_network:
     name: "{{ item.name }}"
     driver: "{{ apps.networks[item.name].driver }}"
     driver_options: "{{ apps.networks[item.name].driver_options | default(omit) }}"
     ipam_config: "{{ apps.networks[item.name].ipam_config | default(omit) }}"
-  loop: "{{ app.networks | default(apps['defaults'].networks) }}"
+  with_items: "{{ app.networks | default(apps['defaults'].networks) }}"
+  when: (app.networks is defined and app.networks != None) or app.networks is undefined
 
 - name: Create container {{ app.name }}
+  # no_log: true
   community.docker.docker_container:
     # use defaults
     name: "{{ app.name }}"
@@ -21,6 +24,7 @@
     security_opts: "{{ app.security_opts | default(apps['defaults'].security_opts) }}"
     volumes: "{{ app.volumes | default([]) + apps['defaults'].volumes }}"
     env: "{{ apps['defaults'].environment | ansible.builtin.combine(app.environment | default([]), list_merge='replace') }}"
+    comparisons: "{{ app.comparisons | default(apps['defaults'].comparisons) }}"
 
     # misc
     exposed_ports: "{{ app.exposed_ports | default(omit) }}"
@@ -95,5 +99,3 @@
     volumes_from: "{{ app.volumes_from | default(omit) }}"
     working_dir: "{{ app.working_dir | default(omit) }}"
   when: app.image is defined
-  # no_log: true
-  changed_when: false

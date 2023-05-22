@@ -1,16 +1,17 @@
 ---
 
 - name: load all app manifests
+  no_log: true
   ansible.builtin.include_vars:
     file: "{{ item }}"
     hash_behaviour: merge
     name: apps
   loop: "{{ lookup('fileglob', '{{ common_ansible_root }}/apps/*', wantlist=True) }}"
-  no_log: true
   vars:
     apps: {}
 
 - name: Set app variables
+  no_log: true
   ansible.builtin.set_fact:
     app: "{{ apps[run_app] | combine({'name': apps[run_app].name | default(run_app)}) }}"
   when: run_app is defined

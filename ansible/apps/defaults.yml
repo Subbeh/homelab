@@ -19,6 +19,10 @@ defaults:
     PUID: "{{ common_user_id | string }}"
     PGID: "{{ common_group_id | string }}"
     TZ: "{{ common_timezone }}"
+  comparisons:
+    volumes: strict
+    networks: strict
+    env: strict
 
 networks:
   mesh:
