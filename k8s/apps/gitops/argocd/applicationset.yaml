@@ -31,6 +31,7 @@ spec:
         kind: ExternalSecret
         jqPathExpressions:
           - .spec.dataFrom[].find
+          - .spec.dataFrom[].extract
           - .spec.data[].remoteRef
       syncPolicy:
         syncOptions:
