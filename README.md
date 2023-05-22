@@ -30,7 +30,7 @@ Work in progress
 
 ## :art: Infrastructure
 
-[<img src="homelab.png" alt="Infrastructure" width="70%" height="70%" title="Infrastructure">](homelab.png)
+[<img src="https://github.com/Subbeh/homelab/assets/1278086/90cc1f05-051c-4ce2-a285-510d1363caf8" alt="Infrastructure" width="70%" height="70%" title="Infrastructure">](https://github.com/Subbeh/homelab/assets/1278086/90cc1f05-051c-4ce2-a285-510)
 
 ## :open_file_folder: Repository Structure
 
