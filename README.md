@@ -3,23 +3,23 @@
 ![Home](https://img.shields.io/uptimerobot/status/m794403672-d8d77f6c6e04bba27fcbcd9c?label=home&style=for-the-badge)
 [![Build Status](https://drone.k8s.sbbh.cloud/api/badges/sysadm/homelab/status.svg)](https://drone.k8s.sbbh.cloud/sysadm/homelab)
 
-## ⚠️
+## :construction:
 
 Work in progress
 
-## 🔧 Hardware
+## :wrench: Hardware
 
 | Device                      | OS Disk Size | Data Disk Size         | Cores | Ram  | Operating System | Purpose                 |
 |-----------------------------|--------------|------------------------|-------|------|------------------|-------------------------|
 | NUC 12 Pro (i7 1260P)       | 1TB SSD      | 1x 500GB SSD           | 16    | 64GB | Proxmox          | VMs                     |
-| Dell Optiplex (i5-8500T)    | 1TB SSD      | 1x 500GB SSD           | 6     | 32GB | Proxmox          | VMs                     |
-| Dell Optiplex (i5-6500T)    | 256GB SSD    | 1x 500GB SSD           | 4     | 16GB | Proxmox          | VMs                     |
+| Dell OptiPlex (i5-8500T)    | 1TB SSD      | 1x 500GB SSD           | 6     | 32GB | Proxmox          | VMs                     |
+| Dell OptiPlex (i5-6500T)    | 256GB SSD    | 1x 500GB SSD           | 4     | 16GB | Proxmox          | VMs                     |
 | Synology 220+               | -            | 2x 6TB HDD             | 2     | 6GB  | -                | Data / Containers / VMs |
 | RPi 4                       | 32GB         | -                      | 4     | 4GB  | PiKVM            | Network KVM             |
 | RPi 4                       | 32GB         | -                      | 4     | 4GB  | -                | -                       |
 | NUC 8 (i5 8259U)            | 256GB SSD    | -                      | 8     | 8GB  | -                | -                       |
 
-## 📶 Networking
+## :satellite: Networking
 
 | Name                                          | CIDR           |
 |-----------------------------------------------|----------------|
@@ -28,11 +28,11 @@ Work in progress
 | Kubernetes VLAN                               | `10.0.80.0/24` |
 | DNS VLAN                                      | `10.10.10.0/24`|
 
-## 👨‍🎨 Infrastructure
+## :art: Infrastructure
 
-![Infrastructure](homelab.png)
+[<img src="homelab.png" alt="Infrastructure" width="70%" height="70%" title="Infrastructure">](homelab.png)
 
-## 📂 Repository Structure
+## :open_file_folder: Repository Structure
 
 ```text
 📁 homelab
@@ -52,7 +52,7 @@ Work in progress
     └──📁 k3s
 ```
 
-## 🖥️ Core Components - Kubernetes
+## :computer: Core Components - Kubernetes
 
 - [argo-cd](https://argo-cd.readthedocs.io/en/stable/): Continuous deployment tool used to deploy manifests/charts from git to my homelab
 - [authentik](https://goauthentik.io/): SSO for the services that support LDAP/SAML/OIDC.
