@@ -4,7 +4,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: manifest-apps
-  namespace: argocd
+  namespace: gitops
 spec:
   generators:
     - git:

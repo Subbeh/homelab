@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: argocd-cmd-params-cm
-  namespace: argocd
+  namespace: gitops
 data:
   $patch: merge
   server.insecure: "true"

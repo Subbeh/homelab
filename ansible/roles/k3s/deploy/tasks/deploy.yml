@@ -12,4 +12,4 @@
     SOPS_AGE_KEY_FILE: /tmp/homelab/.agekey
   loop:
     - security/external-secrets
-    - argocd/argocd
+    - gitops/argocd
