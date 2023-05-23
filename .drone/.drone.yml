@@ -20,35 +20,35 @@ steps:
     environment:
       ANSIBLE_VAULT_PASSWORD:
         from_secret: ANSIBLE_VAULT_PASSWORD
-
-  - name: apps
-    image: git.sbbh.cloud/sysadm/ansible-runner:latest
-    commands:
-      - .drone/apps.sh
-    environment:
-      ANSIBLE_VAULT_PASSWORD:
-        from_secret: ANSIBLE_VAULT_PASSWORD
-      SSH_KEY:
-        from_secret: SSH_KEY
-    when:
-      event:
-      - push
-
-  - name: discord notification
-    image: appleboy/drone-discord
-    settings:
-      username: Drone
-      webhook_id:
-        from_secret: DISCORD_ID
-      webhook_token:
-        from_secret: DISCORD_TOKEN
-      message: >
-        {{#success build.status}}✅{{else}}⚠️{{/success}}
-        repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
-               commit: `{{commit.message}}`
-    when:
-      status: [ success, failure, changed ]
-      event: [ push ]
+  #
+  # - name: apps
+  #   image: git.sbbh.cloud/sysadm/ansible-runner:latest
+  #   commands:
+  #     - .drone/apps.sh
+  #   environment:
+  #     ANSIBLE_VAULT_PASSWORD:
+  #       from_secret: ANSIBLE_VAULT_PASSWORD
+  #     SSH_KEY:
+  #       from_secret: SSH_KEY
+  #   when:
+  #     event:
+  #     - push
+  #
+  # - name: discord notification
+  #   image: appleboy/drone-discord
+  #   settings:
+  #     username: Drone
+  #     webhook_id:
+  #       from_secret: DISCORD_ID
+  #     webhook_token:
+  #       from_secret: DISCORD_TOKEN
+  #     message: >
+  #       {{#success build.status}}✅{{else}}⚠️{{/success}}
+  #       repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
+  #              commit: `{{commit.message}}`
+  #   when:
+  #     status: [ success, failure, changed ]
+  #     event: [ push ]
 ---
 kind: secret
 name: DOCKER_CONF
