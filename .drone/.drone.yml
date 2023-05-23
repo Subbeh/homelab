@@ -10,17 +10,17 @@ trigger:
 image_pull_secrets:
   - DOCKER_CONF
 
-# steps:
-#   - name: lint
-#     image: git.sbbh.cloud/sysadm/ansible-runner:latest
-#     privileged: true
-#     commands:
-#       - ip link set dev eth0 mtu 1450
-#       - .drone/lint.sh
-#     environment:
-#       ANSIBLE_VAULT_PASSWORD:
-#         from_secret: ANSIBLE_VAULT_PASSWORD
-  #
+steps:
+  - name: lint
+    image: git.sbbh.cloud/sysadm/ansible-runner:latest
+    privileged: true
+    commands:
+      - ip link set dev eth0 mtu 1450
+      - .drone/lint.sh
+    environment:
+      ANSIBLE_VAULT_PASSWORD:
+        from_secret: ANSIBLE_VAULT_PASSWORD
+
   # - name: apps
   #   image: git.sbbh.cloud/sysadm/ansible-runner:latest
   #   commands:
