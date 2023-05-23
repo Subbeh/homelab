@@ -1,7 +1,7 @@
 ---
 
 tautulli:
-  image: tautulli/tautulli:v2.12.3
+  image: tautulli/tautulli:v2.12.4
   ports:
     - "{{ network_svc.tautulli.port }}:8181"
   volumes:
