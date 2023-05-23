@@ -5,7 +5,7 @@ kind: Kustomization
 helmCharts:
   - name: traefik
     repo: https://traefik.github.io/charts
-    version: v22.0.0
+    version: 23.0.1
     valuesFile: values.yaml
     namespace: networking
     includeCRDs: true
