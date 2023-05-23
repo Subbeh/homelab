@@ -16,6 +16,7 @@
 
   dependencyDashboardTitle: "Renovate Dashboard",
   rebaseWhen: "conflicted",
+  ignoreTests: true,
   pruneBranchAfterAutomerge: true,
   pruneStaleBranches: true,
   rollbackPrs: true,
