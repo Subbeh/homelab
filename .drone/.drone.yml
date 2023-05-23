@@ -5,7 +5,7 @@ name: default
 
 trigger:
   branch:
-    - main
+    - dev
 
 image_pull_secrets:
   - DOCKER_CONF
