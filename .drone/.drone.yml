@@ -71,11 +71,11 @@ get:
 kind: secret
 name: ANSIBLE_VAULT_PASSWORD
 get:
-  path: drone-doppler
+  path: doppler-drone
   name: ANSIBLE_VAULT_PASSWORD
 ---
 kind: secret
 name: SSH_KEY
 get:
-  path: drone-doppler
+  path: doppler-drone
   name: SSH_KEY

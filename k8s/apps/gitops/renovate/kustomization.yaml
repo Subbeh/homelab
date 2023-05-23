@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: gitops
+#
+# helmCharts:
+#   - name: renovate
+#     repo: https://docs.renovatebot.com/helm-charts
+#     version: 35.87.0
+#     valuesFile: values.yaml
+#     namespace: gitops
+#     includeCRDs: true
+
+resources:
+  - external-secret.yaml
+  - config.yaml
+  - renovate-cronjob.yaml

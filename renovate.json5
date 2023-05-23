@@ -1,38 +1,44 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:base", ":rebaseStalePrs"],
-  rebaseWhen: "conflicted",
-  dependencyDashboard: true,
+
+  "extends": [
+    "config:base",
+    "docker:enableMajor",
+    ":enablePreCommit",
+    ":disableRateLimiting",
+    ":automergeDigest",
+    ":automergeBranch",
+    ":rebaseStalePrs",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":semanticCommitScope(renovate)",
+  ],
+
   dependencyDashboardTitle: "Renovate Dashboard",
-  timezone: "Australia/Melbourne",
-  rollbackPrs: true,
+  rebaseWhen: "conflicted",
   pruneBranchAfterAutomerge: true,
   pruneStaleBranches: true,
-  //schedule: [
-  //  "before 6am on sunday",
-  //],
+  rollbackPrs: true,
 
-  reviewers: ["sysadm"],
-
-  commitMessagePrefix: "renovate: {{depName}}:",
-  commitMessageAction: "update",
-  commitMessageTopic: "version",
-  commitMessageExtra: "to {{#if isMajor}}{{{prettyNewMajor}}}{{else}}{{{prettyNewVersion}}}{{/if}}",
-  prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}",
-
-  ansible: {
-    fileMatch: ["ansible/apps/.+\\.yml$"],
+  "major": {
+    "dependencyDashboardApproval": true
   },
 
-  kubernetes: {
-    fileMatch: ["k8s/.+\\.yaml$"],
-    enabled: false,
+  /* managers */
+  "argocd": {
+    "fileMatch": ["k8s/.+\\.ya?ml$"]
+  },
+  "helm-values": {
+    "fileMatch": ["k8s/.+\\.ya?ml$"]
+  },
+  "kubernetes": {
+    "fileMatch": ["k8s/.+\\.ya?ml$"]
+  },
+  "ansible": {
+    "fileMatch": ["ansible/apps/.*\\.ya?ml$"]
   },
 
-  python: {
-    enabled: false,
-  },
-
+  /* host rules */
   hostRules: [
     {
       matchHost: "docker.io",
@@ -46,34 +52,19 @@
     },
   ],
 
-  packageRules: [
+  /* package rules */
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+
     /* Ignore latest and localhost tags */
     {
       matchDatasources: ["docker"],
       matchCurrentVersion: "/localhost|latest/",
       enabled: false,
-    },
-    /*
-      override Docker datasource defaults
-      https://docs.renovatebot.com/modules/datasource/#docker-datasource
-    */
-    {
-      matchDatasources: ["docker"],
-      commitMessageTopic: "version",
-      digest: {
-        commitMessageTopic: "digest",
-        group: {
-          commitMessageTopic: "digest",
-        },
-      },
-      pin: {
-        group: {
-          commitMessageTopic: "version",
-        },
-      },
-      group: {
-        commitMessageTopic: "version",
-      },
     },
 
     /* terraform */
@@ -86,15 +77,6 @@
     {
       matchPackageNames: ["postgres"],
       enabled: false
-    },
-
-    {
-      description: "Check for Renovate updates",
-      matchPackagePatterns: [".*\\/renovate"],
-      customChangelogUrl: "https://github.com/renovatebot/renovate",
-      matchUpdateTypes: ["patch", "minor"],
-      automerge: true,
-      ignoreTests: true,
     },
   ],
 }
