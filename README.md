@@ -1,7 +1,7 @@
 # Homelab
 
-![Home](https://img.shields.io/uptimerobot/status/m794403672-d8d77f6c6e04bba27fcbcd9c?label=home&style=for-the-badge)
-[![Build Status](https://drone.k8s.sbbh.cloud/api/badges/sysadm/homelab/status.svg)](https://drone.k8s.sbbh.cloud/sysadm/homelab)
+![Home](https://img.shields.io/uptimerobot/status/m794403672-d8d77f6c6e04bba27fcbcd9c?label=home)
+![Build Status](https://badges.sbbh.cloud/sysadm/homelab/status.svg)
 
 ## :construction:
 
