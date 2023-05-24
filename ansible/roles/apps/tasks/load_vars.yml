@@ -3,12 +3,8 @@
 - name: load all app manifests
   no_log: true
   ansible.builtin.include_vars:
-    file: "{{ item }}"
-    hash_behaviour: merge
+    dir: "{{ common_ansible_root }}/apps"
     name: apps
-  loop: "{{ lookup('fileglob', '{{ common_ansible_root }}/apps/*', wantlist=True) }}"
-  vars:
-    apps: {}
 
 - name: Set app variables
   no_log: true
