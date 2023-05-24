@@ -1,7 +1,7 @@
 ---
 
 gluetun:
-  image: qmcgaw/gluetun:v3.33.0
+  image: qmcgaw/gluetun:v3.34.1
   capabilities:
     - net_admin
   ports:
