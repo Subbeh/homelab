@@ -21,3 +21,6 @@ gluetun:
     HTTPPROXY: "on"
     HTTPPROXY_LOG: "on"
     FIREWALL_VPN_INPUT_PORTS: "{{ network_svc.gluetun.port_mullvad | string }}"
+
+  dependents:
+    - qbittorrent

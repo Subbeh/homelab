@@ -1,0 +1,11 @@
+---
+
+- name: Create dependent containers
+  ansible.builtin.include_role:
+    name: apps
+  vars:
+    run_app: "{{ _dependent }}"
+  loop: "{{ app.dependents }}"
+  loop_control:
+    loop_var: _dependent
+  when: app.dependents is defined

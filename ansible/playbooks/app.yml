@@ -56,3 +56,11 @@
         tasks_from: create_container
         apply:
           tags: always
+
+    - name: Rerun for optional dependents
+      tags: always
+      ansible.builtin.include_role:
+        name: apps
+        tasks_from: create_dependents
+        apply:
+          tags: always
