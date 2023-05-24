@@ -15,12 +15,13 @@
     ":semanticCommitScope(renovate)",
   ],
 
-  dependencyDashboardTitle: "Renovate Dashboard",
-  rebaseWhen: "conflicted",
-  ignoreTests: true,
-  pruneBranchAfterAutomerge: true,
-  pruneStaleBranches: true,
-  rollbackPrs: true,
+  "schedule": ["before 5am"],
+  "dependencyDashboardTitle": "Renovate Dashboard",
+  "rebaseWhen": "conflicted",
+  "ignoreTests": true,
+  "pruneBranchAfterAutomerge": true,
+  "pruneStaleBranches": true,
+  "rollbackPrs": true,
 
   "major": {
     "dependencyDashboardApproval": true
@@ -41,16 +42,16 @@
   },
 
   /* host rules */
-  hostRules: [
+  "hostRules": [
     {
-      matchHost: "docker.io",
-      concurrentRequestLimit: 2,
-      maxRequestsPerSecond: 2,
+      "matchHost": "docker.io",
+      "concurrentRequestLimit": 2,
+      "maxRequestsPerSecond": 2,
     },
     {
-      matchHost: "index.docker.io",
-      concurrentRequestLimit: 2,
-      maxRequestsPerSecond: 2,
+      "matchHost": "index.docker.io",
+      "concurrentRequestLimit": 2,
+      "maxRequestsPerSecond": 2,
     },
   ],
 
@@ -71,21 +72,21 @@
 
     /* Ignore latest and localhost tags */
     {
-      matchDatasources: ["docker"],
-      matchCurrentVersion: "/localhost|latest/",
-      enabled: false,
+      "matchDatasources": ["docker"],
+      "matchCurrentVersion": "/localhost|latest/",
+      "enabled": false,
     },
 
     /* terraform */
     {
-      matchPackageNames: ["terraform", "proxmox"],
-      enabled: false
+      "matchPackageNames": ["terraform", "proxmox"],
+      "enabled": false
     },
 
     /* postgres */
     {
-      matchPackageNames: ["postgres"],
-      enabled: false
+      "matchPackageNames": ["postgres"],
+      "enabled": false
     },
   ],
 }
