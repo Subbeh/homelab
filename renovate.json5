@@ -4,6 +4,7 @@
   "extends": [
     "config:base",
     "docker:enableMajor",
+    "schedule:daily",
     ":enablePreCommit",
     ":disableRateLimiting",
     ":automergeDigest",
@@ -60,6 +61,13 @@
       "matchCurrentVersion": "!/^0/",
       "automerge": true
     },
+
+    /* schedule monthly for k8s */
+    {
+      "extends": ["schedule:monthly"],
+      "matchPaths": ["k8s/**"],
+    },
+
 
     /* Ignore latest and localhost tags */
     {
