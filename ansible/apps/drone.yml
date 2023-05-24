@@ -1,0 +1,27 @@
+---
+
+drone:
+  traefik:
+    routers:
+    - name: "drone"
+      rule: "Host(`badges.{{ network_domain.tld }}`)"
+      middlewares:
+        - chain-no-auth
+        - add-prefix
+
+    middlewares: |
+      add-prefix:
+        addPrefix:
+          prefix: "/api/badges"
+
+    services: |
+      drone-svc:
+        loadBalancer:
+          passHostHeader: false
+          serversTransport: "drone"
+          servers:
+            - url: "https://drone.{{ network_domain.tld_k8s }}"
+
+    serversTransports: |
+      drone:
+        insecureSkipVerify: true
