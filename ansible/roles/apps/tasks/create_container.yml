@@ -11,7 +11,7 @@
   when: (app.networks is defined and app.networks != None) or app.networks is undefined
 
 - name: Create container {{ app.name }}
-  # no_log: true
+  no_log: true
   community.docker.docker_container:
     # use defaults
     name: "{{ app.name }}"
