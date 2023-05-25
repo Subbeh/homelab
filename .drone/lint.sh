@@ -7,11 +7,11 @@ echo "${ANSIBLE_VAULT_PASSWORD:?not set}" > $HOME/.ansible_vault
 while read file ; do
   echo checking file $file...
   if [[ "$file" =~ ansible/(roles|playbooks|tasks)/.*\.ya?ml ]] ; then
-    cd ansible
+    pushd ansible
     ansible-lint -v -c .ansible-lint "${file#*/}"
-    cd -
+    popd
   fi
   if [[ "$file" =~ ansible/.*\.ya?ml$ ]] ; then
     yamllint -s -c .yamllint "$file"
   fi
-done <<< $(git diff --name-only --diff-filter=ACMR HEAD~1 main)
+done <<< $(git log --name-only --oneline --diff-filter=ACMR origin/main@{1}..origin/main | awk 'length($1) != 7')
