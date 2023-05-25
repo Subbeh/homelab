@@ -23,6 +23,7 @@ defaults:
     volumes: strict
     networks: strict
     env: strict
+    labels: strict
 
 networks:
   mesh:
