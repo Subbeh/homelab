@@ -182,7 +182,7 @@ network_svc:
     host: hl-services
     port: "3001"
   whoami:
-    host: hl-services
+    host: bastion
   wizarr:
     host: hl-services
     port: "5690"

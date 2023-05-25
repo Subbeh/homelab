@@ -6,4 +6,4 @@ whoami:
     traefik.enable: "true"
     traefik.http.routers.whoami-rtr.rule: "Host(`whoami.{{ network_domain.tld }}`)"
     traefik.http.routers.whoami-rtr.entrypoints: "websecure"
-    traefik.http.routers.whoami-rtr.middlewares: "chain-auth@file"
+    traefik.http.routers.whoami-rtr.middlewares: "secure-headers@file"
