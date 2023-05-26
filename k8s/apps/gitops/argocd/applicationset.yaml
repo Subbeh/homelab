@@ -33,6 +33,11 @@ spec:
           - .spec.dataFrom[].find
           - .spec.dataFrom[].extract
           - .spec.data[].remoteRef
+      - group: apps
+        kind: StatefulSet
+        jqPathExpressions:
+          - .spec.volumeClaimTemplates[].["kind", "apiVersion"]
+          - .spec.persistentVolumeClaimRetentionPolicy
       syncPolicy:
         syncOptions:
           - RespectIgnoreDifferences=true
