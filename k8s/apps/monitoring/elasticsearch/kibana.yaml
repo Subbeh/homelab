@@ -1,0 +1,16 @@
+---
+
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: efk
+  namespace: monitoring
+spec:
+  version: 8.8.0
+  count: 1 # Elastic Search statefulset deployment with two replicas
+  elasticsearchRef:
+    name: efk
+  http:  # NOTE disabling kibana automatic TLS configuration
+    tls:
+      selfSignedCertificate:
+        disabled: true
