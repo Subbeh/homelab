@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: monitoring
+
+helmCharts:
+  - name: fluentd
+    repo: https://fluent.github.io/helm-charts
+    version: 0.3.9
+    valuesFile: values.yaml
+    namespace: monitoring
+    releaseName: fluentd
+    includeCRDs: true
+
+resources:
+  - external-secret.yaml
+  - certificate.yaml
+  - template-cm.yaml
+  - ext-service.yaml
