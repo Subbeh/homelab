@@ -13,7 +13,6 @@ helmCharts:
     includeCRDs: true
 
 resources:
-  - external-secret.yaml
   - certificate.yaml
   - template-cm.yaml
   - ext-service.yaml

@@ -11,7 +11,7 @@ env:
   - name: FLUENT_AGGREGATOR_SHARED_KEY
     valueFrom:
       secretKeyRef:
-        name: doppler-fluentd
+        name: doppler-efk
         key: fluentd-shared-key
   - name: FLUENT_SELFHOSTNAME
     valueFrom:

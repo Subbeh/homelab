@@ -12,6 +12,7 @@ helmCharts:
     includeCRDs: true
 
 resources:
+  - external-secret.yaml
   - secrets/admin-externalsecret.yaml
   - secrets/fluentd-externalsecret.yaml
   - secrets/prometheus-externalsecret.yaml
