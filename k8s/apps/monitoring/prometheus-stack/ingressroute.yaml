@@ -24,5 +24,5 @@ spec:
     - kind: Rule
       match: Host(`grafana.k8s.sbbh.cloud`)
       services:
-        - name: kps-kube-prometheus-stack-grafana
+        - name: kps-grafana
           port: 80
