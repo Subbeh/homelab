@@ -37,8 +37,15 @@ k3s_server_manifests:
   - https://raw.githubusercontent.com/kube-vip/kube-vip/main/docs/manifests/rbac.yaml
   # calico
   - https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
-  # prometheus-operator
-  - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
+  # prometheus
+  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-alertmanagerconfigs.yaml
+  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-alertmanagers.yaml
+  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-podmonitors.yaml
+  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-probes.yaml
+  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-prometheuses.yaml
+  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-prometheusrules.yaml
+  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-servicemonitors.yaml
+  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-thanosrulers.yaml
   # argocd
   - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/application-crd.yaml
   - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/applicationset-crd.yaml
