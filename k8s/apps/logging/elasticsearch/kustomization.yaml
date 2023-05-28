@@ -1,13 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: monitoring
+namespace: logging
 
 helmCharts:
   - name: eck-operator
     repo: https://helm.elastic.co
     version: 2.8.0
-    namespace: monitoring
+    namespace: logging
     releaseName: es
     includeCRDs: true
 

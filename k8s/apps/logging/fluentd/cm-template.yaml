@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fluentd-template
-  namespace: monitoring
+  namespace: logging
 data:
   fluentd-es-template.json: |-
     {

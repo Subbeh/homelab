@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: fluentd-tls
-  namespace: monitoring
+  namespace: logging
 spec:
   # Secret names are always required.
   secretName: fluentd-tls

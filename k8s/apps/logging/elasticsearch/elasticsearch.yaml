@@ -4,7 +4,7 @@ apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
   name: efk
-  namespace: monitoring
+  namespace: logging
 spec:
   version: 8.8.0
   http:    # Making elasticsearch service available from outisde the cluster
