@@ -7,8 +7,9 @@
     "schedule:daily",
     ":enablePreCommit",
     ":disableRateLimiting",
+    ":automergePr",
     ":automergeDigest",
-    ":automergeBranch",
+    ":automergeMinor",
     ":rebaseStalePrs",
     ":semanticCommits",
     ":semanticCommitTypeAll(chore)",
@@ -23,15 +24,32 @@
   "pruneStaleBranches": true,
   "rollbackPrs": true,
 
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "from {{currentValue}} to {{newVersion}}",
+  "commitMessageSuffix": "",
+  "packageRules": [
+    {
+      "matchDatasources": ["helm", "kustomize"],
+      "commitMessageTopic": "chart {{depName}}",
+    },
+    {
+      "matchDatasources": ["docker", "ansible"],
+      "commitMessageTopic": "image {{depName}}",
+    },
+  ],
+
   "major": {
-    "dependencyDashboardApproval": true
+    "dependencyDashboardApproval": true,
   },
 
-  /* managers */
-  "argocd": {
-    "fileMatch": ["k8s/.+\\.ya?ml$"]
+  "pre-commit": {
+    "enabled": true,
   },
-  "helm-values": {
+
+  /* ==============
+   === managers ===
+   ============== */
+  "argocd": {
     "fileMatch": ["k8s/.+\\.ya?ml$"]
   },
   "kubernetes": {
@@ -41,7 +59,9 @@
     "fileMatch": ["ansible/apps/.*\\.ya?ml$"]
   },
 
-  /* host rules */
+  /* ================
+   === host rules ===
+   ================ */
   "hostRules": [
     {
       "matchHost": "docker.io",
@@ -55,20 +75,15 @@
     },
   ],
 
-  /* package rules */
+  /* ===================
+   === package rules ===
+   =================== */
   "packageRules": [
+    /* disable automerge for k8s */
     {
-      "matchUpdateTypes": ["minor", "patch"],
-      "matchCurrentVersion": "!/^0/",
-      "automerge": true
-    },
-
-    /* schedule monthly for k8s */
-    {
-      "extends": ["schedule:monthly"],
       "matchPaths": ["k8s/**"],
+      "automerge": false,
     },
-
 
     /* Ignore latest and localhost tags */
     {
@@ -80,13 +95,123 @@
     /* terraform */
     {
       "matchPackageNames": ["terraform", "proxmox"],
-      "enabled": false
+      "enabled": false,
     },
 
     /* postgres */
     {
       "matchPackageNames": ["postgres"],
-      "enabled": false
+      "enabled": false,
+    },
+
+    /* Labels */
+    {
+      "matchUpdateTypes": ["major"],
+      "labels": ["type/major"],
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "labels": ["type/minor"],
+    },
+    {
+      "matchUpdateTypes": ["patch"],
+      "labels": ["type/patch"],
+    },
+    {
+      "matchUpdateTypes": ["digest"],
+      "labels": ["type/digest"],
+    },
+    {
+      "matchDatasources": ["docker"],
+      "addLabels": ["renovate/container"],
+    },
+    {
+      "matchDatasources": ["helm", "kustomize"],
+      "addLabels": ["renovate/helm"],
+    },
+    {
+      "matchDatasources": ["galaxy", "galaxy-collection"],
+      "addLabels": ["renovate/ansible"],
+    },
+    {
+      "matchDatasources": ["terraform-provider"],
+      "addLabels": ["renovate/terraform"],
+    },
+
+    /* package rules */
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "commitMessagePrefix": "feat(container)!: ",
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat",
+      "semanticCommitScope": "container",
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "container",
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["digest"],
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "container",
+    },
+    {
+      "matchDatasources": ["helm", "kustomize"],
+      "matchUpdateTypes": ["major"],
+      "commitMessagePrefix": "feat(helm)!: ",
+    },
+    {
+      "matchDatasources": ["helm", "kustomize"],
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat",
+      "semanticCommitScope": "helm",
+    },
+    {
+      "matchDatasources": ["helm", "kustomize"],
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "helm",
+    },
+    {
+      "matchDatasources": ["galaxy", "galaxy-collection"],
+      "matchUpdateTypes": ["major"],
+      "commitMessagePrefix": "feat(ansible)!: ",
+    },
+    {
+      "matchDatasources": ["galaxy", "galaxy-collection"],
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat",
+      "semanticCommitScope": "ansible",
+    },
+    {
+      "matchDatasources": ["galaxy", "galaxy-collection"],
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "ansible",
+    },
+    {
+      "matchDatasources": ["terraform-provider"],
+      "matchUpdateTypes": ["major"],
+      "commitMessagePrefix": "feat(terraform)!: ",
+    },
+    {
+      "matchDatasources": ["terraform-provider"],
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat",
+      "semanticCommitScope": "terraform",
+    },
+    {
+      "matchDatasources": ["terraform-provider"],
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "terraform",
     },
   ],
 }
