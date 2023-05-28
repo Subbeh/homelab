@@ -3,16 +3,16 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: my-selfsigned-ca
+  name: cluster-ca
   namespace: networking
 spec:
   isCA: true
-  commonName: my-selfsigned-ca
+  commonName: cluster-ca
   secretName: root-secret
   privateKey:
     algorithm: ECDSA
     size: 256
   issuerRef:
-    name: selfsigned-issuer
+    name: self-signed-issuer
     kind: ClusterIssuer
     group: cert-manager.io

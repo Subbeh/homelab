@@ -13,5 +13,8 @@ helmCharts:
 
 resources:
   - externalsecret.yaml
+  - clusterissuer-local.yaml
+  - clusterissuer-ca.yaml
   - clusterissuer-prd.yaml
+  - certificate-local.yaml
   - certificate-prd.yaml

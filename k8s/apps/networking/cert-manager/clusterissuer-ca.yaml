@@ -3,7 +3,7 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: my-ca-issuer
+  name: ca-issuer
   namespace: networking
 spec:
   ca:
