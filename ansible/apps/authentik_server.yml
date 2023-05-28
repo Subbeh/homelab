@@ -1,7 +1,7 @@
 ---
 
 authentik_server:
-  image: ghcr.io/goauthentik/server:2023.5.1
+  image: ghcr.io/goauthentik/server:2023.5.2
   command: server
   ports:
     - "{{ network_svc.authentik_server.port }}:9000"
