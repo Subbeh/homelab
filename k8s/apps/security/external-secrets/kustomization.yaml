@@ -17,4 +17,4 @@ generators:
 
 resources:
   - namespace.yaml
-  - secret-store.yaml
+  - clustersecretstore.yaml

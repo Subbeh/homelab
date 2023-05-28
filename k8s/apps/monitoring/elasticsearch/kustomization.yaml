@@ -12,7 +12,7 @@ helmCharts:
     includeCRDs: true
 
 resources:
-  - external-secret.yaml
+  - externalsecret.yaml
   - secrets/admin-externalsecret.yaml
   - secrets/fluentd-externalsecret.yaml
   - secrets/prometheus-externalsecret.yaml
@@ -20,4 +20,4 @@ resources:
   - secrets/prometheus-role.yaml
   - elasticsearch.yaml
   - kibana.yaml
-  - ingress-route.yaml
+  - ingressroute.yaml

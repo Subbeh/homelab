@@ -14,5 +14,5 @@ helmCharts:
 resources:
   - middlewares.yaml
   - tlsstore.yaml
-  - ingress-route.yaml
-  - metrics-service.yaml
+  - ingressroute.yaml
+  - service-metrics.yaml

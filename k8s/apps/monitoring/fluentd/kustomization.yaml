@@ -14,5 +14,5 @@ helmCharts:
 
 resources:
   - certificate.yaml
-  - template-cm.yaml
-  - ext-service.yaml
+  - cm-template.yaml
+  - service-ext.yaml

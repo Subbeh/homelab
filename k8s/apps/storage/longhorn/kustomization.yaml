@@ -13,7 +13,7 @@ helmCharts:
     includeCRDs: true
 
 resources:
-  - external-secret.yaml
-  - ingress-route.yaml
-  - snapshots-job.yaml
-  - backups-job.yaml
+  - externalsecret.yaml
+  - ingressroute.yaml
+  - recurringjob-snapshots.yaml
+  - recurringjob-backups.yaml

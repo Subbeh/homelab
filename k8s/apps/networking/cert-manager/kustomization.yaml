@@ -12,6 +12,6 @@ helmCharts:
     releaseName: cert-manager
 
 resources:
-  - external-secret.yaml
+  - externalsecret.yaml
   - clusterissuer-prd.yaml
   - certificate-prd.yaml

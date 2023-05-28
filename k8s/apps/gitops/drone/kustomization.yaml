@@ -29,6 +29,6 @@ helmCharts:
     includeCRDs: true
 
 resources:
-  - external-secret.yaml
-  - ingress-route.yaml
-  - cache-pvc.yaml
+  - externalsecret.yaml
+  - ingressroute.yaml
+  - pvc-cache.yaml

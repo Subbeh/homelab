@@ -16,8 +16,8 @@ generators:
 
 resources:
   - namespace.yaml
-  - external-secret.yaml
-  - ingress-route.yaml
+  - externalsecret.yaml
+  - ingressroute.yaml
   - applicationset.yaml
 
 patches:
