@@ -38,14 +38,18 @@ spec:
         jqPathExpressions:
           - .spec.volumeClaimTemplates[].["kind", "apiVersion"]
           - .spec.persistentVolumeClaimRetentionPolicy
+      - group: apiextensions.k8s.io
+        kind: CustomResourceDefinition
+        jqPathExpressions:
+          - .spec.conversion.webhook.clientConfig.caBundle
       syncPolicy:
         syncOptions:
           - RespectIgnoreDifferences=true
           - CreateNamespace=true
           - ServerSideApply=true
-        # automated:
-        #   prune: true
-        #   selfHeal: true
+        automated:
+          prune: true
+          selfHeal: true
         retry:
           limit: 10
           backoff:
