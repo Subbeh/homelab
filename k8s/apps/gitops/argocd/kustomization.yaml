@@ -22,3 +22,4 @@ resources:
 
 patches:
   - path: patches/argocd-cmd-params-cm.yaml
+  - path: patches/argocd-cm.yaml

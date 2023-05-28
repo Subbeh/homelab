@@ -1,0 +1,4 @@
+identity:
+  externalCA: true
+  issuer:
+    scheme: kubernetes.io/tls

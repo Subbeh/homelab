@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  - name: linkerd-control-plane
+    repo: https://helm.linkerd.io/stable
+    version: 1.12.3
+    valuesFile: values.yaml
+    namespace: linkerd
+    releaseName: linkerd
+
+  - name: linkerd-crds
+    repo: https://helm.linkerd.io/stable
+    version: 1.6.1
+
+resources:
+  - namespace.yaml
+  - certificate-identity-issuer.yaml
+  - bundle-identity-trust-roots.yaml
+
+# patchesJson6902:
+#   - target:
+#       version: v1
+#       kind: Namespace
+#       name: kube-system
+#     path: patches/namespace-kube-system.yaml

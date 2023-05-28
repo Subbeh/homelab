@@ -12,6 +12,7 @@ helmCharts:
     includeCRDs: true
 
 resources:
+  - namespace.yaml
   - externalsecret.yaml
   - secrets/admin-externalsecret.yaml
   - secrets/fluentd-externalsecret.yaml

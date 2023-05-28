@@ -27,21 +27,19 @@ spec:
         server: https://kubernetes.default.svc
         namespace: "{{path[2]}}"
       ignoreDifferences:
+        # external-secrets
       - group: external-secrets.io
         kind: ExternalSecret
         jqPathExpressions:
           - .spec.dataFrom[].find
           - .spec.dataFrom[].extract
           - .spec.data[].remoteRef
+        # loki
       - group: apps
         kind: StatefulSet
         jqPathExpressions:
           - .spec.volumeClaimTemplates[].["kind", "apiVersion"]
           - .spec.persistentVolumeClaimRetentionPolicy
-      - group: apiextensions.k8s.io
-        kind: CustomResourceDefinition
-        jqPathExpressions:
-          - .spec.conversion.webhook.clientConfig.caBundle
       syncPolicy:
         syncOptions:
           - RespectIgnoreDifferences=true
