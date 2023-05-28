@@ -43,6 +43,12 @@ spec:
           - RespectIgnoreDifferences=true
           - CreateNamespace=true
           - ServerSideApply=true
-        automated:
-          prune: true
-          selfHeal: true
+        # automated:
+        #   prune: true
+        #   selfHeal: true
+        retry:
+          limit: 10
+          backoff:
+            duration: 1m
+            maxDuration: 16m
+            factor: 2
