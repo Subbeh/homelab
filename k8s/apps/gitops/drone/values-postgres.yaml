@@ -1,0 +1,17 @@
+---
+
+global:
+  storageClass: "longhorn"
+
+auth:
+  username: "drone"
+  database: "drone"
+  existingSecret: "postgres-secret"
+  secretKeys:
+    adminPasswordKey: postgres-password
+    userPasswordKey: password
+
+primary:
+  persistence:
+    enabled: true
+    size: 5Gi
