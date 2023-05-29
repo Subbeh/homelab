@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sed -i -E -e 's/job="(apiserver|kube-proxy|kube-scheduler|kube-controller-manager)"/job="kubelet"/g' -e '/^  labels:/a\    release: kube-prometheus-stack' *
