@@ -16,3 +16,5 @@ resources:
   - namespace.yaml
   - externalsecret.yaml
   - ingressroute.yaml
+  - config/svc-k3s-metrics.yaml
+  - config/rule-k3s.yaml
