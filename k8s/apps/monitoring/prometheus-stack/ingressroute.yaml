@@ -14,15 +14,15 @@ spec:
     - kind: Rule
       match: Host(`prometheus.k8s.sbbh.cloud`)
       services:
-        - name: kps-kube-prometheus-stack-prometheus
+        - name: kube-prometheus-stack-prometheus
           port: 9090
     - kind: Rule
       match: Host(`alertmanager.k8s.sbbh.cloud`)
       services:
-        - name: kps-kube-prometheus-stack-alertmanager
+        - name: kube-prometheus-stack-alertmanager
           port: 9093
     - kind: Rule
       match: Host(`grafana.k8s.sbbh.cloud`)
       services:
-        - name: kps-grafana
+        - name: kube-prometheus-stack-grafana
           port: 80

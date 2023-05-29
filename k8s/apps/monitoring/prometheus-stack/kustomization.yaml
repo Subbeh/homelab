@@ -9,7 +9,7 @@ helmCharts:
     version: 46.4.1
     namespace: monitoring
     valuesFile: values.yaml
-    releaseName: kps
+    releaseName: kube-prometheus-stack
     includeCRDs: true
 
 resources:
@@ -18,3 +18,12 @@ resources:
   - ingressroute.yaml
   - config/svc-k3s-metrics.yaml
   - config/rule-k3s.yaml
+  - config/servicemonitor.yaml
+  - config/servicemonitor-traefik.yaml
+
+  - dashboards/cm-api-server-dashboard.yaml
+  - dashboards/cm-controller-manager-dashboard.yaml
+  - dashboards/cm-etcd-dashboard.yaml
+  - dashboards/cm-kubelet-dashboard.yaml
+  - dashboards/cm-proxy-dashboard.yaml
+  - dashboards/cm-scheduler-dashboard.yaml

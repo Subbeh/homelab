@@ -95,7 +95,7 @@ grafana:
   # Relabel job name of Grafana's metrics
   serviceMonitor:
     labels:
-      release: kps
+      release: kube-prometheus-stack
     relabelings:
       # Replace job value
       - sourceLabels:
