@@ -6,7 +6,7 @@ namespace: storage
 helmCharts:
   - name: minio
     repo: https://charts.min.io
-    version: 5.0.9
+    version: 5.0.10
     valuesFile: values.yaml
     namespace: storage
     releaseName: minio
