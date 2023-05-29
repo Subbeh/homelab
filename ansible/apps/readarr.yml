@@ -1,7 +1,7 @@
 ---
 
 readarr:
-  image: lscr.io/linuxserver/readarr:0.1.5-develop
+  image: lscr.io/linuxserver/readarr:0.1.6-develop
   ports:
     - "{{ network_svc.nas_srv.ip }}:{{ network_svc.readarr.port }}:8787"
   volumes:
