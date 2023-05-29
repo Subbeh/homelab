@@ -117,6 +117,14 @@
       "labels": ["type/digest"],
     },
     {
+      "matchDatasources": ["ansible"],
+      "addLabels": ["ansible"],
+    },
+    {
+      "matchDatasources": ["kubernetes"],
+      "addLabels": ["kubernetes"],
+    },
+    {
       "matchDatasources": ["docker"],
       "addLabels": ["renovate/container"],
     },
