@@ -16,7 +16,7 @@
     ":semanticCommitScope(renovate)",
   ],
 
-  "schedule": ["before 5am"],
+  "automergeSchedule": ["before 5am"],
   "dependencyDashboardTitle": "Renovate Dashboard",
   "rebaseWhen": "conflicted",
   "ignoreTests": true,
@@ -27,16 +27,6 @@
   "commitMessageTopic": "{{depName}}",
   "commitMessageExtra": "from {{currentValue}} to {{newVersion}}",
   "commitMessageSuffix": "",
-  "packageRules": [
-    {
-      "matchDatasources": ["helm", "kustomize"],
-      "commitMessageTopic": "chart {{depName}}",
-    },
-    {
-      "matchDatasources": ["docker", "ansible"],
-      "commitMessageTopic": "image {{depName}}",
-    },
-  ],
 
   "major": {
     "dependencyDashboardApproval": true,
@@ -51,6 +41,9 @@
    ============== */
   "argocd": {
     "fileMatch": ["k8s/.+\\.ya?ml$"]
+  },
+  "helm-values": {
+    "fileMatch": ["k8s/.+values.*\\.ya?ml$"]
   },
   "kubernetes": {
     "fileMatch": ["k8s/.+\\.ya?ml$"]
@@ -104,7 +97,9 @@
       "enabled": false,
     },
 
-    /* Labels */
+    /* ============
+     === labels ===
+     =============*/
     {
       "matchUpdateTypes": ["major"],
       "labels": ["type/major"],
@@ -138,29 +133,39 @@
       "addLabels": ["renovate/terraform"],
     },
 
-    /* package rules */
+    /* =============
+     === commits ===
+     ==============*/
     {
-      "matchDatasources": ["docker"],
+      "matchDatasources": ["docker", "ansible"],
+      "commitMessageTopic": "image {{depName}}",
+    },
+    {
+      "matchDatasources": ["docker", "ansible"],
       "matchUpdateTypes": ["major"],
       "commitMessagePrefix": "feat(container)!: ",
     },
     {
-      "matchDatasources": ["docker"],
+      "matchDatasources": ["docker", "ansible"],
       "matchUpdateTypes": ["minor"],
       "semanticCommitType": "feat",
       "semanticCommitScope": "container",
     },
     {
-      "matchDatasources": ["docker"],
+      "matchDatasources": ["docker", "ansible"],
       "matchUpdateTypes": ["patch"],
       "semanticCommitType": "fix",
       "semanticCommitScope": "container",
     },
     {
-      "matchDatasources": ["docker"],
+      "matchDatasources": ["docker", "ansible"],
       "matchUpdateTypes": ["digest"],
       "semanticCommitType": "chore",
       "semanticCommitScope": "container",
+    },
+    {
+      "matchDatasources": ["helm", "kustomize"],
+      "commitMessageTopic": "chart {{depName}}",
     },
     {
       "matchDatasources": ["helm", "kustomize"],
