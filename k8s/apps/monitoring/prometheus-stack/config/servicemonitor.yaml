@@ -4,7 +4,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    release: kube-prometheus-stack
+    release: kps
   name: k3s-monitoring
   namespace: monitoring
 spec:
