@@ -3,9 +3,10 @@ kind: ConfigMap
 metadata:
   name: api-server-dashboard
   labels:
-     grafana_dashboard: "1"
+    release: kube-prometheus-stack
+    grafana_dashboard: "1"
 data:
-  dashboard.json: |-
+  api-server-dashboard.json: |-
     {
       "__inputs": [],
       "__requires": [],
@@ -968,7 +969,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "sum(rate(workqueue_adds_total{job=\"apiserver\", instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, name)",
+                  "expr": "sum(rate(workqueue_adds_total{job=\"kubelet\", instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, name)",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} {{name}}",
@@ -1048,7 +1049,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "sum(rate(workqueue_depth{job=\"apiserver\", instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, name)",
+                  "expr": "sum(rate(workqueue_depth{job=\"kubelet\", instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, name)",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} {{name}}",
@@ -1128,7 +1129,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{job=\"apiserver\", instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, name, le))",
+                  "expr": "histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{job=\"kubelet\", instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, name, le))",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} {{name}}",
@@ -1221,7 +1222,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "etcd_helper_cache_entry_total{job=\"apiserver\", instance=~\"$instance\", cluster=\"$cluster\"}",
+                  "expr": "etcd_helper_cache_entry_total{job=\"kubelet\", instance=~\"$instance\", cluster=\"$cluster\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}}",
@@ -1301,14 +1302,14 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "sum(rate(etcd_helper_cache_hit_total{job=\"apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance)",
+                  "expr": "sum(rate(etcd_helper_cache_hit_total{job=\"kubelet\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance)",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} hit",
                   "refId": "A"
                 },
                 {
-                  "expr": "sum(rate(etcd_helper_cache_miss_total{job=\"apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance)",
+                  "expr": "sum(rate(etcd_helper_cache_miss_total{job=\"kubelet\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance)",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} miss",
@@ -1388,14 +1389,14 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "histogram_quantile(0.99,sum(rate(etcd_request_cache_get_duration_seconds_bucket{job=\"apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, le))",
+                  "expr": "histogram_quantile(0.99,sum(rate(etcd_request_cache_get_duration_seconds_bucket{job=\"kubelet\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, le))",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} get",
                   "refId": "A"
                 },
                 {
-                  "expr": "histogram_quantile(0.99,sum(rate(etcd_request_cache_add_duration_seconds_bucket{job=\"apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, le))",
+                  "expr": "histogram_quantile(0.99,sum(rate(etcd_request_cache_add_duration_seconds_bucket{job=\"kubelet\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])) by (instance, le))",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} miss",
@@ -1488,7 +1489,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "process_resident_memory_bytes{job=\"apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}",
+                  "expr": "process_resident_memory_bytes{job=\"kubelet\",instance=~\"$instance\", cluster=\"$cluster\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}}",
@@ -1568,7 +1569,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "rate(process_cpu_seconds_total{job=\"apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])",
+                  "expr": "rate(process_cpu_seconds_total{job=\"kubelet\",instance=~\"$instance\", cluster=\"$cluster\"}[5m])",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}}",
@@ -1648,7 +1649,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "go_goroutines{job=\"apiserver\",instance=~\"$instance\", cluster=\"$cluster\"}",
+                  "expr": "go_goroutines{job=\"kubelet\",instance=~\"$instance\", cluster=\"$cluster\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}}",
@@ -1755,7 +1756,7 @@ data:
             "multi": false,
             "name": "instance",
             "options": [],
-            "query": "label_values(apiserver_request_total{job=\"apiserver\", cluster=\"$cluster\"}, instance)",
+            "query": "label_values(apiserver_request_total{job=\"kubelet\", cluster=\"$cluster\"}, instance)",
             "refresh": 2,
             "regex": "",
             "sort": 1,

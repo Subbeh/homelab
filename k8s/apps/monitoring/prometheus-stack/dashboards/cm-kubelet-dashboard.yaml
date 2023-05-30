@@ -3,9 +3,10 @@ kind: ConfigMap
 metadata:
   name: kubelet-dashboard
   labels:
-     grafana_dashboard: "1"
+    release: kube-prometheus-stack
+    grafana_dashboard: "1"
 data:
-  dashboard.json: |-
+  kubelet-dashboard.json: |-
     {
       "__inputs": [
         {

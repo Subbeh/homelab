@@ -16,7 +16,7 @@ resources:
   - namespace.yaml
   - externalsecret.yaml
   - ingressroute.yaml
-  - config/svc-k3s-metrics.yaml
+  - config/service-metric-k3s.yaml
   - config/rule-k3s.yaml
   - config/servicemonitor.yaml
   - config/servicemonitor-traefik.yaml
