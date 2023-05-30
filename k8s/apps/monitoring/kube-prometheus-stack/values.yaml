@@ -1,0 +1,192 @@
+## Provide a name in place of kube-prometheus-stack for `app:` labels
+##
+nameOverride: prometheus
+
+## Create default rules for monitoring the cluster
+##
+defaultRules:
+  create: true
+  rules:
+    alertmanager: true
+    etcd: true
+    configReloaders: true
+    general: true
+    k8s: true
+    kubeApiserverAvailability: true
+    kubeApiserverBurnrate: true
+    kubeApiserverHistogram: true
+    kubeApiserverSlos: true
+    kubeControllerManager: true
+    kubelet: true
+    kubeProxy: true
+    kubePrometheusGeneral: true
+    kubePrometheusNodeRecording: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    kubeSchedulerAlerting: true
+    kubeSchedulerRecording: true
+    kubeStateMetrics: true
+    network: true
+    node: true
+    nodeExporterAlerting: true
+    nodeExporterRecording: true
+    prometheus: true
+    prometheusOperator: true
+
+alertmanager:
+  fullnameOverride: alertmanager
+  alertmanagerSpec:
+    # Subpath /alertmanager configuration
+    # externalUrl: http://alertmanager.k8s.sbbh.cloud/
+    # routePrefix: /
+    # PVC config
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+
+grafana:
+  enabled: false
+
+kubeApiServer:
+  enabled: true
+
+kubelet:
+  enabled: true
+  serviceMonitor:
+    metricRelabelings:
+      - action: replace
+        sourceLabels:
+          - node
+        targetLabel: instance
+
+kubeControllerManager:
+  enabled: true
+  endpoints: # ips of servers
+    - 10.0.80.11
+    - 10.0.80.12
+    - 10.0.80.13
+
+coreDns:
+  enabled: true
+
+kubeDns:
+  enabled: false
+
+kubeEtcd:
+  enabled: true
+  endpoints: # ips of servers
+    - 10.0.80.11
+    - 10.0.80.12
+    - 10.0.80.13
+  service:
+    enabled: true
+    port: 2381
+    targetPort: 2381
+
+kubeScheduler:
+  enabled: true
+  endpoints: # ips of servers
+    - 10.0.80.11
+    - 10.0.80.12
+    - 10.0.80.13
+
+kubeProxy:
+  enabled: true
+  endpoints: # ips of servers
+    - 10.0.80.11
+    - 10.0.80.12
+    - 10.0.80.13
+
+kubeStateMetrics:
+  enabled: true
+
+kube-state-metrics:
+  fullnameOverride: kube-state-metrics
+  selfMonitor:
+    enabled: true
+  prometheus:
+    monitor:
+      enabled: true
+      relabelings:
+        - action: replace
+          regex: (.*)
+          replacement: $1
+          sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: kubernetes_node
+
+nodeExporter:
+  enabled: true
+  serviceMonitor:
+    relabelings:
+      - action: replace
+        regex: (.*)
+        replacement: $1
+        sourceLabels:
+          - __meta_kubernetes_pod_node_name
+        targetLabel: kubernetes_node
+
+prometheus-node-exporter:
+  fullnameOverride: node-exporter
+  prometheus:
+    monitor:
+      relabelings:
+        - action: replace
+          regex: (.*)
+          replacement: $1
+          sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: kubernetes_node
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 2048Mi
+
+prometheusOperator:
+  # Disable linkerd injection for admission webhooks jobs
+  admissionWebhooks:
+    patch:
+      podAnnotations:
+        linkerd.io/inject: disabled
+  prometheusConfigReloader:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 50Mi
+      limits:
+        memory: 100Mi
+
+prometheus:
+  prometheusSpec:
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    retention: 7d
+    enableAdminAPI: true
+    walCompression: true
+    resources:
+      requests:
+        memory: 2Gi
+      limits:
+        memory: 2Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+thanosRuler:
+  enabled: false
