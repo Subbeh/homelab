@@ -17,8 +17,6 @@ k3s_server:
   disable:
     # Disable flannel - replaced with Calico
     - flannel
-    # Disable local-path-provisioner - installed with Flux
-    - local-storage
     # Disable metrics-server - installed with Flux
     - metrics-server
     # Disable servicelb - replaced with metallb and installed with Flux
