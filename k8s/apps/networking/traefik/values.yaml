@@ -5,14 +5,13 @@ globalArguments:
 additionalArguments:
   - "--serversTransport.insecureSkipVerify=true"
   # Tell Traefik to only trust incoming headers from the local network.
-  - "--entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1/32,10.0.0.0/16"
-  - "--entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1/32,10.0.0.0/16"
+  - "--entryPoints.web.proxyProtocol.trustedIPs=127.0.0.1/32,10.11.0.0/16"
+  - "--entryPoints.websecure.proxyProtocol.trustedIPs=127.0.0.1/32,10.11.0.0/16"
   # Also whitelist the source of headers to trust, the private IPs on the load balancers displayed on the networking page of DO.
-  - "--entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,10.0.0.0/16"
-  - "--entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32,10.0.0.0/16"
+  - "--entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,10.11.0.0/16"
+  - "--entryPoints.websecure.forwardedHeaders.trustedIPs=127.0.0.1/32,10.11.0.0/16"
   - "--log.level=DEBUG"
   - "--accesslog.filepath=/var/log/traefik/access.log"
-  - "--metrics.prometheus=true"
 
 additionalVolumeMounts:
   - name: logs
@@ -74,10 +73,16 @@ service:
     service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
   labels: {}
   spec:
-    loadBalancerIP: 10.0.80.100
+    loadBalancerIP: 10.11.80.100
     externalTrafficPolicy: Local
   loadBalancerSourceRanges: []
   externalIPs: []
   env:
     - name: TZ
       value: "Australia/Melbourne"
+
+metrics:
+  prometheus: {}
+  service:
+    enabled: true
+  serviceMonitor: {}

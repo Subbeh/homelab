@@ -16,7 +16,7 @@ tasks:
     desk: terraform plan
     dir: "{{.USER_WORKING_DIR}}"
     cmds:
-      - terraform plan -var-file="{{.DIR}}.tfvars"
+      - terraform plan
     vars:
       DIR:
         sh: basename {{.USER_WORKING_DIR}}
@@ -25,7 +25,7 @@ tasks:
     desk: terraform apply
     dir: "{{.USER_WORKING_DIR}}"
     cmds:
-      - terraform apply -parallelism=1 -var-file="{{.DIR}}.tfvars"
+      - terraform apply -parallelism=1 -auto-approve
     vars:
       DIR:
         sh: basename {{.USER_WORKING_DIR}}

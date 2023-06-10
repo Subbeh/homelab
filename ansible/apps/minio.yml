@@ -3,8 +3,8 @@
 minio:
   image: quay.io/minio/minio:RELEASE.2023-05-18T00-05-36Z
   ports:
-    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.minio.port }}:9000"
-    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.minio.port_console }}:9090"
+    - "{{ network_svc.minio.port }}:9000"
+    - "{{ network_svc.minio.port_console }}:9090"
   environment:
     MINIO_ROOT_USER: "{{ common_user }}"
     MINIO_ROOT_PASSWORD: "{{ minio_pass }}"

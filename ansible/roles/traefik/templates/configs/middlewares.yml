@@ -52,7 +52,7 @@ http:
 
     authentik:
       forwardAuth:
-        address: "http://{{ network_svc.authentik.host }}:{{ network_svc.authentik.port }}/outpost.goauthentik.io/auth/traefik"
+        address: "http://{{ network_svc.authentik_server.host }}:{{ network_svc.authentik_server.port }}/outpost.goauthentik.io/auth/traefik"
         trustForwardHeader: true
         authResponseHeaders:
           - X-authentik-username

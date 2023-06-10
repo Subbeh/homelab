@@ -5,9 +5,8 @@ gluetun:
   capabilities:
     - net_admin
   ports:
-    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.gluetun.port }}:8888"
-    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.deluge.port }}:8112"
-    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.qbittorrent.port }}:8080"
+    - "{{ network_svc.gluetun.port }}:8888"
+    - "{{ network_svc.qbittorrent.port }}:8080"
   volumes:
     - "{{ common_dir }}/gluetun:/gluetun"
   environment:

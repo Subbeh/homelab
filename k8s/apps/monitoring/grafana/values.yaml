@@ -7,10 +7,37 @@ admin:
   userKey: grafanaUser
   passwordKey: grafanaPassword
 
+# src: https://github.com/onedr0p/containers/tree/main/apps/postgres-init
+extraInitContainers:
+  - name: 01-init-db
+    image: ghcr.io/onedr0p/postgres-init:14.8
+    imagePullPolicy: IfNotPresent
+    envFrom:
+      - secretRef:
+          name: doppler-monitoring
+
+env:
+  GF_DATABASE_TYPE: postgres
+  GF_DATABASE_HOST: postgres-rw.default.svc.cluster.local
+  GF_DATABASE_USER: grafana
+
+envFromSecrets:
+  - name: doppler-monitoring
+
 grafana.ini:
+  feature_toggles:
+    enable: publicDashboards
   analytics:
     check_for_updates: false
     check_for_plugin_updates: false
+  date_formats:
+    use_browser_locale: true
+  security:
+    cookie_samesite: grafana
+  server:
+    root_url: https://grafana.k8s.sbbh.cloud
+  plugins:
+    allow_loading_unsigned_plugins: natel-discrete-panel,pr0ps-trackmap-panel,panodata-map-panel
 
 dashboardProviders:
   dashboardproviders.yaml:
@@ -58,44 +85,44 @@ dashboards:
     minio:
       gnetid: 13502
       revision: 21
-      datasource: prometheus
+      datasource: Prometheus
     # ref: https://grafana.com/grafana/dashboards/1860-node-exporter-full/
     node-exporter-full:
       gnetid: 1860
       revision: 30
-      datasource: prometheus
+      datasource: Prometheus
     cert-manager:
       url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
-      datasource: prometheus
+      datasource: Prometheus
     external-secrets:
       url: https://raw.githubusercontent.com/external-secrets/external-secrets/main/docs/snippets/dashboard.json
-      datasource: prometheus
+      datasource: Prometheus
     kubernetes-api-server:
       url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json
-      datasource: prometheus
+      datasource: Prometheus
     kubernetes-coredns:
       url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json
-      datasource: prometheus
+      datasource: Prometheus
     kubernetes-global:
       url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
-      datasource: prometheus
+      datasource: Prometheus
     kubernetes-namespaces:
       url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
-      datasource: prometheus
+      datasource: Prometheus
     kubernetes-nodes:
       url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
-      datasource: prometheus
+      datasource: Prometheus
     kubernetes-pods:
       url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
-      datasource: prometheus
+      datasource: Prometheus
 
 sidecar:
   dashboards:
     enabled: true
-    searchnamespace: all
+    searchNamespace: ALL
   datasources:
     enabled: true
-    searchnamespace: all
+    searchNamespace: ALL
 
 plugins:
   - grafana-piechart-panel
@@ -106,19 +133,11 @@ plugins:
   - pr0ps-trackmap-panel
   - vonage-status-panel
 
-servicemonitor:
+serviceMonitor:
   enabled: true
 
 persistence:
   enabled: false
 
-testframework:
+testFramework:
   enabled: false
-
-topologyspreadconstraints:
-  - maxskew: 1
-    topologykey: kubernetes.io/hostname
-    whenunsatisfiable: donotschedule
-    labelselector:
-      matchlabels:
-        app.kubernetes.io/name: grafana

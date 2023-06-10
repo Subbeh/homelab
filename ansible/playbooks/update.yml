@@ -15,4 +15,4 @@
     reboot_servers: {}
 
   tasks:
-    - ansible.builtin.include_tasks: ../tasks/update.yml
+    - ansible.builtin.import_tasks: ../tasks/update.yml

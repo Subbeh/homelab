@@ -17,6 +17,9 @@
       - 41641 # tailscale
       - 3478  # tailscale
 
+    docker_users:
+      - "{{ common_user }}"
+
     borg_source_directories:
       - '{{ common_dir }}'
     borgmatic_cron_hour: 02
@@ -49,6 +52,11 @@
       ansible.builtin.import_role:
         name: geerlingguy.firewall
 
+    - name: Install Docker
+      tags: docker
+      ansible.builtin.import_role:
+        name: geerlingguy.docker
+
     - name: Flush handlers
       ansible.builtin.meta: flush_handlers
 
@@ -57,59 +65,24 @@
       ansible.builtin.import_role:
         name: borg
 
-    - name: Restart Docker service
-      tags: [ firewall, docker ]
-      ansible.builtin.service:
-        name: docker
-        state: restarted
-      changed_when: false
-
-    - name: Create Portainer agent container
-      tags: portainer-agent
-      ansible.builtin.include_role:
-        name: apps
-      vars:
-        run_app: portainer_agent_bastion
-
     - name: Import Traefik role
       tags: traefik
       ansible.builtin.import_role:
         name: traefik
-
-    - name: Copy dynamic Traefik config files
-      tags: [ never, traefik-config ]
-      ansible.builtin.import_role:
-        name: traefik
-        tasks_from: copy_config
-
-    - name: Create Endlessh container
-      tags: endlessh
-      ansible.builtin.include_role:
-        name: apps
-      vars:
-        run_app: endlessh
 
     - name: Import CrowdSec role
       tags: crowdsec
       ansible.builtin.import_role:
         name: crowdsec
 
-    - name: Set sysctls
-      tags: tailscale
-      ansible.posix.sysctl:
-        name: "{{ item.key }}"
-        value: "{{ item.value }}"
-        reload: true
-      with_dict: "{{ sysctl_config }}"
+    - name: Deploy containers
+      tags: apps
+      ansible.builtin.include_role:
+        name: apps
+        apply:
+          tags: always
       vars:
-        sysctl_config:
-          net.ipv4.ip_forward: 1
-          net.ipv6.conf.all.forwarding: 1
-
-    - name: Import Tailscale role
-      tags: tailscale
-      ansible.builtin.import_role:
-        name: artis3n.tailscale
-      vars:
-        tailscale_authkey: "{{ network_svc.tailscale.key }}"
-        tailscale_args: "--hostname=bastion --accept-routes=true --advertise-routes=10.0.0.0/8 --advertise-exit-node"
+        run_app: "{{ item }}"
+      with_items:
+        - portainer_agent_bastion
+        - endlessh

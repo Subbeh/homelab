@@ -3,7 +3,7 @@
 prowlarr:
   image: lscr.io/linuxserver/prowlarr:1.3.2.3006-ls12
   ports:
-    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.prowlarr.port }}:9696"
+    - "{{ network_svc.prowlarr.port }}:9696"
   volumes:
     - "{{ common_dir }}/prowlarr/config:/config"
 

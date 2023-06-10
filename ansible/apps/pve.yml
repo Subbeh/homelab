@@ -14,22 +14,18 @@ pve:
 
       pve-main-svc:
         loadBalancer:
-          serversTransport: "pve"
           healthCheck:
+            path: /
             interval: 10s
             timeout: 3s
           servers:
-            - url: "https://{{ network_svc.pve.ip[0] }}:{{ network_svc.pve.port }}"
+            - url: "https://{{ network_svc.pve.host[0] }}.{{ network_domain.tld_local }}:{{ network_svc.pve.port }}"
 
       pve-backup-svc:
         loadBalancer:
-          serversTransport: "pve"
           healthCheck:
+            path: /
             interval: 10s
             timeout: 3s
           servers:
-            - url: "https://{{ network_svc.pve.ip[1] }}:{{ network_svc.pve.port }}"
-
-    serversTransports: |
-      pve:
-        insecureSkipVerify: true
+            - url: "https://{{ network_svc.pve.host[1] }}.{{ network_domain.tld_local }}:{{ network_svc.pve.port }}"

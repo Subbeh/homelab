@@ -7,7 +7,7 @@
     name: apps
 
 - name: Set app variables
-  no_log: true
+  # no_log: true
   ansible.builtin.set_fact:
     app: "{{ apps[run_app] | combine({'name': apps[run_app].name | default(run_app)}) }}"
   when: run_app is defined

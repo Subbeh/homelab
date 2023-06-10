@@ -1,0 +1,82 @@
+---
+
+- hosts: services
+  gather_facts: false
+  become: true
+
+  vars:
+    docker_users:
+      - "{{ common_user }}"
+
+    borg_source_directories:
+      - '{{ common_dir }}'
+    borgmatic_cron_hour: 02
+    borgmatic_cron_minute: 10
+    borgmatic_hooks:
+      before_backup:
+        - echo "`date` - Starting backup."
+      after_backup:
+        - echo "`date` - Backup created."
+      on_error:
+        - echo "`date` - Error while creating a backup."
+      postgresql_databases:
+        - name: all
+          hostname: localhost
+          username: "{{ common_user }}"
+          password: "{{ postgres_pass }}"
+
+  pre_tasks:
+    - name: Verify SSH port
+      tags: [ always, pretasks ]
+      ansible.builtin.import_tasks:
+        file: ../tasks/check_port.yml
+      vars:
+        ansible_become: false
+
+    - name: Gathering facts
+      tags: always
+      ansible.builtin.setup:
+
+  handlers:
+    - name: Import common handlers
+      ansible.builtin.import_tasks: ../tasks/handlers.yml
+
+  tasks:
+    - name: Import bootstrap role
+      tags: bootstrap
+      ansible.builtin.import_role:
+        name: bootstrap
+
+    - name: Install Docker
+      tags: docker
+      ansible.builtin.import_role:
+        name: geerlingguy.docker
+
+    - name: Import Borg backups role
+      tags: borg
+      ansible.builtin.import_role:
+        name: borg
+
+    - name: Import Authentik role
+      tags: authentik
+      ansible.builtin.import_role:
+        name: authentik
+
+    - name: Deploy containers
+      tags: apps
+      ansible.builtin.include_role:
+        name: apps
+        apply:
+          tags: always
+      vars:
+        run_app: "{{ item }}"
+      with_items:
+        - postgres
+        - redis
+        - portainer
+        - gitea
+        - overseerr
+        - tautulli
+        - openspeedtest
+        - uptimekuma
+        - wizarr

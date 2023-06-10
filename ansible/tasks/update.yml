@@ -14,7 +14,7 @@
       ansible.builtin.apt: upgrade=dist force_apt_get=yes
 
     - name: Import reboot task
-      ansible.builtin.include_tasks:
+      ansible.builtin.import_tasks:
         file: ../tasks/check_reboot.yml
 
     - name: Clean up system

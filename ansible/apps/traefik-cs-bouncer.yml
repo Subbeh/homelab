@@ -1,6 +1,7 @@
 ---
 
 traefik_cs_bouncer:
+  name: traefik-cs-bouncer
   image: fbonalair/traefik-crowdsec-bouncer:0.5.0
   restart_policy: always
   environment:

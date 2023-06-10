@@ -20,8 +20,8 @@ tcp:
       ipWhiteList:
         sourceRange:
           - "127.0.0.1/32"
-          - "10.0.0.0/16"
-          - "100.64.0.0/10"
+          - "{{ network_cidr.lan }}"
+          - "{{ network_cidr.tailscale }}"
 
   services:
     k8s-passthrough:

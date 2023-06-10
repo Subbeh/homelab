@@ -5,7 +5,7 @@ metadata:
   name: default-pool
 spec:
   addresses:
-    - 10.0.80.100-10.0.80.150
+    - 10.11.80.100-10.11.80.150
 
 ---
 apiVersion: metallb.io/v1beta1

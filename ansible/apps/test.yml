@@ -1,5 +1,0 @@
----
-
-test:
-  host: hl-services
-  image: hello-world

@@ -12,17 +12,17 @@
   vars:
     run_app: redis
 
-- name: Create authentik-server container
+- name: Create authentik server container
   ansible.builtin.include_role:
     name: apps
   vars:
-    run_app: authentik-server
+    run_app: authentik_server
 
-- name: Create authentik-worker container
+- name: Create authentik worker container
   ansible.builtin.include_role:
     name: apps
   vars:
-    run_app: authentik-worker
+    run_app: authentik_worker
 
 - name: Create authentik database
   ansible.builtin.command: docker exec postgres createdb -U {{ common_user }} authentik

@@ -12,7 +12,7 @@ pip_install_packages:
 
 # (string) Use a specific version of k3s
 # renovate: datasource=github-releases depName=k3s-io/k3s
-k3s_release_version: "v1.24.10+k3s1"
+k3s_release_version: "v1.26.5+k3s1"
 
 # (bool) Install using hard links rather than symbolic links.
 k3s_install_hard_links: true
@@ -32,27 +32,44 @@ k3s_use_unsupported_config: true
 # (string) Control Plane registration address
 k3s_registration_address: "{{ network_k8s.loadbalancer_ip }}"
 
-k3s_server_manifests:
+k3s_server_manifests_urls:
   # kube-vip
-  - https://raw.githubusercontent.com/kube-vip/kube-vip/main/docs/manifests/rbac.yaml
+  - url: https://raw.githubusercontent.com/kube-vip/kube-vip/main/docs/manifests/rbac.yaml
+    filename: kube-vip-rbac.yaml
   # calico
-  - https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
+  - url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/tigera-operator.yaml
+    filename: calico-tigera-operator.yaml
   # prometheus
-  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-alertmanagerconfigs.yaml
-  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-alertmanagers.yaml
-  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-podmonitors.yaml
-  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-probes.yaml
-  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-prometheuses.yaml
-  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-prometheusrules.yaml
-  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-servicemonitors.yaml
-  - https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-thanosrulers.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-alertmanagerconfigs.yaml
+    filename: crd-alertmanagerconfigs.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-alertmanagers.yaml
+    filename: crd-alertmanagers.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-podmonitors.yaml
+    filename: crd-podmonitors.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-probes.yaml
+    filename: crd-probes.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-prometheuses.yaml
+    filename: crd-prometheuses.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-prometheusrules.yaml
+    filename: crd-prometheusrules.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-servicemonitors.yaml
+    filename: crd-servicemonitors.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-thanosrulers.yaml
+    filename: crd-thanosrulers.yaml
   # argocd
-  - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/application-crd.yaml
-  - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/applicationset-crd.yaml
+  - url: https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/application-crd.yaml
+    filename: application-crd.yaml
+  - url: https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/applicationset-crd.yaml
+    filename: applicationset-crd.yaml
   # external-secrets
-  - https://raw.githubusercontent.com/external-secrets/external-secrets/main/config/crds/bases/external-secrets.io_clustersecretstores.yaml
+  - url: https://raw.githubusercontent.com/external-secrets/external-secrets/main/config/crds/bases/external-secrets.io_clustersecretstores.yaml
+    filename: clustersecretstores.yaml
   # upgrade-controller
-  - https://github.com/rancher/system-upgrade-controller/releases/latest/download/system-upgrade-controller.yaml
+  - url: https://github.com/rancher/system-upgrade-controller/releases/latest/download/system-upgrade-controller.yaml
+    filename: system-upgrade-controller.yaml
+  # traefik
+  - url: https://raw.githubusercontent.com/traefik/traefik-helm-chart/master/traefik/crds/traefik.containo.us_ingressroutes.yaml
+    filename: traefik.containo.us_ingressroutes.yaml
 
 # (list) A flat list of templates to deploy on the primary control plane
 # /var/lib/rancher/k3s/server/manifests

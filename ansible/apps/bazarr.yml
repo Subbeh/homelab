@@ -3,7 +3,7 @@
 bazarr:
   image: lscr.io/linuxserver/bazarr:1.2.1
   ports:
-    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.bazarr.port }}:6767"
+    - "{{ network_svc.bazarr.port }}:6767"
   volumes:
     - "{{ common_dir }}/bazarr/config:/config"
     - "{{ common_media_dir }}:/data"

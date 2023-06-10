@@ -41,13 +41,10 @@
   ansible.builtin.include_role:
     name: apps
   vars:
-    run_app: traefik
-
-- name: Create whoami container
-  ansible.builtin.include_role:
-    name: apps
-  vars:
-    run_app: whoami
+    run_app: "{{ item }}"
+  loop:
+    - traefik
+    - whoami
 
 - name: Restart Traefik logging
   ansible.builtin.command: docker kill --signal="USR1" traefik

@@ -3,7 +3,7 @@
 sabnzbd:
   image: lscr.io/linuxserver/sabnzbd:4.0.1
   ports:
-    - "{{ network_svc.nas_srv.ip }}:{{ network_svc.sabnzbd.port }}:8080"
+    - "{{ network_svc.sabnzbd.port }}:8080"
   volumes:
     - "{{ common_dir }}/sabnzbd/config:/config"
     - "{{ common_media_dir }}:/data"

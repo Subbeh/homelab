@@ -3,6 +3,7 @@ gateway = "10.0.80.1"
 vlan_tag = 80
 vm_template = "ubuntu-2204-cloudinit-template"
 storage = "local-lvm"
+nameserver = 10.11.80.1
 
 k3s_nodes = {
   # masters

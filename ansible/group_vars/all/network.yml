@@ -14,10 +14,11 @@ network_domain:
           3835
 
 network_cidr:
-  lan: "10.0.0.0/16"
-  servers: "10.0.10.0/24"
-  k8s: "10.0.80.0/24"
-  dns: "10.10.10.0/24"
+  lan: "10.11.0.0/16"
+  servers: "10.11.10.0/24"
+  dmz: "10.11.5.0/30"
+  vms: "10.11.20.0/24"
+  k8s: "10.11.80.0/24"
   tailscale: "100.64.0.0/10"
   docker:
     mesh: "192.168.100.0/24"
@@ -28,69 +29,54 @@ network_k8s:
   ingress: "{{ network_cidr.k8s | ansible.utils.nthhost(100) }}"
 
 network_svc:
-  udmp:
-    ip: "10.0.0.1"
   dns:
-    host: pihole
-    ip: "10.10.10.10"
+    ip: "{{ ansible_default_ipv4.gateway }}"
   nas:
     host: nas
-    ip: "10.0.10.10"
+    ip: "{{ network_cidr.servers | ansible.utils.nthhost(10) }}"
     port: "5000"
-  nas_srv:
-    host: nas-srv
-    ip: "10.0.10.21"
   bastion:
-    ip: "10.0.10.2"
-  hl_services:
-    ip: "10.0.10.5"
+    ip: "{{ network_cidr.dmz | ansible.utils.nthhost(2) }}"
+  services:
+    ip: "{{ network_cidr.vms | ansible.utils.nthhost(100) }}"
   k8s:
-    lb_ip: "10.0.10.71"
+    lb_ip: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
 
   # services
   authentik_server:
-    host: hl-services
+    host: services
     port: "9000"
   authentik_worker:
-    host: hl-services
+    host: services
   audiobookshelf:
-    host: nas-srv
-    port: "13378"
+    host: nas
+    port: "9060"
   bazarr:
-    host: nas-srv
-    port: "6767"
+    host: nas
+    port: "9053"
   borgmatic:
-    host: nas-srv
+    host: nas
   calibre:
-    host: nas-srv
-    port: "8088"
-    port_server: "8099"
+    host: nas
+    port: "9061"
+    port_server: "9062"
   calibre_web:
-    host: nas-srv
-    port: "8083"
-  cloudflare_ddns:
-    host: hl-services
+    host: nas
+    port: "9063"
   crowdsec:
     host: bastion
-    port: "8888"
-    bouncer_port: "8889"
-  deluge:
-    host: nas-srv
-    port: "8112"
-  drone:
-    host: hl-services
-    port_web: "8100"
-    port_agent: "9100"
+    port: "9003"
+    bouncer_port: "9004"
   endlessh:
     host: bastion
   gitea:
-    host: hl-services
-    port: "3000"
-    port_ssh: "222"
+    host: services
+    port: "9023"
+    port_ssh: "9022"
   gluetun:
-    host: nas-srv
+    host: nas
     ip: "192.168.100.100"
-    port: "8888"
+    port: "9005"
     port_wg: "51820"
     port_mullvad: "55000"
     wg_addr: "10.64.76.182/32"
@@ -103,66 +89,63 @@ network_svc:
           65613637386330346134663364613765353561386463356234633764376566633534373630373430
           3366333231393562356133393036343232616139366663633031
   minio:
-    host: nas-srv
-    port: "9000"
-    port_console: "9090"
+    host: nas
+    port: "9006"
+    port_console: "9007"
   netbootxyz:
-    host: nas-srv
-    port: "3000"
+    host: nas
+    port: "9030"
   openspeedtest:
-    host: hl-services
-    port: "3010"
+    host: services
+    port: "9031"
   overseerr:
-    host: hl-services
-    port: "5055"
-  pihole:
-    host: "10.10.10.10"
-    port: "80"
+    host: services
+    port: "9071"
   pikvm:
     host: pikvm
-    ip: "10.0.10.254"
+    ip: "{{ network_cidr.servers | ansible.utils.nthhost(254) }}"
   plex:
     host: plex
-    ip: "10.0.10.30"
+    ip: "{{ network_cidr.vms | ansible.utils.nthhost(30) }}"
     port: "32400"
   portainer:
-    host: hl-services
-    port: "8000"
-    agent_port: "9001"
+    host: services
+    port: "9001"
+    agent_port: "9002"
   portainer_agent_bastion:
     host: bastion
   portainer_agent_nas:
-    host: nas-srv
+    host: nas
   postgres:
-    host: hl-services
+    host: services
     port: "5432"
   prowlarr:
-    host: nas-srv
-    port: "9696"
+    host: nas
+    port: "9054"
   pbk:
-    ip: 10.0.10.25
-    port: 8007
+    ip: "{{ network_cidr.servers | ansible.utils.nthhost(20) }}"
+    port: "8007"
   pve:
     host: ["pve-nuc-01", "pve-opti-01", "pve-opti-02"]
-    ip: ["10.0.10.11", "10.0.10.12", "10.0.10.13"]
+    ip: ["{{ network_cidr.servers | ansible.utils.nthhost(21) }}", "{{ network_cidr.servers | ansible.utils.nthhost(22) }}", "{{ network_cidr.servers | ansible.utils.nthhost(23) }}"]
     port: "8006"
   qbittorrent:
-    host: nas-srv
-    port: "8090"
+    host: nas
+    port: "9090"
   radarr:
-    host: nas-srv
-    port: "7878"
+    host: nas
+    port: "9050"
   readarr:
-    host: nas-srv
-    port: "8787"
+    host: nas
+    port: "9052"
   redis:
-    host: hl-services
+    host: services
   sabnzbd:
-    host: nas-srv
-    port: "8080"
+    host: nas
+    port: "9091"
   sonarr:
-    host: nas-srv
-    port: "8989"
+    host: nas
+    port: "9051"
   tailscale:
     key: !vault |
           $ANSIBLE_VAULT;1.1;AES256
@@ -174,19 +157,19 @@ network_svc:
           33396362613864653234333462663137666661626463363865636236666336376266636330393961
           623731353166363533663961393932313062
   tautulli:
-    host: hl-services
-    port: "8181"
+    host: services
+    port: "9070"
   traefik:
-    host: hl-services
+    host: bastion
   traefik_cs_bouncer:
     host: bastion
   unpackerr:
-    host: nas-srv
+    host: nas
   uptimekuma:
-    host: hl-services
-    port: "3001"
+    host: services
+    port: "9032"
   whoami:
     host: bastion
   wizarr:
-    host: hl-services
-    port: "5690"
+    host: services
+    port: "9072"

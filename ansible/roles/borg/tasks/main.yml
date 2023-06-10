@@ -13,4 +13,4 @@
 
 - name: Run borgbackup role
   ansible.builtin.include_role:
-    name: m3nu.ansible_role_borgbackup
+    name: borgbase.ansible_role_borgbackup

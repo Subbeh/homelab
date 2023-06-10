@@ -17,6 +17,7 @@ skip_list:
   - key-order
   - command-instead-of-module
   - latest[git]
+  - var-naming[no-role-prefix]
 
 exclude_paths:
   - molecule

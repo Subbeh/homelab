@@ -8,7 +8,7 @@ k3s_control_node: true
 # (dict) k3s settings for all control-plane nodes
 k3s_server:
   node-ip: "{{ ansible_host }}"
-  node-taint: "node-role.kubernetes.io/master=true:NoSchedule"
+  # node-taint: "node-role.kubernetes.io/master=true:NoSchedule"
   tls-san:
     - "{{ network_k8s.loadbalancer_ip }}"
   # Disable Docker - this will use the default containerd CRI
