@@ -48,10 +48,14 @@ k3s_server_manifests_urls:
     filename: crd-podmonitors.yaml
   - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-probes.yaml
     filename: crd-probes.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/main/charts/kube-prometheus-stack/crds/crd-prometheusagents.yaml
+    filename: crd-prometheusagents.yaml
   - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-prometheuses.yaml
     filename: crd-prometheuses.yaml
   - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-prometheusrules.yaml
     filename: crd-prometheusrules.yaml
+  - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/main/charts/kube-prometheus-stack/crds/crd-scrapeconfigs.yaml
+    filename: crd-scrapeconfigs.yaml
   - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-servicemonitors.yaml
     filename: crd-servicemonitors.yaml
   - url: https://raw.githubusercontent.com/prometheus-community/helm-charts/kube-prometheus-stack-43.3.1/charts/kube-prometheus-stack/crds/crd-thanosrulers.yaml

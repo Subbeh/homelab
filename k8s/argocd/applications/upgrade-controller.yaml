@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  name: upgrade-controller
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+    path: k8s/apps/kube-system/upgrade-controller
+    targetRevision: main
+  destination:
+    namespace: kube-system
+    server: https://kubernetes.default.svc
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        maxDuration: 3m0s
+        factor: 2
