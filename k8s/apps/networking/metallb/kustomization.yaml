@@ -5,7 +5,7 @@ kind: Kustomization
 helmCharts:
   - name: metallb
     repo: https://metallb.github.io/metallb
-    version: v0.13.9
+    version: 0.13.10
     valuesFile: values.yaml
     namespace: networking
     includeCRDs: true
