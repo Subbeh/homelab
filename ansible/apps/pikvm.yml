@@ -10,7 +10,7 @@ pikvm:
         loadBalancer:
           serversTransport: "pikvm"
           servers:
-            - url: "https://{{ network_svc.pikvm.host }}"
+            - url: "https://{{ network_svc.pikvm.ip }}"
     serversTransports: |
       pikvm:
         insecureSkipVerify: true

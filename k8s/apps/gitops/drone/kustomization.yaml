@@ -4,14 +4,6 @@ kind: Kustomization
 namespace: gitops
 
 helmCharts:
-  - name: postgresql
-    repo: https://charts.bitnami.com/bitnami
-    version: 12.5.5
-    valuesFile: values-postgres.yaml
-    namespace: gitops
-    releaseName: postgres
-    includeCRDs: true
-
   - name: drone
     repo: https://charts.drone.io
     version: 0.6.4
@@ -39,5 +31,6 @@ helmCharts:
 resources:
   - externalsecret.yaml
   - externalsecret-postgres.yaml
+  - cluster.yaml
   - ingressroute.yaml
   - pvc-cache.yaml

@@ -1,6 +1,0 @@
-- op: add
-  path: /metadata/annotations/linkerd.io~1inject
-  value: disabled
-- op: add
-  path: /metadata/labels/config.linkerd.io~1admission-webhooks
-  value: disabled

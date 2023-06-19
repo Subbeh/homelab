@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+  name: postgres
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+    path: k8s/apps/storage/postgres
+    targetRevision: main
+  destination:
+    namespace: storage
+    server: https://kubernetes.default.svc
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        maxDuration: 3m0s
+        factor: 2
+    syncOptions:
+      - CreateNamespace=true

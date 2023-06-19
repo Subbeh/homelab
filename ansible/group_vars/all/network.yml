@@ -30,7 +30,7 @@ network_k8s:
 
 network_svc:
   dns:
-    ip: "{{ ansible_default_ipv4.gateway }}"
+    ip: "{{ ansible_default_ipv4.gateway | default('') }}"
   nas:
     host: nas
     ip: "{{ network_cidr.servers | ansible.utils.nthhost(10) }}"
