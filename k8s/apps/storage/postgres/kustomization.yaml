@@ -6,7 +6,7 @@ namespace: storage
 helmCharts:
   - name: cloudnative-pg
     repo: https://cloudnative-pg.github.io/charts
-    version: 0.18.0
+    version: 0.18.1
     namespace: storage
     releaseName: cloudnative-pg
     includeCRDs: true
