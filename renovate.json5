@@ -4,7 +4,7 @@
   "extends": [
     "config:base",
     "docker:enableMajor",
-    "schedule:daily",
+    //"schedule:daily",
     ":enablePreCommit",
     ":disableRateLimiting",
     ":automergePr",
@@ -16,7 +16,7 @@
     ":semanticCommitScope(renovate)",
   ],
 
-  "automergeSchedule": ["before 5am"],
+//  "automergeSchedule": ["before 5am"],
   "dependencyDashboardTitle": "Renovate Dashboard",
   "rebaseWhen": "conflicted",
   "ignoreTests": true,
