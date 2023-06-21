@@ -1,7 +1,7 @@
 ---
 
 overseerr:
-  image: sctx/overseerr:1.32.5
+  image: sctx/overseerr:1.33.0
   ports:
     - "{{ network_svc.overseerr.port }}:5055"
   volumes:
