@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: all:!exclude
   become: true
   gather_facts: false
 
