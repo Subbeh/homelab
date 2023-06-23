@@ -2,7 +2,7 @@
 
 authentik_worker:
   name: authentik-worker
-  image: ghcr.io/goauthentik/server:2023.5.3
+  image: ghcr.io/goauthentik/server:2023.5.4
   command: worker
   volumes:
     - "{{ common_dir }}/authentik/media:/media"
