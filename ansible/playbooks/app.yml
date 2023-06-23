@@ -5,10 +5,15 @@
   gather_facts: false
 
   tasks:
+    - name: Set config parameter if defined
+      tags: config
+      ansible.builtin.set_fact:
+        config: true
+
     - name: Set fact with tags
       tags: always
       ansible.builtin.set_fact:
-        run_app: "{{ ansible_run_tags[0] }}"
+        run_app: "{{ ansible_run_tags | reject('search', 'config') | first }}"
 
     - name: Load all manifests
       tags: always
@@ -18,13 +23,18 @@
         apply:
           tags: always
 
-    - name: Generate Traefik config
+    - name: Generate Traefik app config
       tags: always
       ansible.builtin.include_role:
         name: apps
-        tasks_from: generate_traefik_config
+        tasks_from: generate_traefik_app
         apply:
           tags: always
+
+    - name: End play if config parameter is provided
+      tags: always
+      ansible.builtin.meta: end_play
+      when: config is defined
 
     - name: Add container host to temporary host group
       tags: always
