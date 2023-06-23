@@ -68,6 +68,9 @@ network_svc:
   calibre_web:
     host: nas
     port: "9063"
+  changedetection:
+    host: services
+    port: "9033"
   crowdsec:
     host: bastion
     port: "9003"
