@@ -29,6 +29,8 @@ network_k8s:
   ingress: "{{ network_cidr.k8s | ansible.utils.nthhost(100) }}"
 
 network_svc:
+  gw:
+    ip: "{{ ansible_default_ipv4.gateway | default('') }}"
   dns:
     ip: "{{ ansible_default_ipv4.gateway | default('') }}"
   nas:
