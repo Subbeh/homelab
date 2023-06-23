@@ -39,10 +39,7 @@ spec:
   backup:
     retentionPolicy: 30d
     barmanObjectStore:
-      wal:
-        compression: bzip2
-        maxParallel: 8
-      destinationPath: s3://k3s-postgres/
+      destinationPath: s3://k3s-drone/
       endpointURL: https://s3.sbbh.cloud
       s3Credentials:
         accessKeyId:
