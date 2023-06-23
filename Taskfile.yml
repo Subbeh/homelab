@@ -6,14 +6,16 @@ vars:
   ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
   TERRAFORM_DIR: "{{.ROOT_DIR}}/tf"
 
-dotenv: [".envrc"]
-
 includes:
   precommit: .taskfiles/precommit.yml
   ansible: .taskfiles/ansible.yml
   tf: .taskfiles/terraform.yml
 
 tasks:
+  default:
+    desc: List tasks
+    cmds:
+      - go-task --list-all
 
   init:
     desc: Initialize workstation dependencies

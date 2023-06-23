@@ -13,7 +13,7 @@ tasks:
       - terraform init
 
   plan:
-    desk: terraform plan
+    desc: terraform plan
     dir: "{{.USER_WORKING_DIR}}"
     cmds:
       - terraform plan
@@ -22,7 +22,7 @@ tasks:
         sh: basename {{.USER_WORKING_DIR}}
 
   apply:
-    desk: terraform apply
+    desc: terraform apply
     dir: "{{.USER_WORKING_DIR}}"
     cmds:
       - terraform apply -parallelism=1 -auto-approve

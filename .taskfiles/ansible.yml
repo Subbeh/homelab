@@ -24,13 +24,13 @@ tasks:
     desc: Ping all the hosts
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible all --one-line -m 'ping'
+      - 'ansible {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}all:!exclude{{end}} --one-line -m "ping"'
 
   uptime:
     desc: Uptime of all the hosts
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible all --one-line -a 'uptime'
+      - ansible {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}all:!exclude{{end}} --one-line -a 'uptime'
 
   reboot:
     desc: Reboot hosts
@@ -42,7 +42,7 @@ tasks:
     desc: Run playbook
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/{{.CLI_ARGS}}
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/{{.CLI_ARGS}} -e "debug=true"
 
   update:
     desc: Update all the hosts
@@ -54,7 +54,13 @@ tasks:
     desc: Run app
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags {{.CLI_ARGS}}
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags {{.CLI_ARGS}} -e "debug=true"
+
+  appconfig:
+    desc: Generate Traefik app config
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags '{{.CLI_ARGS}},config' -e "debug=true"
 
   bastion:
     desc: Run bastion playbook
