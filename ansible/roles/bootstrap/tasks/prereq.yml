@@ -1,23 +1,13 @@
 ---
 
-- name: Restart chronyd to sync time
-  ansible.builtin.service:
-    name: chronyd
-    state: restarted
-  when: ansible_distribution == "Debian"
-  failed_when: false
-
-- name: Restart systemd-timesyncd to sync time
-  ansible.builtin.service:
-    name: systemd-timesyncd
-    state: restarted
-  when: ansible_distribution == "Ubuntu"
-  failed_when: false
-
-- name: Set timezone
-  community.general.timezone:
-    name: "{{ common_timezone }}"
-    hwclock: "local"
+- name: Import NTP role
+  ansible.builtin.import_role:
+    name: geerlingguy.ntp
+  vars:
+    ntp_manage_config: true
+    ntp_timezone: "{{ common_timezone }}"
+    ntp_servers:
+      - "{{ network_svc.gw.ip }} iburst"
 
 - name: Set defaults
   community.general.alternatives:
