@@ -45,6 +45,9 @@ network_svc:
     lb_ip: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
 
   # services
+  apprise:
+    host: services
+    port: "9034"
   authentik_server:
     host: services
     port: "9000"
