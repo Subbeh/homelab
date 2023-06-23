@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure docker network is present
-  no_log: true
+  no_log: "{{ false if debug | default(true) }}"
   community.docker.docker_network:
     name: "{{ item.name }}"
     driver: "{{ apps.networks[item.name].driver }}"
@@ -11,7 +11,7 @@
   when: (app.networks is defined and app.networks != None) or app.networks is undefined
 
 - name: Create container {{ app.name }}
-  no_log: true
+  no_log: "{{ false if debug | bool else true }}"
   community.docker.docker_container:
     # use defaults
     name: "{{ app.name }}"

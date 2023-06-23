@@ -1,7 +1,7 @@
 ---
 
 - name: Delete git repository
-  no_log: true
+  no_log: "{{ false if debug | default(true) }}"
   ansible.builtin.file:
     path: /tmp/homelab
     state: absent
