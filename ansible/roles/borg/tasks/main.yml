@@ -2,7 +2,7 @@
 
 - name: Copy SSH keys
   become: true
-  no_log: "{{ false if debug | default(true) }}"
+  no_log: "{{ debug is not defined | default(false) }}"
   ansible.builtin.copy:
     content: '{{ borg_ssh_key }}'
     dest: '/root/.ssh/borg.key'

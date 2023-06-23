@@ -1,13 +1,15 @@
 ---
 
 - name: load all app manifests
-  no_log: "{{ false if debug | default(true) }}"
+  no_log: "{{ debug is not defined | default(false) }}"
   ansible.builtin.include_vars:
     dir: "{{ common_ansible_root }}/apps"
     name: apps
 
+- meta: end_play
+
 - name: Set app variables
-  no_log: "{{ false if debug | default(true) }}"
+  no_log: "{{ debug is not defined | default(false) }}"
   ansible.builtin.set_fact:
     app: "{{ apps[run_app] | combine({'name': apps[run_app].name | default(run_app)}) }}"
   when: run_app is defined
