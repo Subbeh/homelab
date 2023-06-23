@@ -14,3 +14,8 @@ crowdsec:
     - "{{ common_dir }}/logs:/logs/svc:ro"
     - "{{ common_dir }}/crowdsec/data:/var/lib/crowdsec/data"
     - "{{ common_dir }}/crowdsec/config:/etc/crowdsec"
+
+  traefik:
+    rtr_middlewares:
+      - local-only
+    url: http://crowdsec:8080
