@@ -1,7 +1,7 @@
 ---
 
 - name: Create Traefik config for {{ app.name }}
-  delegate_to: bastion
+  delegate_to: network_svc.traefik.host
   become: true
   ansible.builtin.template:
     src: traefik-app.yml.j2
