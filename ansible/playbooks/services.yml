@@ -8,6 +8,9 @@
     docker_users:
       - "{{ common_user }}"
 
+    packages_custom:
+      - postgres-client
+
     borg_source_directories:
       - '{{ common_dir }}'
     borgmatic_cron_hour: 02
