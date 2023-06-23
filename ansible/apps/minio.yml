@@ -1,10 +1,10 @@
 ---
 
 minio:
-  image: quay.io/minio/minio:RELEASE.2023-05-18T00-05-36Z
+  image: quay.io/minio/minio:RELEASE.2023-06-19T19-52-50Z
   ports:
     - "{{ network_svc.minio.port }}:9000"
-    - "{{ network_svc.minio.port_console }}:9090"
+    - "{{ network_svc.minio.port_console }}:9001"
   environment:
     MINIO_ROOT_USER: "{{ common_user }}"
     MINIO_ROOT_PASSWORD: "{{ minio_pass }}"
@@ -12,7 +12,7 @@ minio:
     MINIO_SERVER_URL: "https://s3.{{ network_domain.tld }}"
   volumes:
     - "{{ common_backup_dir | default('') }}/minio:/data"
-  command: server /data --console-address ":9090"
+  command: server /data --console-address ":9001"
 
   traefik:
     routers:
