@@ -5,6 +5,7 @@ roles:
   - name: geerlingguy.docker
   - name: geerlingguy.security
   - name: geerlingguy.firewall
+  - name: geerlingguy.ntp
   - name: borgbase.ansible_role_borgbackup
   - name: xanmanning.k3s
   - name: artis3n.tailscale

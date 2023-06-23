@@ -1,0 +1,53 @@
+---
+
+- name: Install packages
+  ansible.builtin.apt:
+    pkg:
+      - libsasl2-modules
+      - mailutils
+      - postfix-pcre
+
+- name: Create sasl password file
+  ansible.builtin.copy:
+    content: "{{ common_email_server }} {{ common_email_svc }}:{{ common_email_pass }}"
+    dest: /etc/postfix/sasl_passwd
+    mode: '0600'
+
+- name: Fix from-name in address
+  ansible.builtin.copy:
+    content: "/^From:.*/ REPLACE From: {{ inventory_hostname }} infra@{{ network_domain.tld }}"
+    dest: /etc/postfix/smtp_header_checks
+    mode: '0600'
+
+- name: Hash config files
+  ansible.builtin.command: postmap hash:{{ item }}
+  with_items:
+    - /etc/postfix/sasl_passwd
+    - /etc/postfix/smtp_header_checks
+  changed_when: false
+
+- name: Configure postfix
+  ansible.builtin.lineinfile:
+    dest: /etc/postfix/main.cf
+    state: present
+    regex: "^{{ item.key }}"
+    line: "{{ item.key }} = {{ item.value }}"
+    validate: "echo %s && postfix reload"
+  loop: "{{ items | dict2items }}"
+  vars:
+    items:
+      "relayhost": "{{ common_email_server }}:{{ common_email_port }}"
+      "smtp_use_tls": "yes"
+      "smtp_sasl_auth_enable": "yes"
+      "smtp_sasl_security_options": ""
+      "smtp_sasl_password_maps": "hash:/etc/postfix/sasl_passwd"
+      "smtp_tls_CAfile": "/etc/ssl/certs/Entrust_Root_Certification_Authority.pem"
+      "smtp_tls_session_cache_database": "btree:/var/lib/postfix/smtp_tls_session_cache"
+      "smtp_tls_session_cache_timeout": "3600s"
+      "smtp_header_checks": "pcre:/etc/postfix/smtp_header_checks"
+
+- name: Send test message
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    echo "This is a test message sent from postfix" | mail -s "Test Email from Proxmox" {{ common_email }}
+  changed_when: false
