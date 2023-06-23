@@ -1,17 +1,18 @@
 ---
 
 borgmatic:
-  image: b3vis/borgmatic:1.7
+  image: ghcr.io/borgmatic-collective/borgmatic:1.7.14
   capabilities:
     - net_admin
   devices:
     - /dev/fuse:/dev/fuse
   volumes:
     - "{{ common_backup_dir | default('') }}/borg:/mnt/borg-repository"
-    - "{{ common_dir }}:/mnt/app_data:ro"
+    - "{{ common_dir }}:/mnt/source:ro"
     - "{{ common_dir }}/borgmatic/etc:/etc/borgmatic.d"
+    - "{{ common_dir }}/borgmatic/state:/root/.borgmatic"
     - "{{ common_dir }}/borgmatic/config:/root/.config/borg"
     - "{{ common_dir }}/borgmatic/ssh:/root/.ssh"
     - "{{ common_dir }}/borgmatic/cache:/root/.cache/borg"
-  env:
+  environment:
     BORG_PASSPHRASE: "{{ borg_encryption_passphrase }}"
