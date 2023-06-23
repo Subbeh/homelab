@@ -18,5 +18,4 @@ while read file ; do
     echo running app script for $app...
     ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook "${APP_PLAYBOOK:?not set}" --tags $app
   fi
-done <<< $(git diff --name-only --diff-filter=ACMR HEAD~1 main)
-# done <<< $(git log --name-only --oneline --diff-filter=ACMR origin/main@{1}..origin/main | awk 'length($1) != 7')
+done <<< $(git diff --name-only --diff-filter=ACMR HEAD~1 main | xargs awk -F: '/^[^ ]\w/ { print $1 }')
