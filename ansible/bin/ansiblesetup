@@ -1,9 +1,8 @@
 #!/bin/bash
 
-pushd ${INFRA:?not set}/ansible
+cd ${INFRA:?not set}/ansible
 if [ $# -gt 1 ] ; then
   ansible $1 -m setup -a "filter=$2"
 else
   ansible $1 -m setup
 fi
-popd

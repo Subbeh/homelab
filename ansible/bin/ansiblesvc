@@ -1,0 +1,14 @@
+#!/bin/bash
+
+INPUT_FILE="${INFRA:?not set}/ansible/group_vars/all/network.yml"
+
+yq '
+  .network_svc | to_entries | .[] | [
+    .key,
+    ((
+      select(.value.host | type == "!!str").value.host,
+      select(.value.host | type != "!!str").value.host[]
+    ) // ""),
+    (.value.port // "")
+  ] | join(" ")
+' < $INPUT_FILE | sort -n -k 3 | column -t
