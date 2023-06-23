@@ -14,4 +14,4 @@ while read file ; do
   if [[ "$file" =~ ansible/.*\.ya?ml$ ]] ; then
     yamllint -s -c .yamllint "$file"
   fi
-done <<< $(git log --name-only --oneline --diff-filter=ACMR origin/main@{1}..origin/main | awk 'length($1) != 7')
+done <<< $(git diff --name-only --diff-filter=ACMR HEAD~1 main)

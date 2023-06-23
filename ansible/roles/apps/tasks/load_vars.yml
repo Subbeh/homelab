@@ -6,8 +6,6 @@
     dir: "{{ common_ansible_root }}/apps"
     name: apps
 
-- meta: end_play
-
 - name: Set app variables
   no_log: "{{ debug is not defined | default(false) }}"
   ansible.builtin.set_fact:
