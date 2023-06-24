@@ -4,7 +4,7 @@ kind: Kustomization
 helmCharts:
   - name: linkerd-control-plane
     repo: https://helm.linkerd.io/stable
-    version: 1.12.4
+    version: 1.12.5
     valuesFile: values.yaml
     namespace: linkerd
     releaseName: linkerd
