@@ -1,7 +1,7 @@
 ---
 
 openspeedtest:
-  image: openspeedtest/latest:v0.0.1
+  image: openspeedtest/latest:v2.0.0
   ports:
     - "{{ network_svc.openspeedtest.port }}:3000"
 
