@@ -1,7 +1,7 @@
 ---
 
 borgmatic:
-  image: ghcr.io/borgmatic-collective/borgmatic:1.7.14
+  image: ghcr.io/borgmatic-collective/borgmatic:1.7.15
   capabilities:
     - net_admin
   devices:
