@@ -1,7 +1,7 @@
 ---
 
 changedetection:
-  image: ghcr.io/dgtlmoon/changedetection.io:0.42.3
+  image: ghcr.io/dgtlmoon/changedetection.io:0.43.1
   restart: false
   state: stopped
   comparisons:
