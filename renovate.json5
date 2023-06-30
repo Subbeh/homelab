@@ -72,6 +72,12 @@
    === package rules ===
    =================== */
   "packageRules": [
+    /* disable minor updates for renovate */
+    {
+      "matchPackageNames": ["renovate"],
+      "matchUpdateTypes": ["patch"],
+      "enabled": false,
+    },
     /* disable automerge for k8s */
     {
       "matchPaths": ["k8s/**"],
