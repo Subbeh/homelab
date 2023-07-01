@@ -19,6 +19,7 @@ resources:
   - externalsecret.yaml
   - ingressroute.yaml
   - app-project.yaml
+  - argocd-app.yaml
   - apps.yaml
 
 patches:
