@@ -31,7 +31,7 @@ calibre:
             - url: "http://{{ network_svc.calibre.host }}:{{ network_svc.calibre.port_server }}"
 
 calibre_web:
-  image: lscr.io/linuxserver/calibre-web:0.6.20-ls206
+  image: lscr.io/linuxserver/calibre-web:0.6.20
   environment:
     DOCKER_MODS: linuxserver/mods:universal-calibre
   ports:
