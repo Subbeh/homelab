@@ -21,9 +21,10 @@ changedetection:
       - chain-no-auth
 
   dependents:
-    - changedetection-chrome
+    - changedetection_chrome
 
-changedetection-chrome:
+changedetection_chrome:
+  name: changedetection-chrome
   image: browserless/chrome
   restart: false
   state: stopped
