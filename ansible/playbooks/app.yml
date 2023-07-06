@@ -31,6 +31,14 @@
         apply:
           tags: always
 
+    - name: Generate Homer config
+      tags: always
+      ansible.builtin.include_role:
+        name: apps
+        tasks_from: generate_homer_config
+        apply:
+          tags: always
+
     - name: End play if config parameter is provided
       tags: always
       ansible.builtin.meta: end_play

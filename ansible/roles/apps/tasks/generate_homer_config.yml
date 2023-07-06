@@ -1,0 +1,18 @@
+---
+
+- name: Load all configurations
+  ansible.builtin.set_fact:
+    homer_apps: "{{ homer_apps | default({}) |
+                   combine({
+                     item.1.category: [item.1 | combine({'category': omit})]
+                   }, recursive=true, list_merge='append')
+                 }}"
+  loop: "{{ apps | subelements('homer', skip_missing=True) }}"
+
+- name: Create Homer config
+  delegate_to: "{{ network_svc.homer.host }}"
+  become: true
+  ansible.builtin.template:
+    src: homer-config.yml.j2
+    dest: "{{ hostvars[network_svc.homer.host].common_dir }}/homer/assets/config.yml"
+  when: homer_apps is defined
