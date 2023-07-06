@@ -1,0 +1,40 @@
+---
+
+- hosts: plex
+  gather_facts: true
+  become: true
+
+  vars:
+    borg_source_directories:
+      - /var/lib/plexmediaserver/Library/Application Support/Plex Media Server
+    borg_exclude_patterns:
+      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache'
+      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Codecs'
+      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Crash Reports'
+      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Diagnostics'
+      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Drivers'
+      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Logs'
+      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Updates'
+
+    borg_hc_ping_url: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          32303730313662646530613936623239643235663761346535323862343661306331383339626232
+          3861643037353465623230373338343639376234373336350a623563336661613438303964663264
+          65643962363134363061323261386362326537613635393233306663396364323438343836393038
+          3036323731366563320a313566336233386432313562653534643738323031643735323237613065
+          34366434363962353538303232646334303862353531356338363639656665323561356638666437
+          62303733646438323361386139396136363666366236663162663263333831376464636630323430
+          336437626233376435356365343235653837
+    borgmatic_timer_hour: 02
+    borgmatic_timer_minute: 45
+
+  handlers:
+    - name: Import common handlers
+      ansible.builtin.import_tasks: ../tasks/handlers.yml
+
+  tasks:
+    - name: Import Borg backups role
+      tags: borg
+      ansible.builtin.import_role:
+        name: borg
+
