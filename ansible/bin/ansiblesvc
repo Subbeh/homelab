@@ -9,6 +9,6 @@ yq '
       select(.value.host | type == "!!str").value.host,
       select(.value.host | type != "!!str").value.host[]
     ) // ""),
-    (.value.port // "")
-  ] | join(" ")
-' < $INPUT_FILE | sort -n -k 3 | column -t
+    (.value | with_entries(select(.key | test("^port"))) | [.[]] | join(",") // "")
+  ] | join(",")
+' <$INPUT_FILE | column -t -s "," | sort -n -k 3

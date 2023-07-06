@@ -28,5 +28,4 @@ tcp:
       loadbalancer:
         proxyProtocol:
         servers:
-          - address: "{{ network_svc.k8s.lb_ip }}:443"
-
+          - address: "{{ network_svc.k8s.ingress }}:443"

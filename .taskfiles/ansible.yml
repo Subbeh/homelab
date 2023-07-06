@@ -11,8 +11,13 @@ tasks:
     desc: Install / Upgrade Ansible galaxy deps
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - pip3 install --user --requirement requirements.txt
       - ansible-galaxy install -r requirements.yml --force
+
+  pip:
+    desc: Install / Upgrade python deps
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - pip3 install --user --requirement requirements.txt
 
   list:
     desc: List all the hosts
@@ -62,6 +67,12 @@ tasks:
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags '{{.CLI_ARGS}},config' -e "debug=true"
 
+  traefikconfig:
+    desc: Generate Traefik config
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/task.yml -l bastion -e "role=traefik task=copy_config"
+
   bastion:
     desc: Run bastion playbook
     dir: "{{.ANSIBLE_DIR}}"
@@ -97,12 +108,6 @@ tasks:
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/k3s.yml {{.CLI_ARGS}}
-
-  traefik-config:
-    desc: Update Traefik config
-    dir: "{{.ANSIBLE_DIR}}"
-    cmds:
-      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/bastion.yml --tags traefik-config
 
   pihole:
     desc: Run Pihole playbook

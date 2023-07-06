@@ -24,10 +24,6 @@ network_cidr:
     mesh: "192.168.100.0/24"
   all: ["127.0.0.1/32", "10.0.0.0/8", "192.168.0.0/16", "172.16.0.0/12", "100.64.0.0/10"]
 
-network_k8s:
-  loadbalancer_ip: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
-  ingress: "{{ network_cidr.k8s | ansible.utils.nthhost(100) }}"
-
 network_svc:
   gw:
     ip: "{{ ansible_default_ipv4.gateway | default('') }}"
@@ -42,7 +38,8 @@ network_svc:
   services:
     ip: "{{ network_cidr.vms | ansible.utils.nthhost(100) }}"
   k8s:
-    lb_ip: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
+    api: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
+    ingress: "{{ network_cidr.k8s | ansible.utils.nthhost(100) }}"
 
   # services
   apprise:
