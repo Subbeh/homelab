@@ -11,6 +11,10 @@ uptimekuma:
     routers:
     - name: "uptime"
       rule: "Host(`uptime.{{ network_domain.tld }}`)"
+    - name: "uptime-bypass"
+      rule: "Host(`uptime.{{ network_domain.tld }}`) && Headers(`Authorization`, `Basic {{ (':' ~ uptime_kuma_api) | b64encode }}`)"
+      middlewares:
+        - chain-no-auth
     - name: "status"
       rule: "Host(`status.{{ network_domain.tld }}`)"
       middlewares:
