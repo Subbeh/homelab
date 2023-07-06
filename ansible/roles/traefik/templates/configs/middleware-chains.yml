@@ -10,14 +10,6 @@ http:
           - secure-headers
           - compress
 
-    chain-basic-auth:
-      chain:
-        middlewares:
-          - rate-limit
-          - secure-headers
-          - basic-auth
-          - compress
-
     chain-auth:
       chain:
         middlewares:
