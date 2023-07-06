@@ -1,0 +1,26 @@
+---
+
+- hosts: "{{ ansible_limit | default(omit) }}"
+  become: true
+  gather_facts: false
+
+  pre_tasks:
+    - name: Verify SSH port
+      tags: always
+      ansible.builtin.include_tasks:
+        file: ../tasks/check_port.yml
+      vars:
+        ansible_become: false
+
+    - name: Gathering facts
+      tags: always
+      ansible.builtin.setup:
+
+  tasks:
+    - name: Run task
+      ansible.builtin.include_role:
+        name: "{{ role }}"
+        tasks_from: "{{ task }}"
+      when:
+        - role is defined
+        - task is defined
