@@ -6,7 +6,7 @@ crowdsec:
     - "{{ network_svc.crowdsec.port }}:8080"
   environment:
     COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/linux-lpe crowdsecurity/sshd crowdsecurity/endlessh crowdsecurity/base-http-scenarios crowdsecurity/unifi"
-    PARSERS: "crowdsecurity/geoip-enrich"
+    PARSERS: "crowdsecurity/geoip-enrich crowdsecurity/whitelists"
     GID: "{{ common_user_id | string }}"
     CUSTOM_HOSTNAME: "{{ network_svc.crowdsec.host }}"
   volumes:
