@@ -103,6 +103,12 @@ network_svc:
   netbootxyz:
     host: nas
     port: "9030"
+  nextcloud:
+    host: services
+    port: "9021"
+  ntfy:
+    host: services
+    port: "9035"
   openspeedtest:
     host: services
     port: "9031"

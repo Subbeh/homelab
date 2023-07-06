@@ -1,0 +1,37 @@
+nextcloud:
+  image: nextcloud:27.0.0
+  ports:
+    - "{{ network_svc.nextcloud.port }}:80"
+  volumes:
+    - "{{ common_dir }}/nextcloud/html:/var/www/html"
+  environment:
+    POSTGRES_DB: "nextcloud"
+    POSTGRES_HOST: "postgres:5432"
+    POSTGRES_USER: "{{ common_user }}"
+    POSTGRES_PASSWORD: "{{ postgres_pass }}"
+    NEXTCLOUD_ADMIN_USER: "{{ common_user }}"
+    NEXTCLOUD_ADMIN_PASSWORD: "{{ nextcloud_pass }}"
+    NEXTCLOUD_TRUSTED_DOMAINS: "next.{{ network_domain.tld }}"
+    TRUSTED_PROXIES: "{{ network_svc.bastion.ip }}"
+    OVERWRITEHOST: "next.{{ network_domain.tld }}"
+    OVERWRITEPROTOCOL: "https"
+    SMTP_HOST: "{{ common_email_server }}"
+    SMTP_SECURE: "{{ common_email_protocol }}"
+    SMTP_PORT: "{{ common_email_port | string }}"
+    SMTP_NAME: "{{ common_email_user }}"
+    MAIL_FROM_ADDRESS: "{{ common_email_svc }}"
+    SMTP_PASSWORD: "{{ common_email_pass }}"
+
+  traefik:
+    routers:
+    - name: "nextcloud"
+      rule: "Host(`next.{{ network_domain.tld }}`)"
+      middlewares:
+        - local-only
+        - secure-headers
+        - nextcloud-redirect
+    middlewares: |
+      nextcloud-redirect:
+        redirectRegex:
+          regex: "https://(.*)/.well-known/(?:card|cal)dav"
+          replacement: "https://${1}/remote.php/dav"
