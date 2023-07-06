@@ -11,7 +11,8 @@ minio:
     MINIO_SITE_REGION: "ap-southeast-4"
     MINIO_SERVER_URL: "https://s3.{{ network_domain.tld }}"
   volumes:
-    - "{{ common_backup_dir | default('') }}/minio:/data"
+    # - "{{ common_backup_dir | default('') }}/minio:/data"
+    - "{{ common_dir }}/minio:/data"
   command: server /data --console-address ":9001"
 
   traefik:
