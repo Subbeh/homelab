@@ -8,7 +8,15 @@ qbittorrent:
     - "{{ common_dir }}/qbittorrent/config:/config"
     - "{{ common_dir }}/qbittorrent/mam_id:/mam_id"
     - "{{ common_media_dir }}/downloads/torrents:/downloads"
-  command: bash -c "curl -c /config/mam.cookies -b mam_id=$(</mam_id) https://t.myanonamouse.net/json/dynamicSeedbox.php ; sleep infinity"
+  command: |
+    bash -c "set -x &&
+             while true; do
+                 PORT=$(curl -Ls localhost:8000/v1/openvpn/portforwarded | awk -F'[{}:]' '/port/ { print $3 }') &&
+                 curl -s -b /tmp/.cookies -c /tmp/.cookies --header 'Referer: http://localhost:8080' --data 'username={{ common_user }}&password={{ media_qbittorrent_password }}' localhost:8080/api/v2/auth/login &&
+                 curl -s -b /tmp/.cookies -c /tmp/.cookies "http://localhost:8080/api/v2/app/setPreferences" -d "'"json={\"listen_port\": "'"$PORT"'"}"'" &&
+                 curl -s -b mam_id=$(</mam_id) -c /tmp/mam.cookies https://t.myanonamouse.net/json/dynamicSeedbox.php &&
+                 sleep 43200;
+             done"
 
   traefik:
     rtr_middlewares:
