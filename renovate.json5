@@ -106,18 +106,18 @@
     /* overseerr */
     {
       matchPackagePatterns: ["linuxserver\\/overseerr"],
-      versioning: "regex:^v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-ls(?<build>\\d+)$",
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
     },
 
     /* calibre-web */
     {
-      matchPackagePatterns: ["linuxserver\\/overseerr"],
-      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-ls(?<build>\\d+)$",
+      matchPackagePatterns: ["linuxserver\\/calibre-web"],
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
     },
 
     /* qbittorrent */
     {
-      matchPackagePatterns: ["linuxserver\\/overseerr"],
+      matchPackagePatterns: ["linuxserver\\/qbittorrent"],
       versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
     },
 
