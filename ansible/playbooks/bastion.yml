@@ -32,7 +32,7 @@
           32363237343033396631366635393333323831363838363866313032376538666434643761656361
           396361343630626466633239333230313562
     borgmatic_timer_hour: 02
-    borgmatic_timer_minute: 00
+    borgmatic_timer_minute: 10
 
   pre_tasks:
     - name: Verify SSH port

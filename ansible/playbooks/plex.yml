@@ -26,7 +26,7 @@
           62303733646438323361386139396136363666366236663162663263333831376464636630323430
           336437626233376435356365343235653837
     borgmatic_timer_hour: 02
-    borgmatic_timer_minute: 45
+    borgmatic_timer_minute: 30
 
   handlers:
     - name: Import common handlers

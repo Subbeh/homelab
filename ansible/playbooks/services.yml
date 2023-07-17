@@ -23,7 +23,7 @@
           39613237393565666463303861393463366262346535336636326561633530376133326135313931
           626337333138313462373335316366666536
     borgmatic_timer_hour: 02
-    borgmatic_timer_minute: 15
+    borgmatic_timer_minute: 20
     borgmatic_hooks:
       before_backup:
         - echo "`date` - Starting backup."
@@ -36,6 +36,8 @@
           hostname: localhost
           username: "{{ common_user }}"
           password: "{{ postgres_pass }}"
+      healthchecks:
+        ping_url: "{{ borg_hc_ping_url }}"
 
   pre_tasks:
     - name: Verify SSH port
