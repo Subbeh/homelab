@@ -1,5 +1,5 @@
 ntfy:
-  image: binwiederhier/ntfy:v2.5.0
+  image: binwiederhier/ntfy:v2.6.2
   command: serve
   volumes:
     - "{{ common_dir }}/ntfy/etc:/etc/ntfy"
