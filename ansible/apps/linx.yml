@@ -1,0 +1,17 @@
+---
+
+linx:
+  image: andreimarcu/linx-server
+  ports:
+    - "{{ network_svc.linx.port }}:8080"
+  volumes:
+    - "{{ common_dir }}/linx/files:/data/files"
+    - "{{ common_dir }}/linx/meta:/data/meta"
+    - "{{ common_dir }}/linx/linx-server.conf:/data/linx-server.conf"
+    - "{{ common_dir }}/linx/.apikey:/data/.apikey"
+  command: -config /data/linx-server.conf
+
+  traefik:
+    name: paste
+    rtr_middlewares:
+      - chain-no-auth

@@ -121,6 +121,9 @@ network_svc:
   homer:
     host: services
     port: "9020"
+  linx:
+    host: services
+    port: "9024"
   minio:
     host: services
     port: "9006"
