@@ -1,7 +1,7 @@
 ---
 
 sabnzbd:
-  image: lscr.io/linuxserver/sabnzbd:4.0.2
+  image: lscr.io/linuxserver/sabnzbd:4.0.3
   ports:
     - "{{ network_svc.sabnzbd.port }}:8080"
   volumes:
