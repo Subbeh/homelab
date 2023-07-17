@@ -14,7 +14,7 @@ portainer:
 
 portainer_agent_bastion:
   name: portainer-agent
-  image: portainer/agent:2.18.3
+  image: portainer/agent:2.18.4
   ports:
     - "{{ network_svc.portainer.agent_port }}:9001"
   volumes:
@@ -23,7 +23,7 @@ portainer_agent_bastion:
 
 portainer_agent_nas:
   name: portainer-agent
-  image: portainer/agent:2.18.3
+  image: portainer/agent:2.18.4
   ports:
     - "{{ network_svc.portainer.agent_port }}:9001"
   volumes:
