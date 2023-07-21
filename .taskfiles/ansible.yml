@@ -101,7 +101,7 @@ tasks:
     desc: Run pve bootstrap playbook
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/pve_bootstrap.yml --limit {{.CLI_ARGS}}
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/pve.yml --limit {{.CLI_ARGS}}
 
   k3s:
     desc: Create k3s cluster

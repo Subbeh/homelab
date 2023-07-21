@@ -92,7 +92,7 @@ network_svc:
   bazarr:
     host: nas
     port: "9053"
-  borgmatic:
+  borgmatic_nas:
     host: nas
   calibre:
     host: nas

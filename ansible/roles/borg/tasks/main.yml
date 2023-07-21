@@ -5,7 +5,7 @@
   no_log: "{{ debug is not defined | default(false) }}"
   ansible.builtin.copy:
     content: '{{ borg_ssh_key }}'
-    dest: '/root/.ssh/borg.key'
+    dest: '/root/.ssh/borg'
     owner: root
     group: root
     mode: 0600
