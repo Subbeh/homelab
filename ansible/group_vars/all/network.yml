@@ -104,6 +104,9 @@ network_svc:
   changedetection:
     host: services
     port: "9033"
+  collabora:
+    host: services
+    port: "9026"
   crowdsec:
     host: bastion
     port: "9003"

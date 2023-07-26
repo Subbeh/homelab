@@ -1,0 +1,10 @@
+collabora:
+  image: collabora/code:23.05.1.3.1
+  ports:
+    - "{{ network_svc.collabora.port }}:9980"
+  capabilities:
+    - MKNOD
+  environment:
+    extra_params: "--o:ssl.enable=false"
+
+  traefik:
