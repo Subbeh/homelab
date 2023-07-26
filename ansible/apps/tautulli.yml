@@ -1,10 +1,17 @@
 ---
 
 tautulli:
-  image: tautulli/tautulli:v2.12.5
+  image: ghcr.io/tautulli/tautulli:v2.12.5
   ports:
     - "{{ network_svc.tautulli.port }}:8181"
   volumes:
     - "{{ common_dir }}/tautulli/config:/config"
 
   traefik:
+    routers:
+    - name: "tautulli"
+      rule: "Host(`tautulli.{{ network_domain.tld }}`)"
+    - name: "tautulli-pub"
+      rule: "Host(`tautulli.{{ network_domain.tld }}`) && (PathPrefix(`/image/`) || PathPrefix(`/newsletter/`))"
+      middlewares:
+        - chain-no-auth
