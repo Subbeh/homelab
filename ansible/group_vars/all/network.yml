@@ -143,6 +143,9 @@ network_svc:
   overseerr:
     host: services
     port: "9071"
+  pgadmin:
+    host: services
+    port: "9025"
   pikvm:
     host: pikvm
     ip: "{{ network_cidr.servers | ansible.utils.nthhost(254) }}"

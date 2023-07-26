@@ -15,3 +15,16 @@ postgres:
   environment:
     POSTGRES_USER: "{{ common_user }}"
     POSTGRES_PASSWORD: "{{ postgres_pass }}"
+
+pgadmin:
+  image: dpage/pgadmin4:7.4
+  ports:
+    - "{{ network_svc.pgadmin.port }}:80"
+  volumes:
+    - "{{ common_dir }}/pgadmin/lib:/var/lib/pgadmin"
+  environment:
+    PGADMIN_DEFAULT_EMAIL: "{{ common_email }}"
+    PGADMIN_DEFAULT_PASSWORD: "{{ pgadmin_pass }}"
+    PGADMIN_DISABLE_POSTFIX: "true"
+
+  traefik:
