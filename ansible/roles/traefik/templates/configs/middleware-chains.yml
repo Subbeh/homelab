@@ -16,5 +16,5 @@ http:
           - crowdsec-bouncer
           - rate-limit
           - secure-headers
-          - authentik
           - compress
+          - authentik

@@ -18,7 +18,7 @@ uptimekuma:
     - name: "status"
       rule: "Host(`status.{{ network_domain.tld }}`)"
       middlewares:
-        - chain-no-auth
+        - chain-auth
         - uptimekuma-status
     middlewares: |
       uptimekuma-status:

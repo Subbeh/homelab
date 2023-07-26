@@ -2,8 +2,6 @@
 
 pve:
   traefik:
-    rtr_middlewares:
-      - local-only
 
     services: |
       pve-svc:

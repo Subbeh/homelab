@@ -15,5 +15,3 @@ ntfy:
       start_period: 40s
 
   traefik:
-    rtr_middlewares:
-      - local-only

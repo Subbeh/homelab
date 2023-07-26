@@ -2,16 +2,12 @@
 
 pbk:
   traefik:
-    rtr_middlewares:
-      - local-only
-
     services: |
       pbk-svc:
         loadBalancer:
           serversTransport: "pbk"
           servers:
             - url: "https://{{ network_svc.pbk.ip }}:{{ network_svc.pbk.port }}"
-
     serversTransports: |
       pbk:
         insecureSkipVerify: true

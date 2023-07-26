@@ -6,5 +6,3 @@ apprise:
     - "{{ network_svc.apprise.port }}:8000"
 
   traefik:
-    rtr_middlewares:
-      - local-only

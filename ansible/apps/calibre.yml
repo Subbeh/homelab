@@ -13,13 +13,9 @@ calibre:
     routers:
     - name: "calibre"
       rule: "Host(`calibre.{{ network_domain.tld }}`)"
-      middlewares:
-        - chain-auth
       service: calibre-svc
     - name: "calibre-server"
       rule: "Host(`calibre-server.{{ network_domain.tld }}`)"
-      middlewares:
-        - local-only
       service: calibre-server-svc
     services: |
       calibre-svc:

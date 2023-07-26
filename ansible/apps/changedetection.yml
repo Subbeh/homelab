@@ -16,9 +16,6 @@ changedetection:
     HIDE_REFERER: "true"
 
   traefik:
-    rtr_middlewares:
-      - local-only
-      - chain-no-auth
 
   dependents:
     - changedetection_chrome

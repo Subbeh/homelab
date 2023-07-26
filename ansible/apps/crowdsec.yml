@@ -16,6 +16,4 @@ crowdsec:
     - "{{ common_dir }}/crowdsec/config:/etc/crowdsec"
 
   traefik:
-    rtr_middlewares:
-      - local-only
     url: http://crowdsec:8080

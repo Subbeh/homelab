@@ -67,7 +67,7 @@ tasks:
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags '{{.CLI_ARGS}},config' -e "debug=true"
 
-  traefikconfig:
+  traefik:
     desc: Generate Traefik config
     dir: "{{.ANSIBLE_DIR}}"
     cmds:

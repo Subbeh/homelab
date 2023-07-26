@@ -19,13 +19,9 @@ minio:
     routers:
     - name: "s3"
       rule: "Host(`s3.{{ network_domain.tld }}`)"
-      middlewares:
-        - local-only
       service: s3-svc
     - name: "minio"
       rule: "Host(`minio.{{ network_domain.tld }}`)"
-      middlewares:
-        - chain-auth
       service: minio-svc
     services: |
       s3-svc:

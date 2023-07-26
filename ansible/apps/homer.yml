@@ -7,8 +7,6 @@ homer:
 
   traefik:
     name: home
-    rtr_middlewares:
-      - local-only
 
   homer:
     - category: various
