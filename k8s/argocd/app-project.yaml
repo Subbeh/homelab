@@ -7,10 +7,22 @@ metadata:
   namespace: argocd
 spec:
   sourceRepos:
-    - '*'
+    - "*"
   destinations:
-    - namespace: '*'
-      server: '*'
+    - namespace: "*"
+      server: "*"
   clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    - group: "*"
+      kind: "*"
+  syncWindows:
+    - applications:
+        - "*"
+      clusters:
+        - "*"
+      namespaces:
+        - "*"
+      schedule: "* 5 * * *"
+      duration: 1h
+      kind: allow
+      manualSync: true
+      timeZone: Australia/Melbourne
