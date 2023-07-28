@@ -1,7 +1,7 @@
 ---
 
 overseerr:
-  image: lscr.io/linuxserver/overseerr:1.33.0
+  image: lscr.io/linuxserver/overseerr:1.33.1
   ports:
     - "{{ network_svc.overseerr.port }}:5055"
   volumes:
