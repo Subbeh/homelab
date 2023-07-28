@@ -1,7 +1,7 @@
 ---
 
 bazarr:
-  image: lscr.io/linuxserver/bazarr:1.2.3
+  image: lscr.io/linuxserver/bazarr:1.2.4
   ports:
     - "{{ network_svc.bazarr.port }}:6767"
   volumes:
