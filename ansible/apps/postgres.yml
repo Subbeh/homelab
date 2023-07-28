@@ -17,7 +17,7 @@ postgres:
     POSTGRES_PASSWORD: "{{ postgres_pass }}"
 
 pgadmin:
-  image: dpage/pgadmin4:7.4
+  image: dpage/pgadmin4:7.5
   ports:
     - "{{ network_svc.pgadmin.port }}:80"
   volumes:
