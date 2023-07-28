@@ -10,8 +10,13 @@ data:
     |
     jqPathExpressions:
     - '.webhooks[]?.clientConfig.caBundle'
-    - '.spec.conversion.webhook.clientConfig.caBundle'
+  resource.customizations.ignoreDifferences.secret: |
+    jqPathExpressions:
     - '.data.tls'
+  resource.customizations.ignoreDifferences.apiextensions.k8s.io_CustomResourceDefinition:
+    |
+    jqPathExpressions:
+    - '.spec.conversion.webhook.clientConfig.caBundle'
   resource.customizations.health.argoproj.io_Application: |
     hs = {}
     hs.status = "Progressing"
