@@ -12,6 +12,6 @@ linx:
   command: -config /data/linx-server.conf
 
   traefik:
-    name: paste
+    name: upload
     rtr_middlewares:
       - chain-no-auth
