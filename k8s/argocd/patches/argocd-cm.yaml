@@ -6,9 +6,11 @@ metadata:
 data:
   $patch: merge
   statusbadge.enabled: "true"
-  resource.customizations.ignoreDifferences.admissionregistration.k8s.io_MutatingWebhookConfiguration: |
+  resource.customizations.ignoreDifferences.admissionregistration.k8s.io_MutatingWebhookConfiguration:
+    |
     jqPathExpressions:
     - '.webhooks[]?.clientConfig.caBundle'
+    - '.spec.conversion.webhook.clientConfig.caBundle'
   resource.customizations.health.argoproj.io_Application: |
     hs = {}
     hs.status = "Progressing"
