@@ -6,7 +6,7 @@ namespace: storage
 helmCharts:
   - name: longhorn
     repo: https://charts.longhorn.io
-    version: 1.4.2
+    version: 1.5.1
     valuesFile: values.yaml
     namespace: storage
     releaseName: longhorn
