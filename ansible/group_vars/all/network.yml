@@ -110,6 +110,8 @@ network_svc:
   changedetection:
     host: services
     port: "9033"
+  changedetection_chrome:
+    host: services
   collabora:
     host: services
     port: "9026"

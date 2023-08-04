@@ -37,5 +37,4 @@ changedetection_chrome:
     - CHROME_REFRESH_TIME: "600000"
     - DEFAULT_BLOCK_ADS: "true"
     - DEFAULT_STEALTH: "true"
-
     - DEFAULT_IGNORE_HTTPS_ERRORS: "true"
