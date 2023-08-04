@@ -1,18 +1,36 @@
 ---
-
-readarr:
+readarr_ebooks:
+  container_name: readarr-ebooks
   image: lscr.io/linuxserver/readarr:0.3.0-develop
   ports:
-    - "{{ network_svc.readarr.port }}:8787"
+    - "{{ network_svc.readarr_ebooks.port }}:8787"
   volumes:
-    - "{{ common_dir }}/readarr/config:/config"
+    - "{{ common_dir }}/readarr_ebooks/config:/config"
     - "{{ common_media_dir }}:/data"
 
   traefik:
     routers:
-    - name: "readarr"
-      rule: "Host(`readarr.{{ network_domain.tld }}`)"
-    - name: "readarr-bypass"
-      rule: "Host(`readarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_api }}`)"
-      middlewares:
-        - chain-no-auth
+      - name: "readarr-eb"
+        rule: "Host(`ebooks.{{ network_domain.tld }}`)"
+      - name: "readarr-eb-bypass"
+        rule: "Host(`ebooks.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_ebooks_api }}`)"
+        middlewares:
+          - chain-no-auth
+
+readarr_audiobooks:
+  container_name: readarr-audiobooks
+  image: lscr.io/linuxserver/readarr:0.3.0-develop
+  ports:
+    - "{{ network_svc.readarr_audiobooks.port }}:8787"
+  volumes:
+    - "{{ common_dir }}/readarr_audiobooks/config:/config"
+    - "{{ common_media_dir }}:/data"
+
+  traefik:
+    routers:
+      - name: "readarr-ab"
+        rule: "Host(`audiobooks.{{ network_domain.tld }}`)"
+      - name: "readarr-ab-bypass"
+        rule: "Host(`audiobooks.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_audiobooks_api }}`)"
+        middlewares:
+          - chain-no-auth
