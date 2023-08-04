@@ -4,7 +4,5 @@
   become: true
   ansible.builtin.template:
     src: traefik-app.yml.j2
-    dest: "{{ hostvars[network_svc.traefik.host].common_dir }}/traefik/configs/app-{{ app_name }}.yml"
+    dest: "{{ hostvars[network_svc.traefik.host].common_dir }}/traefik/configs/app-{{ app.container_name | default(app.name) }}.yml"
   when: app.traefik is defined
-  vars:
-    app_name: "{{ app.traefik.name | default(app.container_name | default(app.name)) }}"

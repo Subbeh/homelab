@@ -18,12 +18,12 @@ http:
       {% if route.service is defined %}
       service: {{ route.service }}
       {% else %}
-      service: {{ app_name }}-svc
+      service: {{ app.name }}-svc
       {% endif %}
     {% endfor %}
   {% else %}
-    {{ app_name }}-rtr:
-      rule: "Host(`{{ app_name }}.{{ network_domain.tld }}`)"
+    {{ app.name }}-rtr:
+      rule: "Host(`{{ app.traefik.name | default(app.name) }}.{{ network_domain.tld }}`)"
       entryPoints:
         - websecure
       middlewares:
@@ -34,7 +34,7 @@ http:
       {% else %}
         - local-only
       {% endif %}
-      service: {{ app_name }}-svc
+      service: {{ app.name }}-svc
   {% endif %}
 
   {% if app.traefik.middlewares is defined %}
@@ -46,7 +46,7 @@ http:
   {% if app.traefik.services is defined %}
     {{ app.traefik.services | indent(width=4) }}
   {% else %}
-    {{ app_name }}-svc:
+    {{ app.name }}-svc:
       loadBalancer:
         servers:
         {% if app.traefik.url is defined %}
