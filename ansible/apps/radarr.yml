@@ -1,5 +1,4 @@
 ---
-
 radarr:
   image: lscr.io/linuxserver/radarr:4.6.4
   ports:
@@ -11,9 +10,9 @@ radarr:
 
   traefik:
     routers:
-    - name: "radarr"
-      rule: "Host(`radarr.{{ network_domain.tld }}`)"
-    - name: "radarr-bypass"
-      rule: "Host(`radarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_radarr_api }}`)"
-      middlewares:
-        - chain-no-auth
+      - name: "radarr"
+        rule: "Host(`radarr.{{ network_domain.tld }}`)"
+      - name: "radarr-bypass"
+        rule: "Host(`radarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_radarr_api }}`)"
+        middlewares:
+          - chain-no-auth
