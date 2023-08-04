@@ -1,5 +1,4 @@
 ---
-
 changedetection:
   image: ghcr.io/dgtlmoon/changedetection.io:0.43.2
   restart: false
@@ -21,7 +20,7 @@ changedetection:
     - changedetection_chrome
 
 changedetection_chrome:
-  name: changedetection-chrome
+  container_name: changedetection-chrome
   image: browserless/chrome
   restart: false
   state: stopped

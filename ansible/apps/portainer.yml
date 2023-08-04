@@ -1,5 +1,4 @@
 ---
-
 portainer:
   image: portainer/portainer-ce:2.18.4
   command: "-H unix:///var/run/docker.sock"
@@ -13,7 +12,7 @@ portainer:
   traefik:
 
 portainer_agent_bastion:
-  name: portainer-agent
+  container_name: portainer-agent
   image: portainer/agent:2.18.4
   ports:
     - "{{ network_svc.portainer.agent_port }}:9001"
@@ -22,7 +21,7 @@ portainer_agent_bastion:
     - "/var/lib/docker/volumes:/var/lib/docker/volumes"
 
 portainer_agent_nas:
-  name: portainer-agent
+  container_name: portainer-agent
   image: portainer/agent:2.18.4
   ports:
     - "{{ network_svc.portainer.agent_port }}:9001"
