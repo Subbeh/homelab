@@ -1,7 +1,6 @@
 ---
-
 authentik_server:
-  name: authentik-server
+  container_name: authentik-server
   image: ghcr.io/goauthentik/server:2023.6.1
   command: server
   ports:
@@ -22,16 +21,16 @@ authentik_server:
 
   traefik:
     routers:
-    - name: "auth"
-      rule: "Host(`auth.{{ network_domain.tld }}`)"
-      middlewares:
-        - chain-no-auth
-      service: auth-svc
-    - name: "auth-outpost"
-      rule: "HostRegexp(`{subdomain:[a-z0-9-]+}.{{ network_domain.tld }}`) && PathPrefix(`/outpost.goauthentik.io/`)"
-      middlewares:
-        - chain-no-auth
-      service: auth-outpost-svc
+      - name: "auth"
+        rule: "Host(`auth.{{ network_domain.tld }}`)"
+        middlewares:
+          - chain-no-auth
+        service: auth-svc
+      - name: "auth-outpost"
+        rule: "HostRegexp(`{subdomain:[a-z0-9-]+}.{{ network_domain.tld }}`) && PathPrefix(`/outpost.goauthentik.io/`)"
+        middlewares:
+          - chain-no-auth
+        service: auth-outpost-svc
     services: |
       auth-svc:
         loadBalancer:

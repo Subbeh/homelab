@@ -1,7 +1,6 @@
 ---
-
 borgmatic_nas:
-  name: borgmatic
+  container_name: borgmatic
   image: ghcr.io/borgmatic-collective/borgmatic:1.7.15
   capabilities:
     - net_admin
@@ -18,4 +17,4 @@ borgmatic_nas:
     - "{{ common_dir }}/borgmatic/cache:/root/.cache/borg"
   environment:
     BORG_PASSPHRASE: "{{ borg_encryption_passphrase }}"
-    BORG_RSH: 'ssh -i ~/.ssh/borg'
+    BORG_RSH: "ssh -i ~/.ssh/borg"

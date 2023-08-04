@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure docker network is present
   no_log: "{{ debug is not defined | default(false) }}"
   community.docker.docker_network:
@@ -14,7 +13,7 @@
   no_log: "{{ debug is not defined | default(false) }}"
   community.docker.docker_container:
     # use defaults
-    name: "{{ app.name }}"
+    name: "{{ app.container_name | default(app.name) }}"
     image: "{{ app.image }}"
     networks: "{{ app.networks | default(apps['defaults'].networks) }}"
     restart_policy: "{{ app.restart_policy | default(apps['defaults'].restart_policy) }}"
@@ -23,7 +22,7 @@
     log_options: "{{ app.log_options | default(apps['defaults'].log_options) }}"
     security_opts: "{{ app.security_opts | default(apps['defaults'].security_opts) }}"
     volumes: "{{ app.volumes | default([]) + apps['defaults'].volumes }}"
-    env: "{{ apps['defaults'].environment | ansible.builtin.combine(app.environment | default([]), list_merge='replace') }}"
+    env: "{{ app.env | default(apps['defaults'].environment | ansible.builtin.combine(app.environment | default([]), list_merge='replace')) }}"
     comparisons: "{{ app.comparisons | default(apps['defaults'].comparisons) }}"
 
     # misc
