@@ -1,5 +1,4 @@
 ---
-
 audiobookshelf:
   image: ghcr.io/advplyr/audiobookshelf:2.3.3
   ports:
@@ -11,4 +10,6 @@ audiobookshelf:
 
   traefik:
     rtr_middlewares:
-      - chain-no-auth
+      - crowdsec-bouncer
+      - rate-limit
+      - compress
