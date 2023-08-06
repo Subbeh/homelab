@@ -1,7 +1,7 @@
 ---
 readarr_ebooks:
   container_name: readarr-ebooks
-  image: lscr.io/linuxserver/readarr:0.3.0-develop
+  image: lscr.io/linuxserver/readarr:0.3.1-develop
   ports:
     - "{{ network_svc.readarr_ebooks.port }}:8787"
   volumes:
@@ -19,7 +19,7 @@ readarr_ebooks:
 
 readarr_audiobooks:
   container_name: readarr-audiobooks
-  image: lscr.io/linuxserver/readarr:0.3.0-develop
+  image: lscr.io/linuxserver/readarr:0.3.1-develop
   ports:
     - "{{ network_svc.readarr_audiobooks.port }}:8787"
   volumes:
