@@ -1,19 +1,18 @@
 ---
-
 gluetun:
   image: qmcgaw/gluetun:pr-1543
   capabilities:
     - net_admin
   ports:
-    - "{{ network_svc.gluetun.port }}:8888"
+    - "{{ network_svc.gluetun.port }}:8000"
     - "{{ network_svc.qbittorrent.port }}:8080"
   volumes:
     - "{{ common_dir }}/gluetun:/gluetun"
   environment:
     VPN_SERVICE_PROVIDER: "protonvpn"
     VPN_PORT_FORWARDING: "on"
-    OPENVPN_USER: "{{ vpn.openvpn_user}}+pmp"
-    OPENVPN_PASSWORD: "{{ vpn.openvpn_pass }}"
+    OPENVPN_USER: "{{ network_vpn.openvpn_user}}+pmp"
+    OPENVPN_PASSWORD: "{{ network_vpn.openvpn_pass }}"
     SERVER_COUNTRIES: "Singapore"
     FIREWALL_OUTBOUND_SUBNETS: "{{ network_cidr.lan }}"
     HEALTH_TARGET_ADDRESS: "cloudflare.com:443"
