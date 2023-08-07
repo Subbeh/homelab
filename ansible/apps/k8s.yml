@@ -1,0 +1,37 @@
+---
+k8s:
+  uptime:
+    - name: k3s-master-1
+      group: k8s
+      type: ping
+      hostname: "{{ network_hosts.k8s['master_1'] }}"
+    - name: k3s-master-2
+      group: k8s
+      type: ping
+      hostname: "{{ network_hosts.k8s['master_2'] }}"
+    - name: k3s-master-3
+      group: k8s
+      type: ping
+      hostname: "{{ network_hosts.k8s['master_3'] }}"
+    - name: k3s-worker-1
+      group: k8s
+      type: ping
+      hostname: "{{ network_hosts.k8s['worker_1'] }}"
+    - name: k3s-worker-2
+      group: k8s
+      type: ping
+      hostname: "{{ network_hosts.k8s['worker_2'] }}"
+    - name: k3s-worker-3
+      group: k8s
+      type: ping
+      hostname: "{{ network_hosts.k8s['worker_3'] }}"
+    - name: k3s-api
+      group: k8s
+      type: port
+      port: 6443
+      hostname: "{{ network_hosts.k8s['api'] }}"
+    - name: k3s-ingress
+      group: k8s
+      type: port
+      port: 443
+      hostname: "{{ network_hosts.k8s['ingress'] }}"
