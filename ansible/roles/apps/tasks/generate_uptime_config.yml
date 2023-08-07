@@ -1,0 +1,59 @@
+---
+- block:
+    - name: Set facts
+      ansible.builtin.set_fact:
+        _config: "{{ apps.defaults.uptime | ansible.builtin.combine(config | default([]), list_merge='replace') }}"
+        _monitor_name: "{{ config.name | default(app.name) }}"
+        _api_url: "http://{{ network_hosts[network_svc.uptimekuma.host] }}:{{ network_svc.uptimekuma.port }}"
+
+    - name: Set Ansible veritualenv location
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV') + '/bin/python' }}"
+      when: lookup('ansible.builtin.env', 'VIRTUAL_ENV')
+
+    - block:
+        - name: Login to Uptime Kuma and fetch token
+          lucasheld.uptime_kuma.login:
+            api_url: "{{ _api_url }}"
+            api_username: "{{ common_user }}"
+            api_password: "{{ uptime_kuma_password }}"
+          register: _result
+
+        - name: Extract the token from the result and set it as fact
+          ansible.builtin.set_fact:
+            _uptimekuma_api_token: "{{ _result.token }}"
+      when: _uptimekuma_api_token is undefined
+
+    - name: Delete existing monitor configs for {{ _monitor_name }}
+      lucasheld.uptime_kuma.monitor:
+        api_url: "{{ _api_url }}"
+        api_token: "{{ _uptimekuma_api_token }}"
+        name: "{{ _monitor_name }}"
+        state: absent
+      register: _result
+
+    - name: Add HTTP monitor config for {{ _monitor_name }}
+      lucasheld.uptime_kuma.monitor:
+        api_url: "{{ _api_url }}"
+        api_token: "{{ _uptimekuma_api_token }}"
+        name: "{{ _monitor_name }}"
+        parent_name: "{{ _config.group | default(omit) }}"
+        interval: "{{ _config.interval | default(omit) }}"
+        maxretries: "{{ _config.maxretries | default(omit) }}"
+        upsideDown: "{{ _config.upsideDown | default(omit) }}"
+        type: "{{ _config.type | default('http') }}"
+        url: |
+          {%- if (_config.url is defined) -%}{{ _config.url }}
+          {%- elif (network_svc[app.name].host is defined and network_hosts[network_svc[app.name].host] is defined) -%}http://{{ network_hosts[network_svc[app.name].host] }}{{ ':' + network_svc[app.name].port | default() }}
+          {%- elif (app.traefik.name is defined) -%}https://{{ app.traefik.name }}.{{ network_domain.tld }}
+          {%- else -%}https://{{ app.name }}.{{ network_domain.tld }}
+          {%- endif -%}
+        port: "{{ (_config.port | default(network_svc[app.name].port)) | default(omit) }}"
+        hostname: "{{ (_config.hostname | default(network_hosts[network_svc[app.name].host])) | default(omit) }}"
+        ignoreTls: "{{ _config.ignoreTls | default(omit) }}"
+        keyword: "{{ _config.keyword | default(omit) }}"
+        databaseConnectionString: "{{ _config.databaseConnectionString | default(omit) }}"
+        databaseQuery: "{{ _config.databaseQuery | default(omit) }}"
+        notification_names: "{{ _config.notification_names | default(omit) }}"
+        state: present
+  when: ansible_host == 'localhost'
