@@ -147,6 +147,9 @@ network_svc:
   homer:
     host: services
     port: "9020"
+  linkace:
+    host: services
+    port: "9036"
   linx:
     host: services
     port: "9024"

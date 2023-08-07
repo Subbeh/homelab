@@ -1,0 +1,35 @@
+linkace:
+  image: linkace/linkace:v1.12.2-simple
+  ports:
+    - "{{ network_svc.linkace.port }}:80"
+  volumes:
+    - "{{ common_dir }}/linkace/backups:/app/storage/app/backups"
+    - "{{ common_dir }}/linkace/.env:/app/.env"
+    - "{{ common_dir }}/logs/linkace:/app/storage/logs"
+  environment:
+    APP_KEY: "{{ linkace_key }}"
+    DB_CONNECTION: "pgsql"
+    DB_HOST: "postgres"
+    DB_PORT: "5432"
+    DB_DATABASE: "linkace"
+    SETUP_COMPLETED: "true"
+    DB_USERNAME: "{{ common_user }}"
+    DB_PASSWORD: "{{ postgres_pass }}"
+
+    MAIL_FROM_ADDRESS: "{{ common_email_svc }}"
+    MAIL_FROM_NAME: "linkace"
+    MAIL_DRIVER: "smtp"
+    MAIL_HOST: "{{ common_email_server }}"
+    MAIL_PORT: "{{ common_email_port | string }}"
+    MAIL_USERNAME: "{{ common_email_user }}"
+    MAIL_PASSWORD: "{{ common_email_pass }}"
+    MAIL_ENCRYPTION: "{{ common_email_protocol }}"
+
+  traefik:
+
+  uptime:
+    - group: services
+    - group: databases
+      name: postgres_linkace
+      type: postgres
+      databaseConnectionString: "postgres://{{ common_user }}:{{ postgres_pass }}@{{ network_hosts[network_svc.postgres.host] }}:{{ network_svc.postgres.port }}/linkace"
