@@ -1,5 +1,4 @@
 ---
-
 linx:
   image: andreimarcu/linx-server
   ports:
@@ -15,3 +14,6 @@ linx:
     name: upload
     rtr_middlewares:
       - chain-no-auth
+
+  uptime:
+    group: services

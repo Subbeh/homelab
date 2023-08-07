@@ -1,5 +1,4 @@
 ---
-
 sonarr:
   image: lscr.io/linuxserver/sonarr:3.0.10
   ports:
@@ -11,9 +10,12 @@ sonarr:
 
   traefik:
     routers:
-    - name: "sonarr"
-      rule: "Host(`sonarr.{{ network_domain.tld }}`)"
-    - name: "sonarr-bypass"
-      rule: "Host(`sonarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_sonarr_api }}`)"
-      middlewares:
-        - chain-no-auth
+      - name: "sonarr"
+        rule: "Host(`sonarr.{{ network_domain.tld }}`)"
+      - name: "sonarr-bypass"
+        rule: "Host(`sonarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_sonarr_api }}`)"
+        middlewares:
+          - chain-no-auth
+
+  uptime:
+    group: media

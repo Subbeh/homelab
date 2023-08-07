@@ -30,26 +30,30 @@ network_cidr:
       "100.64.0.0/10",
     ]
 
-vpn:
-  wg_endpoint_ip: 103.107.199.210
-  wg_endpoint_port: 51820
-  wg_public_key: !vault |
-    $ANSIBLE_VAULT;1.1;AES256
-    35306234663561353136333838363936373735326431653738666562333834663461386636373363
-    3732356264613032646337663138376262646630616137300a666532633065653739373233616335
-    34393530663833343261356534393965303661336639396636363962363064643338666566626632
-    3430303532623864370a353436666338373632333938646431336262303062393831353462623130
-    32323534633237373533353563656537366331336365333332376537323865613463616265393931
-    6230313135333835643031653965353963666236346537306336
-  wg_private_key: !vault |
-    $ANSIBLE_VAULT;1.1;AES256
-    39333932336439626437363333626138346434366564326533343338323836663330323163306262
-    6564643130613263336634303932303230623430353532330a633032623431366538363761393833
-    36626565656636356435663931303364343863623065633539626231313739386266366165356236
-    3363313835353364300a386639333038633330373232336266373062366537613435356334336536
-    31393865626666643633653632313439363331393965393432666262396161633039616135656663
-    6336663838646435323465343466356530396233666465343633
-  wg_address: 10.2.0.2/32
+network_hosts:
+  gw: "{{ ansible_default_ipv4.gateway | default('') }}"
+  opnsense: "{{ network_cidr.lan | ansible.utils.ipsubnet(24, -2) | ansible.utils.nthhost(1) }}"
+  nas: "{{ network_cidr.servers | ansible.utils.nthhost(10) }}"
+  pbk: "{{ network_cidr.servers | ansible.utils.nthhost(20) }}"
+  pikvm: "{{ network_cidr.servers | ansible.utils.nthhost(254) }}"
+  bastion: "{{ network_cidr.dmz | ansible.utils.nthhost(2) }}"
+  services: "{{ network_cidr.vms | ansible.utils.nthhost(100) }}"
+  plex: "{{ network_cidr.vms | ansible.utils.nthhost(30) }}"
+  pve:
+    pve_nuc_01: "{{ network_cidr.servers | ansible.utils.nthhost(21) }}"
+    pve_opti_01: "{{ network_cidr.servers | ansible.utils.nthhost(22) }}"
+    pve_opti_02: "{{ network_cidr.servers | ansible.utils.nthhost(23) }}"
+  k8s:
+    master_1: "{{ network_cidr.k8s | ansible.utils.nthhost(11) }}"
+    master_2: "{{ network_cidr.k8s | ansible.utils.nthhost(12) }}"
+    master_3: "{{ network_cidr.k8s | ansible.utils.nthhost(13) }}"
+    worker_1: "{{ network_cidr.k8s | ansible.utils.nthhost(21) }}"
+    worker_2: "{{ network_cidr.k8s | ansible.utils.nthhost(22) }}"
+    worker_3: "{{ network_cidr.k8s | ansible.utils.nthhost(23) }}"
+    api: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
+    ingress: "{{ network_cidr.k8s | ansible.utils.nthhost(100) }}"
+
+network_vpn:
   openvpn_user: !vault |
     $ANSIBLE_VAULT;1.1;AES256
     34316566346537633931653736663232646133623230393565656465393236376338313666303536
@@ -80,10 +84,21 @@ network_svc:
   services:
     ip: "{{ network_cidr.vms | ansible.utils.nthhost(100) }}"
   k8s:
-    api: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
-    ingress: "{{ network_cidr.k8s | ansible.utils.nthhost(100) }}"
+    host: "{{ network_hosts.k8s | first }}"
+  pbk:
+    host: pbk
+    port: "8007"
+  pve:
+    host: "{{ network_hosts.pve | first }}"
+    port: "8006"
 
   # services
+  adguard:
+    host: "{{ network_hosts.opnsense }}"
+    port: "5380"
+  adminer:
+    host: services
+    port: "9027"
   apprise:
     host: services
     port: "9034"
@@ -159,10 +174,8 @@ network_svc:
     port: "9025"
   pikvm:
     host: pikvm
-    ip: "{{ network_cidr.servers | ansible.utils.nthhost(254) }}"
   plex:
     host: plex
-    ip: "{{ network_cidr.vms | ansible.utils.nthhost(30) }}"
     port: "32400"
   portainer:
     host: services
@@ -178,18 +191,6 @@ network_svc:
   prowlarr:
     host: nas
     port: "9054"
-  pbk:
-    ip: "{{ network_cidr.servers | ansible.utils.nthhost(20) }}"
-    port: "8007"
-  pve:
-    host: ["pve-nuc-01", "pve-opti-01", "pve-opti-02"]
-    ip:
-      [
-        "{{ network_cidr.servers | ansible.utils.nthhost(21) }}",
-        "{{ network_cidr.servers | ansible.utils.nthhost(22) }}",
-        "{{ network_cidr.servers | ansible.utils.nthhost(23) }}",
-      ]
-    port: "8006"
   qbittorrent:
     host: nas
     port: "9090"

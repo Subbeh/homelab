@@ -15,3 +15,6 @@ homer:
       subtitle: Dashboard
       tag: app
       url: https://hom.sbbh.cloud
+
+  uptime:
+    group: services

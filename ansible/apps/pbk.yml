@@ -1,5 +1,4 @@
 ---
-
 pbk:
   traefik:
     services: |
@@ -7,7 +6,16 @@ pbk:
         loadBalancer:
           serversTransport: "pbk"
           servers:
-            - url: "https://{{ network_svc.pbk.ip }}:{{ network_svc.pbk.port }}"
+            - url: "https://{{ network_hosts.pbk }}:{{ network_svc.pbk.port }}"
     serversTransports: |
       pbk:
         insecureSkipVerify: true
+
+  uptime:
+    - name: pbk-webui
+      group: pve
+      url: "https://{{ network_hosts.pbk }}:{{ network_svc.pbk.port }}"
+      ignoreTls: yes
+    - group: servers
+      type: ping
+      hostname: "{{ network_hosts.pbk }}"

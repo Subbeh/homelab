@@ -1,5 +1,4 @@
 ---
-
 postgres:
   image: postgres:12-alpine
   healthcheck:
@@ -16,6 +15,12 @@ postgres:
     POSTGRES_USER: "{{ common_user }}"
     POSTGRES_PASSWORD: "{{ postgres_pass }}"
 
+  uptime:
+    group: databases
+    name: "postgres_{{ network_svc.postgres.host }}"
+    type: postgres
+    databaseConnectionString: "postgres://{{ common_user }}:{{ postgres_pass }}@{{ network_hosts[network_svc.postgres.host] }}:{{ network_svc.postgres.port }}/postgres"
+
 pgadmin:
   image: dpage/pgadmin4:7.5
   ports:
@@ -28,3 +33,6 @@ pgadmin:
     PGADMIN_DISABLE_POSTFIX: "true"
 
   traefik:
+
+  uptime:
+    group: databases

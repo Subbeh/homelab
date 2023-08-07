@@ -1,5 +1,4 @@
 ---
-
 overseerr:
   image: lscr.io/linuxserver/overseerr:1.33.2
   ports:
@@ -11,3 +10,6 @@ overseerr:
     name: requests
     rtr_middlewares:
       - chain-no-auth
+
+  uptime:
+    group: media

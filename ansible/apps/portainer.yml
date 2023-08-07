@@ -11,6 +11,10 @@ portainer:
 
   traefik:
 
+  uptime:
+    group: portainer
+    name: portainer_server
+
 portainer_agent_bastion:
   container_name: portainer-agent
   image: portainer/agent:2.18.4
@@ -20,6 +24,11 @@ portainer_agent_bastion:
     - "/var/run/docker.sock:/var/run/docker.sock"
     - "/var/lib/docker/volumes:/var/lib/docker/volumes"
 
+  uptime:
+    group: portainer
+    type: port
+    port: "{{ network_svc.portainer.agent_port }}"
+
 portainer_agent_nas:
   container_name: portainer-agent
   image: portainer/agent:2.18.4
@@ -28,3 +37,8 @@ portainer_agent_nas:
   volumes:
     - "/var/run/docker.sock:/var/run/docker.sock"
     - "/volume1/@docker/volumes:/volume1/@docker/volumes"
+
+  uptime:
+    group: portainer
+    type: port
+    port: "{{ network_svc.portainer.agent_port }}"

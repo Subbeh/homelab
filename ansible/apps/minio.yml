@@ -1,5 +1,4 @@
 ---
-
 minio:
   image: quay.io/minio/minio:RELEASE.2023-06-19T19-52-50Z
   ports:
@@ -17,12 +16,12 @@ minio:
 
   traefik:
     routers:
-    - name: "s3"
-      rule: "Host(`s3.{{ network_domain.tld }}`)"
-      service: s3-svc
-    - name: "minio"
-      rule: "Host(`minio.{{ network_domain.tld }}`)"
-      service: minio-svc
+      - name: "s3"
+        rule: "Host(`s3.{{ network_domain.tld }}`)"
+        service: s3-svc
+      - name: "minio"
+        rule: "Host(`minio.{{ network_domain.tld }}`)"
+        service: minio-svc
     services: |
       s3-svc:
         loadBalancer:
@@ -32,3 +31,7 @@ minio:
         loadBalancer:
           servers:
             - url: "http://{{ network_svc.minio.host }}:{{ network_svc.minio.port_console }}"
+
+  uptime:
+    url: "http://{{ network_svc.minio.host }}:{{ network_svc.minio.port_console }}"
+    group: system

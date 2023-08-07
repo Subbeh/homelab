@@ -25,14 +25,21 @@ nextcloud:
 
   traefik:
     routers:
-    - name: "nextcloud"
-      rule: "Host(`next.{{ network_domain.tld }}`)"
-      middlewares:
-        - local-only
-        - secure-headers
-        - nextcloud-redirect
+      - name: "nextcloud"
+        rule: "Host(`next.{{ network_domain.tld }}`)"
+        middlewares:
+          - local-only
+          - secure-headers
+          - nextcloud-redirect
     middlewares: |
       nextcloud-redirect:
         redirectRegex:
           regex: "https://(.*)/.well-known/(?:card|cal)dav"
           replacement: "https://${1}/remote.php/dav"
+
+  uptime:
+    - group: services
+    - group: databases
+      name: "postgres_nextcloud"
+      type: postgres
+      databaseConnectionString: "postgres://{{ common_user }}:{{ postgres_pass }}@{{ network_hosts[network_svc.postgres.host] }}:{{ network_svc.postgres.port }}/nextcloud"

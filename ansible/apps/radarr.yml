@@ -16,3 +16,6 @@ radarr:
         rule: "Host(`radarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_radarr_api }}`)"
         middlewares:
           - chain-no-auth
+
+  uptime:
+    group: media

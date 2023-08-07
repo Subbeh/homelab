@@ -1,5 +1,4 @@
 ---
-
 traefik:
   image: traefik:v2.10.4
   restart_policy: always
@@ -27,6 +26,11 @@ traefik:
     traefik.http.routers.traefik-rtr.tls.domains[0].sans: "*.{{ network_domain.tld }}"
     traefik.http.routers.traefik-rtr.service: "api@internal"
     traefik.http.routers.traefik-rtr.middlewares: "local-only@file"
+
+  uptime:
+    group: system
+    type: port
+    port: "443"
 
 whoami:
   image: traefik/whoami

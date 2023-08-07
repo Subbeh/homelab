@@ -1,5 +1,4 @@
 ---
-
 prowlarr:
   image: lscr.io/linuxserver/prowlarr:version-1.6.3.3608
   ports:
@@ -9,9 +8,12 @@ prowlarr:
 
   traefik:
     routers:
-    - name: "prowlarr"
-      rule: "Host(`prowlarr.{{ network_domain.tld }}`)"
-    - name: "prowlarr-bypass"
-      rule: "Host(`prowlarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_prowlarr_api }}`)"
-      middlewares:
-        - chain-no-auth
+      - name: "prowlarr"
+        rule: "Host(`prowlarr.{{ network_domain.tld }}`)"
+      - name: "prowlarr-bypass"
+        rule: "Host(`prowlarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_prowlarr_api }}`)"
+        middlewares:
+          - chain-no-auth
+
+  uptime:
+    group: media

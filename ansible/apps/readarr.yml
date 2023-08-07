@@ -17,6 +17,9 @@ readarr_ebooks:
         middlewares:
           - chain-no-auth
 
+  uptime:
+    group: media
+
 readarr_audiobooks:
   container_name: readarr-audiobooks
   image: lscr.io/linuxserver/readarr:0.3.1-develop
@@ -34,3 +37,6 @@ readarr_audiobooks:
         rule: "Host(`audiobooks.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_audiobooks_api }}`)"
         middlewares:
           - chain-no-auth
+
+  uptime:
+    group: media

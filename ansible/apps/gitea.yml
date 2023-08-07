@@ -1,5 +1,4 @@
 ---
-
 gitea:
   image: gitea/gitea:1.20.2
   volumes:
@@ -61,3 +60,10 @@ gitea:
 
   traefik:
     name: "git"
+
+  uptime:
+    - group: system
+    - group: databases
+      name: "postgres_gitea"
+      type: postgres
+      databaseConnectionString: "postgres://{{ common_user }}:{{ postgres_pass }}@{{ network_hosts[network_svc.postgres.host] }}:{{ network_svc.postgres.port }}/gitea"

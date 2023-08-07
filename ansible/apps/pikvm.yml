@@ -1,5 +1,4 @@
 ---
-
 pikvm:
   traefik:
     name: kvm
@@ -8,7 +7,15 @@ pikvm:
         loadBalancer:
           serversTransport: "pikvm"
           servers:
-            - url: "https://{{ network_svc.pikvm.ip }}"
+            - url: "https://{{ network_hosts.pikvm }}"
     serversTransports: |
       pikvm:
         insecureSkipVerify: true
+
+  uptime:
+    - name: pikvm-webui
+      group: system
+      ignoreTls: yes
+    - group: servers
+      type: ping
+      hostname: "{{ network_hosts.pikvm }}"

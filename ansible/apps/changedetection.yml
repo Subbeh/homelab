@@ -14,10 +14,13 @@ changedetection:
     PLAYWRIGHT_DRIVER_URL: "ws://changedetection-chrome:3000/?stealth=1&--disable-web-security=true"
     HIDE_REFERER: "true"
 
-  traefik:
-
   dependents:
     - changedetection_chrome
+
+  traefik:
+
+  uptime:
+    group: services
 
 changedetection_chrome:
   container_name: changedetection-chrome

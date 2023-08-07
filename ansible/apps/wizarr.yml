@@ -1,5 +1,4 @@
 ---
-
 wizarr:
   image: ghcr.io/wizarrrr/wizarr:2.2.0
   ports:
@@ -7,14 +6,17 @@ wizarr:
   volumes:
     - "{{ common_dir }}/wizarr/config:/data/database"
   environment:
-    APP_URL: "https://wizarr.{{ network_domain.tld }}"
+    APP_URL: "https://invites.{{ network_domain.tld }}"
     DISABLE_BUILTIN_AUTH: "true"
 
   traefik:
     routers:
-    - name: "wizarr"
-      rule: "Host(`wizarr.{{ network_domain.tld }}`)"
-    - name: "wizarr-bypass"
-      rule: "Host(`wizarr.{{ network_domain.tld }}`) && (Path(`/join`, `/setup`) || PathPrefix(`/j/`, `/setup/`, `/static/`))"
-      middlewares:
-        - chain-no-auth
+      - name: "wizarr"
+        rule: "Host(`invites.{{ network_domain.tld }}`)"
+      - name: "wizarr-bypass"
+        rule: "Host(`invites.{{ network_domain.tld }}`) && (Path(`/join`, `/setup`) || PathPrefix(`/j/`, `/setup/`, `/static/`))"
+        middlewares:
+          - chain-no-auth
+
+  uptime:
+    group: media

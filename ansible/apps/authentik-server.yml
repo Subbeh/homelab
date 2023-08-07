@@ -40,3 +40,10 @@ authentik_server:
         loadBalancer:
           servers:
             - url: "http://{{ network_svc.authentik_server.host }}:{{ network_svc.authentik_server.port }}/outpost.goauthentik.io"
+
+  uptime:
+    - group: system
+    - group: databases
+      name: "postgres_authentik"
+      type: postgres
+      databaseConnectionString: "postgres://{{ common_user }}:{{ postgres_pass }}@{{ network_hosts[network_svc.postgres.host] }}:{{ network_svc.postgres.port }}/authentik"

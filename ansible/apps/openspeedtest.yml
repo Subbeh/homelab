@@ -1,5 +1,4 @@
 ---
-
 openspeedtest:
   image: openspeedtest/latest:v2.0.2
   ports:
@@ -14,3 +13,6 @@ openspeedtest:
       buffer-limit:
         buffering:
           maxRequestBodyBytes: 10000000000
+
+  uptime:
+    group: services

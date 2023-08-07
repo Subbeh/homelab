@@ -1,5 +1,4 @@
 ---
-
 tautulli:
   image: ghcr.io/tautulli/tautulli:v2.12.5
   ports:
@@ -9,9 +8,12 @@ tautulli:
 
   traefik:
     routers:
-    - name: "tautulli"
-      rule: "Host(`tautulli.{{ network_domain.tld }}`)"
-    - name: "tautulli-pub"
-      rule: "Host(`tautulli.{{ network_domain.tld }}`) && (PathPrefix(`/image/`) || PathPrefix(`/newsletter/`))"
-      middlewares:
-        - chain-no-auth
+      - name: "tautulli"
+        rule: "Host(`tautulli.{{ network_domain.tld }}`)"
+      - name: "tautulli-pub"
+        rule: "Host(`tautulli.{{ network_domain.tld }}`) && (PathPrefix(`/image/`) || PathPrefix(`/newsletter/`))"
+        middlewares:
+          - chain-no-auth
+
+  uptime:
+    group: media

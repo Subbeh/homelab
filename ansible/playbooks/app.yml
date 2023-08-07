@@ -1,5 +1,4 @@
 ---
-
 - hosts: localhost
   become: false
   gather_facts: false
@@ -31,13 +30,25 @@
         apply:
           tags: always
 
-    - name: Generate Homer config
+    - name: Generate Uptime Kuma config
       tags: always
       ansible.builtin.include_role:
         name: apps
-        tasks_from: generate_homer_config
+        tasks_from: generate_uptime_config
         apply:
           tags: always
+      loop: "{{ app.uptime is mapping | ternary([app.uptime], app.uptime is iterable | ternary(app.uptime, [true])) }}"
+      loop_control:
+        loop_var: config
+      when: app.uptime is defined
+
+    # - name: Generate Homer config
+    #   tags: always
+    #   ansible.builtin.include_role:
+    #     name: apps
+    #     tasks_from: generate_homer_config
+    #     apply:
+    #       tags: always
 
     - name: End play if config parameter is provided
       tags: always

@@ -13,3 +13,6 @@ audiobookshelf:
       - crowdsec-bouncer
       - rate-limit
       - compress
+
+  uptime:
+    group: media

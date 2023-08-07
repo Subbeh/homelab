@@ -1,5 +1,4 @@
 ---
-
 bazarr:
   image: lscr.io/linuxserver/bazarr:1.2.4
   ports:
@@ -10,9 +9,12 @@ bazarr:
 
   traefik:
     routers:
-    - name: "bazarr"
-      rule: "Host(`bazarr.{{ network_domain.tld }}`)"
-    - name: "bazarr-bypass"
-      rule: "Host(`bazarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_bazarr_api }}`)"
-      middlewares:
-        - chain-no-auth
+      - name: "bazarr"
+        rule: "Host(`bazarr.{{ network_domain.tld }}`)"
+      - name: "bazarr-bypass"
+        rule: "Host(`bazarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_bazarr_api }}`)"
+        middlewares:
+          - chain-no-auth
+
+  uptime:
+    group: media

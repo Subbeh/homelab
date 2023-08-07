@@ -1,5 +1,4 @@
 ---
-
 netbootxyz:
   image: netbootxyz/netbootxyz:0.6.7-nbxyz18
   ports:
@@ -10,3 +9,6 @@ netbootxyz:
     - "{{ common_data_dir }}/netboot:/assets"
 
   traefik:
+
+  uptime:
+    group: services

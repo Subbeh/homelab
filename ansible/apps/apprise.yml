@@ -6,3 +6,6 @@ apprise:
     - "{{ network_svc.apprise.port }}:8000"
 
   traefik:
+
+  uptime:
+    group: services

@@ -6,7 +6,6 @@ env:
   ANSIBLE_PLAYBOOK_DIR: "{{.ANSIBLE_DIR}}/playbooks"
 
 tasks:
-
   galaxy:
     desc: Install / Upgrade Ansible galaxy deps
     dir: "{{.ANSIBLE_DIR}}"
@@ -62,16 +61,22 @@ tasks:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags {{.CLI_ARGS}} -e "debug=true"
 
   appconfig:
-    desc: Generate Traefik app config
+    desc: Generate service configs for app
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags '{{.CLI_ARGS}},config' -e "debug=true"
 
-  traefik:
+  webconfig:
     desc: Generate Traefik config
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/task.yml -l bastion -e "role=traefik task=copy_config"
+
+  test:
+    desc: Run test playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/test.yml {{.CLI_ARGS}}
 
   bastion:
     desc: Run bastion playbook

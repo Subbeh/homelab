@@ -1,6 +1,13 @@
 ---
-
 plex:
   traefik:
     rtr_middlewares:
       - chain-no-auth
+
+  uptime:
+    - name: plex-webui
+      group: media
+      ignoreTls: yes
+    - group: servers
+      type: ping
+      hostname: "{{ network_hosts.plex }}"

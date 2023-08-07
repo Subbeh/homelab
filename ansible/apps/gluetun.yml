@@ -23,3 +23,27 @@ gluetun:
 
   dependents:
     - qbittorrent
+
+  uptime:
+    - name: gluetun_dns
+      type: keyword
+      url: "http://{{ network_hosts[network_svc.gluetun.host] }}:{{ network_svc.gluetun.port }}/v1/dns/status"
+      keyword: running
+      group: gluetun
+    - name: gluetun_vpn
+      type: keyword
+      url: "http://{{ network_hosts[network_svc.gluetun.host] }}:{{ network_svc.gluetun.port }}/v1/openvpn/status"
+      keyword: running
+      group: gluetun
+    - name: gluetun_ip
+      type: keyword
+      url: "http://{{ network_hosts[network_svc.gluetun.host] }}:{{ network_svc.gluetun.port }}/v1/publicip/ip"
+      upsideDown: yes
+      keyword: "{{ lookup('ansible.builtin.url', 'http://ifconfig.me', http_agent='curl/8.2.1') }}"
+      group: gluetun
+    - name: gluetun_port
+      type: keyword
+      url: "http://{{ network_hosts[network_svc.gluetun.host] }}:{{ network_svc.gluetun.port }}/v1/openvpn/portforwarded"
+      upsideDown: yes
+      keyword: ":0"
+      group: gluetun

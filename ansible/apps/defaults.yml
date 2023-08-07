@@ -1,5 +1,4 @@
 ---
-
 defaults:
   networks:
     - name: mesh
@@ -24,6 +23,12 @@ defaults:
     networks: strict
     env: strict
     labels: strict
+
+  uptime:
+    interval: 60
+    maxretries: 1
+    notification_names:
+      - "discord"
 
 networks:
   mesh:

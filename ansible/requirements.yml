@@ -1,5 +1,4 @@
 ---
-
 roles:
   - name: geerlingguy.pip
   - name: geerlingguy.docker
@@ -17,3 +16,4 @@ collections:
   - name: ansible.posix
   - name: kubernetes.core
   - name: community.sops
+  - name: lucasheld.uptime_kuma

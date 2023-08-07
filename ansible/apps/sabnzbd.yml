@@ -1,5 +1,4 @@
 ---
-
 sabnzbd:
   image: lscr.io/linuxserver/sabnzbd:4.0.3
   ports:
@@ -10,9 +9,12 @@ sabnzbd:
 
   traefik:
     routers:
-    - name: "sabnzbd"
-      rule: "Host(`sabnzbd.{{ network_domain.tld }}`)"
-    - name: "sabnzbd-bypass"
-      rule: "Host(`sabnzbd.{{ network_domain.tld }}`) && Query(`apikey={{ media_sabnzbd_api }}`)"
-      middlewares:
-        - chain-no-auth
+      - name: "sabnzbd"
+        rule: "Host(`sabnzbd.{{ network_domain.tld }}`)"
+      - name: "sabnzbd-bypass"
+        rule: "Host(`sabnzbd.{{ network_domain.tld }}`) && Query(`apikey={{ media_sabnzbd_api }}`)"
+        middlewares:
+          - chain-no-auth
+
+  uptime:
+    group: media

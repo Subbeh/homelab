@@ -1,8 +1,6 @@
 ---
-
 pve:
   traefik:
-
     services: |
       pve-svc:
         failover:
@@ -17,7 +15,7 @@ pve:
             interval: 10s
             timeout: 3s
           servers:
-            - url: "https://{{ network_svc.pve.host[0] }}.{{ network_domain.tld_local }}:{{ network_svc.pve.port }}"
+            - url: "https://{{ network_hosts.pve | first | regex_replace('_', '-') }}.{{ network_domain.tld_local }}:{{ network_svc.pve.port }}"
 
       pve-backup-svc:
         loadBalancer:
@@ -26,4 +24,29 @@ pve:
             interval: 10s
             timeout: 3s
           servers:
-            - url: "https://{{ network_svc.pve.host[1] }}.{{ network_domain.tld_local }}:{{ network_svc.pve.port }}"
+            - url: "https://{{ (network_hosts.pve | list)[1] | regex_replace('_', '-') }}.{{ network_domain.tld_local }}:{{ network_svc.pve.port }}"
+  uptime:
+    - name: pve-nuc-01-webui
+      group: pve
+      url: "https://{{ network_hosts.pve['pve_nuc_01'] }}:{{ network_svc.pve.port }}"
+      ignoreTls: yes
+    - name: pve-nuc-01
+      group: servers
+      type: ping
+      hostname: "{{ network_hosts.pve['pve_nuc_01'] }}"
+    - name: pve-opti-01-webui
+      group: pve
+      url: "https://{{ network_hosts.pve['pve_opti_01'] }}:{{ network_svc.pve.port }}"
+      ignoreTls: yes
+    - name: pve-opti-01
+      group: servers
+      type: ping
+      hostname: "{{ network_hosts.pve['pve_opti_01'] }}"
+    - name: pve-opti-02-webui
+      group: pve
+      url: "https://{{ network_hosts.pve['pve_opti_02'] }}:{{ network_svc.pve.port }}"
+      ignoreTls: yes
+    - name: pve-opti-02
+      group: servers
+      type: ping
+      hostname: "{{ network_hosts.pve['pve_opti_02'] }}"

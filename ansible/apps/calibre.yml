@@ -27,6 +27,9 @@ calibre:
           servers:
             - url: "http://{{ network_svc.calibre.host }}:{{ network_svc.calibre.port_server }}"
 
+  uptime:
+    group: media
+
 calibre_web:
   container_name: calibre-web
   image: lscr.io/linuxserver/calibre-web:0.6.20
@@ -42,3 +45,6 @@ calibre_web:
     name: books
     rtr_middlewares:
       - chain-no-auth
+
+  uptime:
+    group: media

@@ -22,3 +22,7 @@ qbittorrent:
   traefik:
     rtr_middlewares:
       - chain-no-auth
+
+  uptime:
+    group: media
+    url: "https://qbittorrent.{{ network_domain.tld }}"

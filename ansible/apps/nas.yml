@@ -1,4 +1,10 @@
 ---
-
 nas:
   traefik:
+
+  uptime:
+    - name: nas-webui
+      group: system
+    - group: servers
+      type: ping
+      hostname: "{{ network_hosts.nas }}"
