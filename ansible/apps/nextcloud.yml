@@ -1,5 +1,5 @@
 nextcloud:
-  image: nextcloud:27.0.1
+  image: nextcloud:27.0.2
   hostname: "next.{{ network_domain.tld }}"
   ports:
     - "{{ network_svc.nextcloud.port }}:80"
