@@ -28,10 +28,29 @@ nextcloud:
       - name: "nextcloud"
         rule: "Host(`next.{{ network_domain.tld }}`)"
         middlewares:
-          - local-only
-          - secure-headers
+          - nextcloud-secure-headers
           - nextcloud-redirect
+          - crowdsec-bouncer
+          - rate-limit
     middlewares: |
+      nextcloud-secure-headers:
+        headers:
+          accessControlMaxAge: 100
+          sslRedirect: true
+          stsSeconds: 63072000
+          stsIncludeSubdomains: true
+          stsPreload: true
+          forceSTSHeader: true
+          customFrameOptionsValue: "SAMEORIGIN" #CSP takes care of this but may be needed for organizr.
+          contentTypeNosniff: true
+          browserXssFilter: true
+          sslForceHost: true # add sslHost to all of the services
+          sslHost: "next.{{ network_domain.tld }}"
+          referrerPolicy: "no-referrer"
+          featurePolicy: "camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+          customResponseHeaders:
+            X-Robots-Tag: "none"
+            server: ""
       nextcloud-redirect:
         redirectRegex:
           regex: "https://(.*)/.well-known/(?:card|cal)dav"
@@ -39,6 +58,7 @@ nextcloud:
 
   uptime:
     - group: services
+      type: port
     - group: databases
       name: "postgres_nextcloud"
       type: postgres
