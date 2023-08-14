@@ -3,6 +3,7 @@ env:
   DRONE_RUNNER_NETWORKS: bridge
   # fix: https://community.harness.io/t/docker-mtu-problem/11246/8
   DRONE_RUNNER_NETWORK_OPTS: com.docker.network.drive.mtu:1450
+  DRONE_TMATE_ENABLED: true
 extraSecretNamesForEnvFrom:
   - doppler-drone
 extraVolumes:
@@ -17,4 +18,3 @@ dind:
   extraVolumeMounts:
     - name: docker-cache
       mountPath: /var/cache/
-
