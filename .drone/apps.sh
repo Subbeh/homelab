@@ -16,4 +16,4 @@ while read app; do
 		echo running app script for $app...
 		ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook "${APP_PLAYBOOK:?not set}" --tags $app -e "pipeline=true"
 	fi
-done <<<$(git diff --name-only --diff-filter=ACMR HEAD~1 main | grep -oP '(?<=ansible/)apps/.*.ya?ml' | xargs awk -F: '/^[^ -]/{ print $1 }')
+done <<<$(git diff --name-only --diff-filter=ACMR HEAD~1 main | grep -oP '(?<=ansible/)apps/[^/]*.ya?ml' | xargs awk -F: '/^[^ -]/{ print $1 }')
