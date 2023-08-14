@@ -96,9 +96,6 @@ network_svc:
   adguard:
     host: "{{ network_hosts.opnsense }}"
     port: "5380"
-  adminer:
-    host: services
-    port: "9027"
   apprise:
     host: services
     port: "9034"
@@ -127,15 +124,15 @@ network_svc:
     port: "9033"
   changedetection_chrome:
     host: services
-  collabora:
-    host: services
-    port: "9026"
   crowdsec:
     host: bastion
     port: "9003"
     bouncer_port: "9004"
   endlessh:
     host: bastion
+  freshrss:
+    host: services
+    port: "9026"
   gitea:
     host: services
     port: "9023"

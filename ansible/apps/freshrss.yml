@@ -1,0 +1,13 @@
+---
+freshrss:
+  image: freshrss/freshrss:1.21.0
+  ports:
+    - "{{ network_svc.freshrss.port }}:80"
+  volumes:
+    - "{{ common_dir }}/freshrss/data:/var/www/FreshRSS/data"
+    - "{{ common_dir }}/freshrss/extensions:/var/www/FreshRSS/extensions"
+
+  traefik:
+
+  uptime:
+    group: services
