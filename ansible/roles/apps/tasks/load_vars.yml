@@ -1,9 +1,10 @@
 ---
-
 - name: load all app manifests
   no_log: "{{ debug is not defined | default(false) }}"
   ansible.builtin.include_vars:
     dir: "{{ common_ansible_root }}/apps"
+    ignore_unknown_extensions: true
+    depth: 1
     name: apps
 
 - name: Set app variables

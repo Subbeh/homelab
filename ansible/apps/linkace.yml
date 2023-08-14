@@ -26,6 +26,7 @@ linkace:
     MAIL_ENCRYPTION: "{{ common_email_protocol }}"
 
   traefik:
+    name: bookmarks
 
   uptime:
     - group: services
