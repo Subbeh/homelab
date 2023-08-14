@@ -1,6 +1,6 @@
 ---
 prowlarr:
-  image: lscr.io/linuxserver/prowlarr:version-1.6.3.3608
+  image: lscr.io/linuxserver/prowlarr:version-1.7.4.3769
   ports:
     - "{{ network_svc.prowlarr.port }}:9696"
   volumes:

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-
-set -euo pipefail
+set -xeuo pipefail
 
 echo "${ANSIBLE_VAULT_PASSWORD:?not set}" >$HOME/.ansible_vault
 

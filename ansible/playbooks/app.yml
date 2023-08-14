@@ -40,6 +40,8 @@
       loop: "{{ app.uptime is mapping | ternary([app.uptime], app.uptime is iterable | ternary(app.uptime, [true])) }}"
       loop_control:
         loop_var: config
+      vars:
+        ansible_user: "{{ pipeline is defined | ternary('root', common_user) }}"
       when: app.uptime is defined
 
     # - name: Generate Homer config

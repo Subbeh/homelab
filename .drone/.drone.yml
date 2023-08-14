@@ -24,7 +24,7 @@ steps:
   - name: apps
     image: git.sbbh.cloud/sysadm/ansible-runner:latest
     commands:
-      - .drone/apps.sh
+      - /entry.sh .drone/apps.sh
     environment:
       ANSIBLE_VAULT_PASSWORD:
         from_secret: ANSIBLE_VAULT_PASSWORD
@@ -32,7 +32,7 @@ steps:
         from_secret: SSH_KEY
     when:
       event:
-      - push
+        - push
 
   - name: discord notification
     image: appleboy/drone-discord
@@ -47,8 +47,8 @@ steps:
         repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
                commit: `{{commit.message}}`
     when:
-      status: [ success, failure, changed ]
-      event: [ push ]
+      status: [success, failure, changed]
+      event: [push]
 ---
 kind: secret
 name: DOCKER_CONF
