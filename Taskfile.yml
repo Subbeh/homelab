@@ -3,12 +3,19 @@ version: "3"
 
 vars:
   KUBERNETES_DIR: "{{.ROOT_DIR}}/k8s"
-  ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
   TERRAFORM_DIR: "{{.ROOT_DIR}}/tf"
+  ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
+  ANSIBLE_PLAYBOOK_DIR: "playbooks"
 
 includes:
   precommit: .taskfiles/precommit.yml
-  ansible: .taskfiles/ansible.yml
+  ansible:
+    taskfile: .taskfiles/ansible.yml
+    aliases: [a]
+    dir: ansible
+  app:
+    taskfile: .taskfiles/app.yml
+    dir: ansible
   tf: .taskfiles/terraform.yml
 
 tasks:
@@ -23,6 +30,7 @@ tasks:
       - yay -S {{.DEPS}}
       - direnv allow {{.ROOT_DIR}}
       - task: precommit:init
+      - task: ansible:pip
       - task: ansible:galaxy
     preconditions:
       - sh: command -v yay
@@ -31,18 +39,13 @@ tasks:
     vars:
       DEPS: >-
         age
-        ansible
-        ansible-core
-        ansible-lint
         direnv
         go-yq
         helm
         jq
         kubectl
         kustomize
-        molecule
         git-crypt
-        molecule-docker
         python-pre-commit
         sops
         terraform

@@ -1,12 +1,13 @@
 ---
 readarr_ebooks:
-  container_name: readarr-ebooks
-  image: lscr.io/linuxserver/readarr:0.3.1-develop
-  ports:
-    - "{{ network_svc.readarr_ebooks.port }}:8787"
-  volumes:
-    - "{{ common_dir }}/readarr_ebooks/config:/config"
-    - "{{ common_media_dir }}:/data"
+  name: readarr-ebooks
+  container:
+    image: lscr.io/linuxserver/readarr:0.3.1-develop
+    ports:
+      - "{{ network_svc.readarr_ebooks.port }}:8787"
+    volumes:
+      - "{{ common_dir }}/readarr_ebooks/config:/config"
+      - "{{ common_media_dir }}:/data"
 
   traefik:
     routers:
@@ -21,13 +22,14 @@ readarr_ebooks:
     group: media
 
 readarr_audiobooks:
-  container_name: readarr-audiobooks
-  image: lscr.io/linuxserver/readarr:0.3.1-develop
-  ports:
-    - "{{ network_svc.readarr_audiobooks.port }}:8787"
-  volumes:
-    - "{{ common_dir }}/readarr_audiobooks/config:/config"
-    - "{{ common_media_dir }}:/data"
+  name: readarr-audiobooks
+  container:
+    image: lscr.io/linuxserver/readarr:0.3.1-develop
+    ports:
+      - "{{ network_svc.readarr_audiobooks.port }}:8787"
+    volumes:
+      - "{{ common_dir }}/readarr_audiobooks/config:/config"
+      - "{{ common_media_dir }}:/data"
 
   traefik:
     routers:

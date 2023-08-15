@@ -1,4 +1,9 @@
+ansible-core
+ansible-lint
+molecule
+molecule-plugins[podman]
+molecule-plugins[docker]
+ansible-lint
 netaddr==0.8.0
 kubernetes==26.1.0
 uptime-kuma-api
-ansible-lint

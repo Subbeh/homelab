@@ -4,94 +4,21 @@
   gather_facts: false
 
   tasks:
-    - name: Set config parameter if defined
-      tags: config
+    - name: Set app fact
       ansible.builtin.set_fact:
-        config: true
+        _run_apps: "{{ app | split }}"
 
-    - name: Set fact with tags
-      tags: always
-      ansible.builtin.set_fact:
-        run_app: "{{ ansible_run_tags | reject('search', 'config') | first }}"
-
-    - name: Load all manifests
-      tags: always
+    - name: Load app configs
       ansible.builtin.include_role:
         name: apps
-        tasks_from: load_vars
-        apply:
-          tags: always
+        tasks_from: load_configs
 
-    - name: Generate Traefik app config
-      tags: always
+    - name: Include app role
       ansible.builtin.include_role:
         name: apps
-        tasks_from: generate_traefik_app
-        apply:
-          tags: always
-
-    - name: Generate Uptime Kuma config
-      tags: always
-      ansible.builtin.include_role:
-        name: apps
-        tasks_from: generate_uptime_config
-        apply:
-          tags: always
-      loop: "{{ app.uptime is mapping | ternary([app.uptime], app.uptime is iterable | ternary(app.uptime, [true])) }}"
+      with_items: "{{ _run_apps }}"
       loop_control:
-        loop_var: config
+        loop_var: app_item
       vars:
-        ansible_user: "{{ pipeline is defined | ternary('root', common_user) }}"
-      when: app.uptime is defined
-
-    # - name: Generate Homer config
-    #   tags: always
-    #   ansible.builtin.include_role:
-    #     name: apps
-    #     tasks_from: generate_homer_config
-    #     apply:
-    #       tags: always
-
-    - name: End play if config parameter is provided
-      tags: always
-      ansible.builtin.meta: end_play
-      when: config is defined
-
-    - name: Add container host to temporary host group
-      tags: always
-      ansible.builtin.add_host:
-        name: "{{ network_svc[run_app].host }}"
-        groups: temp_group
-      when: apps[run_app].image is defined
-      changed_when: false
-
-- hosts: temp_group
-  become: true
-  gather_facts: true
-
-  tasks:
-    - name: Reload all app / container manifests
-      tags: always
-      ansible.builtin.include_role:
-        name: apps
-        tasks_from: load_vars
-        apply:
-          tags: always
-      vars:
-        run_app: "{{ hostvars['localhost']['run_app'] }}"
-
-    - name: Include apps role
-      tags: always
-      ansible.builtin.include_role:
-        name: apps
-        tasks_from: create_container
-        apply:
-          tags: always
-
-    - name: Rerun for optional dependents
-      tags: always
-      ansible.builtin.include_role:
-        name: apps
-        tasks_from: create_dependents
-        apply:
-          tags: always
+        _app: "{{ app_item }}"
+        _preprocessed: true

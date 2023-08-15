@@ -1,10 +1,11 @@
 ---
 prowlarr:
-  image: lscr.io/linuxserver/prowlarr:version-1.7.4.3769
-  ports:
-    - "{{ network_svc.prowlarr.port }}:9696"
-  volumes:
-    - "{{ common_dir }}/prowlarr/config:/config"
+  container:
+    image: lscr.io/linuxserver/prowlarr:version-1.7.4.3769
+    ports:
+      - "{{ network_svc.prowlarr.port }}:9696"
+    volumes:
+      - "{{ hostvars[network_svc.prowlarr.host]['common_dir'] }}/prowlarr/config:/config"
 
   traefik:
     routers:

@@ -1,9 +1,10 @@
 homer:
-  image: b4bz/homer:v23.05.1
-  ports:
-    - "{{ network_svc.homer.port }}:8080"
-  volumes:
-    - "{{ common_dir }}/homer/assets:/www/assets"
+  container:
+    image: b4bz/homer:v23.05.1
+    ports:
+      - "{{ network_svc.homer.port }}:8080"
+    volumes:
+      - "{{ common_dir }}/homer/assets:/www/assets"
 
   traefik:
     name: home

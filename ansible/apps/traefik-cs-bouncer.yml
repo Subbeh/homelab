@@ -1,10 +1,11 @@
 ---
 traefik_cs_bouncer:
-  container_name: traefik-cs-bouncer
-  image: fbonalair/traefik-crowdsec-bouncer:0.5.0
-  restart_policy: always
-  environment:
-    CROWDSEC_BOUNCER_API_KEY: "{{ crowdsec_bouncer_api_key | default(omit) }}"
-    CROWDSEC_AGENT_HOST: "crowdsec:8080"
-    GIN_MODE: release
-    CROWDSEC_BOUNCER_LOG_LEVEL: "2"
+  name: traefik-cs-bouncer
+  container:
+    image: fbonalair/traefik-crowdsec-bouncer:0.5.0
+    restart_policy: always
+    env:
+      CROWDSEC_BOUNCER_API_KEY: "{{ crowdsec_bouncer_api_key | default(omit) }}"
+      CROWDSEC_AGENT_HOST: "crowdsec:8080"
+      GIN_MODE: release
+      CROWDSEC_BOUNCER_LOG_LEVEL: "2"

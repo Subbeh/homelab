@@ -1,9 +1,10 @@
 apprise:
-  image: lscr.io/linuxserver/apprise-api:0.9.3
-  volumes:
-    - "{{ common_dir }}/apprise/config:/config"
-  ports:
-    - "{{ network_svc.apprise.port }}:8000"
+  container:
+    image: lscr.io/linuxserver/apprise-api:0.9.3
+    volumes:
+      - "{{ common_dir }}/apprise/config:/config"
+    ports:
+      - "{{ network_svc.apprise.port }}:8000"
 
   traefik:
 

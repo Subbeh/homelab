@@ -1,23 +1,24 @@
 ---
 qbittorrent:
-  image: lscr.io/linuxserver/qbittorrent:4.5.4
-  network_mode: "container:gluetun"
-  networks:
-  volumes:
-    - "{{ common_dir }}/qbittorrent/config:/config"
-    - "{{ common_dir }}/qbittorrent/webui:/webui"
-    - "{{ common_dir }}/qbittorrent/mam_id:/mam_id"
-    - "{{ common_media_dir }}/downloads/torrents:/downloads"
-  command: |
-    bash -c "set -x &&
-             while true; do
-                 PORT=$(curl -Ls localhost:8000/v1/openvpn/portforwarded | awk -F'[{}:]' '/port/ { print $3 }') &&
-                 curl -s -b /tmp/.cookies -c /tmp/.cookies --header 'Referer: http://localhost:8080' --data 'username={{ common_user }}&password={{ media_qbittorrent_password }}' localhost:8080/api/v2/auth/login &&
-                 curl -s -b /tmp/.cookies -c /tmp/.cookies "http://localhost:8080/api/v2/app/setPreferences" -d "'"json={\"listen_port\": "'"$PORT"'"}"'" &&
-                 curl -s -b mam_id=$(</mam_id) -c /tmp/mam.cookies https://t.myanonamouse.net/json/dynamicSeedbox.php ;
-                 echo \"IP ADDRESS: $(curl ifconfig.me)\" ;
-                 sleep 3600;
-             done"
+  container:
+    image: lscr.io/linuxserver/qbittorrent:4.5.4
+    network_mode: "container:gluetun"
+    networks:
+    volumes:
+      - "{{ common_dir }}/qbittorrent/config:/config"
+      - "{{ common_dir }}/qbittorrent/webui:/webui"
+      - "{{ common_dir }}/qbittorrent/mam_id:/mam_id"
+      - "{{ common_media_dir }}/downloads/torrents:/downloads"
+    command: |
+      bash -c "set -x &&
+              while true; do
+                  PORT=$(curl -Ls localhost:8000/v1/openvpn/portforwarded | awk -F'[{}:]' '/port/ { print $3 }') &&
+                  curl -s -b /tmp/.cookies -c /tmp/.cookies --header 'Referer: http://localhost:8080' --data 'username={{ common_user }}&password={{ media_qbittorrent_password }}' localhost:8080/api/v2/auth/login &&
+                  curl -s -b /tmp/.cookies -c /tmp/.cookies "http://localhost:8080/api/v2/app/setPreferences" -d "'"json={\"listen_port\": "'"$PORT"'"}"'" &&
+                  curl -s -b mam_id=$(</mam_id) -c /tmp/mam.cookies https://t.myanonamouse.net/json/dynamicSeedbox.php ;
+                  echo \"IP ADDRESS: $(curl ifconfig.me)\" ;
+                  sleep 3600;
+              done"
 
   traefik:
     rtr_middlewares:

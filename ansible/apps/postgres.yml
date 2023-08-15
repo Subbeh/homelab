@@ -1,19 +1,20 @@
 ---
 postgres:
-  image: postgres:12-alpine
-  healthcheck:
-    test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
-    start_period: 20s
-    interval: 30s
-    retries: 5
-    timeout: 5s
-  ports:
-    - "{{ network_svc.postgres.port }}:5432"
-  volumes:
-    - "{{ common_dir }}/postgresql/data:/var/lib/postgresql/data"
-  environment:
-    POSTGRES_USER: "{{ common_user }}"
-    POSTGRES_PASSWORD: "{{ postgres_pass }}"
+  container:
+    image: postgres:12-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    ports:
+      - "{{ network_svc.postgres.port }}:5432"
+    volumes:
+      - "{{ common_dir }}/postgresql/data:/var/lib/postgresql/data"
+    env:
+      POSTGRES_USER: "{{ common_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_pass }}"
 
   uptime:
     group: databases
@@ -22,15 +23,16 @@ postgres:
     databaseConnectionString: "postgres://{{ common_user }}:{{ postgres_pass }}@{{ network_hosts[network_svc.postgres.host] }}:{{ network_svc.postgres.port }}/postgres"
 
 pgadmin:
-  image: dpage/pgadmin4:7.5
-  ports:
-    - "{{ network_svc.pgadmin.port }}:80"
-  volumes:
-    - "{{ common_dir }}/pgadmin/lib:/var/lib/pgadmin"
-  environment:
-    PGADMIN_DEFAULT_EMAIL: "{{ common_email }}"
-    PGADMIN_DEFAULT_PASSWORD: "{{ pgadmin_pass }}"
-    PGADMIN_DISABLE_POSTFIX: "true"
+  container:
+    image: dpage/pgadmin4:7.5
+    ports:
+      - "{{ network_svc.pgadmin.port }}:80"
+    volumes:
+      - "{{ common_dir }}/pgadmin/lib:/var/lib/pgadmin"
+    env:
+      PGADMIN_DEFAULT_EMAIL: "{{ common_email }}"
+      PGADMIN_DEFAULT_PASSWORD: "{{ pgadmin_pass }}"
+      PGADMIN_DISABLE_POSTFIX: "true"
 
   traefik:
 

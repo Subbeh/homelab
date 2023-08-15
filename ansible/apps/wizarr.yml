@@ -1,13 +1,14 @@
 ---
 wizarr:
-  image: ghcr.io/wizarrrr/wizarr:2.2.0
-  ports:
-    - "{{ network_svc.wizarr.port }}:5690"
-  volumes:
-    - "{{ common_dir }}/wizarr/config:/data/database"
-  environment:
-    APP_URL: "https://invites.{{ network_domain.tld }}"
-    DISABLE_BUILTIN_AUTH: "true"
+  container:
+    image: ghcr.io/wizarrrr/wizarr:2.2.0
+    ports:
+      - "{{ network_svc.wizarr.port }}:5690"
+    volumes:
+      - "{{ common_dir }}/wizarr/config:/data/database"
+    env:
+      APP_URL: "https://invites.{{ network_domain.tld }}"
+      DISABLE_BUILTIN_AUTH: "true"
 
   traefik:
     routers:

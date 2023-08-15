@@ -1,0 +1,34 @@
+---
+version: "3"
+
+tasks:
+  default:
+    desc: Run app role
+    vars:
+      TAGS: 'untagged,{{default "all" .TAGS}}'
+    cmds:
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/test.yml -e 'app="{{.CLI_ARGS}}"' --tags {{.TAGS}}
+
+  container:
+    desc: Create container
+    cmds:
+      - task: default
+        vars: { TAGS: "container" }
+
+  traefik:
+    desc: Create Traefik config
+    cmds:
+      - task: default
+        vars: { TAGS: "traefik" }
+
+  uptime:
+    desc: Create Uptime Kuma config
+    cmds:
+      - task: default
+        vars: { TAGS: "uptime" }
+
+  config:
+    desc: Create app configs
+    cmds:
+      - task: default
+        vars: { TAGS: "traefik,uptime" }

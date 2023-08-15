@@ -1,20 +1,21 @@
 ---
 borgmatic_nas:
-  container_name: borgmatic
-  image: ghcr.io/borgmatic-collective/borgmatic:1.7.15
-  capabilities:
-    - net_admin
-  devices:
-    - /dev/fuse:/dev/fuse
-  volumes:
-    - "{{ common_backup_dir | default('') }}/borg:/mnt/repo"
-    - "{{ common_dir }}:/mnt/app_data:ro"
-    - "{{ common_media_dir }}:/mnt/media:ro"
-    - "{{ common_dir }}/borgmatic/etc:/etc/borgmatic.d"
-    - "{{ common_dir }}/borgmatic/state:/root/.borgmatic"
-    - "{{ common_dir }}/borgmatic/config:/root/.config/borg"
-    - "{{ common_dir }}/borgmatic/ssh:/root/.ssh"
-    - "{{ common_dir }}/borgmatic/cache:/root/.cache/borg"
-  environment:
-    BORG_PASSPHRASE: "{{ borg_encryption_passphrase }}"
-    BORG_RSH: "ssh -i ~/.ssh/borg"
+  name: borgmatic
+  container:
+    image: ghcr.io/borgmatic-collective/borgmatic:1.7.15
+    capabilities:
+      - net_admin
+    devices:
+      - /dev/fuse:/dev/fuse
+    volumes:
+      - "{{ common_backup_dir | default('') }}/borg:/mnt/repo"
+      - "{{ common_dir }}:/mnt/app_data:ro"
+      - "{{ common_media_dir }}:/mnt/media:ro"
+      - "{{ common_dir }}/borgmatic/etc:/etc/borgmatic.d"
+      - "{{ common_dir }}/borgmatic/state:/root/.borgmatic"
+      - "{{ common_dir }}/borgmatic/config:/root/.config/borg"
+      - "{{ common_dir }}/borgmatic/ssh:/root/.ssh"
+      - "{{ common_dir }}/borgmatic/cache:/root/.cache/borg"
+    env:
+      BORG_PASSPHRASE: "{{ borg_encryption_passphrase }}"
+      BORG_RSH: "ssh -i ~/.ssh/borg"

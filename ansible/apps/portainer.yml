@@ -1,13 +1,14 @@
 ---
 portainer:
-  image: portainer/portainer-ce:2.18.4
-  command: "-H unix:///var/run/docker.sock"
-  ports:
-    - "{{ network_svc.portainer.port }}:9000"
-    - "{{ network_svc.portainer.agent_port }}:8000"
-  volumes:
-    - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    - "{{ common_dir }}/portainer/data:/data"
+  container:
+    image: portainer/portainer-ce:2.18.4
+    command: "-H unix:///var/run/docker.sock"
+    ports:
+      - "{{ network_svc.portainer.port }}:9000"
+      - "{{ network_svc.portainer.agent_port }}:8000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ common_dir }}/portainer/data:/data"
 
   traefik:
 
@@ -16,13 +17,14 @@ portainer:
     name: portainer_server
 
 portainer_agent_bastion:
-  container_name: portainer-agent
-  image: portainer/agent:2.18.4
-  ports:
-    - "{{ network_svc.portainer.agent_port }}:9001"
-  volumes:
-    - "/var/run/docker.sock:/var/run/docker.sock"
-    - "/var/lib/docker/volumes:/var/lib/docker/volumes"
+  name: portainer-agent
+  container:
+    image: portainer/agent:2.18.4
+    ports:
+      - "{{ network_svc.portainer.agent_port }}:9001"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/lib/docker/volumes:/var/lib/docker/volumes"
 
   uptime:
     group: portainer
@@ -30,13 +32,14 @@ portainer_agent_bastion:
     port: "{{ network_svc.portainer.agent_port }}"
 
 portainer_agent_nas:
-  container_name: portainer-agent
-  image: portainer/agent:2.18.4
-  ports:
-    - "{{ network_svc.portainer.agent_port }}:9001"
-  volumes:
-    - "/var/run/docker.sock:/var/run/docker.sock"
-    - "/volume1/@docker/volumes:/volume1/@docker/volumes"
+  name: portainer-agent
+  container:
+    image: portainer/agent:2.18.4
+    ports:
+      - "{{ network_svc.portainer.agent_port }}:9001"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/volume1/@docker/volumes:/volume1/@docker/volumes"
 
   uptime:
     group: portainer

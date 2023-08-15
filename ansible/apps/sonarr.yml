@@ -1,12 +1,13 @@
 ---
 sonarr:
-  image: lscr.io/linuxserver/sonarr:3.0.10
-  ports:
-    - "{{ network_svc.sonarr.port }}:8989"
-  volumes:
-    - "{{ common_dir }}/sonarr/config:/config"
-    - "{{ common_dir }}/sonarr/MediaCover:/config/MediaCover"
-    - "{{ common_media_dir }}:/data"
+  container:
+    image: lscr.io/linuxserver/sonarr:3.0.10
+    ports:
+      - "{{ network_svc.sonarr.port }}:8989"
+    volumes:
+      - "{{ common_dir }}/sonarr/config:/config"
+      - "{{ common_dir }}/sonarr/MediaCover:/config/MediaCover"
+      - "{{ common_media_dir }}:/data"
 
   traefik:
     routers:

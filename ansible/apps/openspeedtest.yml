@@ -1,8 +1,9 @@
 ---
 openspeedtest:
-  image: openspeedtest/latest:v2.0.2
-  ports:
-    - "{{ network_svc.openspeedtest.port }}:3000"
+  container:
+    image: openspeedtest/latest:v2.0.2
+    ports:
+      - "{{ network_svc.openspeedtest.port }}:3000"
 
   traefik:
     name: speedtest

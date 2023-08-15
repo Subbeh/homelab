@@ -1,31 +1,32 @@
 ---
 traefik:
-  image: traefik:v2.10.4
-  restart_policy: always
-  ports:
-    - "80:80"
-    - "443:443"
-    - "8080:8080"
-  volumes:
-    - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    - "{{ common_dir }}/logs/traefik:/logs"
-    - "{{ common_dir }}/traefik/configs:/configs"
-    - "{{ common_dir }}/traefik/traefik.yaml:/traefik.yaml"
-    - "{{ common_dir }}/traefik/acme.json:/acme.json"
-    - "{{ common_dir }}/traefik/pve.pem:/pve.pem"
-    - "{{ common_dir }}/traefik/.htpasswd:/.htpasswd"
-  environment:
-    CF_API_EMAIL: "{{ common_email }}"
-    CF_API_KEY: "{{ cloudflare_api_global }}"
-  labels:
-    traefik.enable: "true"
-    traefik.http.routers.traefik-rtr.entrypoints: "websecure"
-    traefik.http.routers.traefik-rtr.rule: "Host(`traefik.{{ network_domain.tld }}`)"
-    traefik.http.routers.traefik-rtr.tls.certresolver: "dns-cloudflare"
-    traefik.http.routers.traefik-rtr.tls.domains[0].main: "{{ network_domain.tld }}"
-    traefik.http.routers.traefik-rtr.tls.domains[0].sans: "*.{{ network_domain.tld }}"
-    traefik.http.routers.traefik-rtr.service: "api@internal"
-    traefik.http.routers.traefik-rtr.middlewares: "local-only@file"
+  container:
+    image: traefik:v2.10.4
+    restart_policy: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ common_dir }}/logs/traefik:/logs"
+      - "{{ common_dir }}/traefik/configs:/configs"
+      - "{{ common_dir }}/traefik/traefik.yaml:/traefik.yaml"
+      - "{{ common_dir }}/traefik/acme.json:/acme.json"
+      - "{{ common_dir }}/traefik/pve.pem:/pve.pem"
+      - "{{ common_dir }}/traefik/.htpasswd:/.htpasswd"
+    env:
+      CF_API_EMAIL: "{{ common_email }}"
+      CF_API_KEY: "{{ cloudflare_api_global }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.traefik-rtr.entrypoints: "websecure"
+      traefik.http.routers.traefik-rtr.rule: "Host(`traefik.{{ network_domain.tld }}`)"
+      traefik.http.routers.traefik-rtr.tls.certresolver: "dns-cloudflare"
+      traefik.http.routers.traefik-rtr.tls.domains[0].main: "{{ network_domain.tld }}"
+      traefik.http.routers.traefik-rtr.tls.domains[0].sans: "*.{{ network_domain.tld }}"
+      traefik.http.routers.traefik-rtr.service: "api@internal"
+      traefik.http.routers.traefik-rtr.middlewares: "local-only@file"
 
   uptime:
     group: system

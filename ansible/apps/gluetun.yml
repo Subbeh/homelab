@@ -1,24 +1,25 @@
 ---
 gluetun:
-  image: qmcgaw/gluetun:pr-1543
-  capabilities:
-    - net_admin
-  ports:
-    - "{{ network_svc.gluetun.port }}:8000"
-    - "{{ network_svc.qbittorrent.port }}:8080"
-  volumes:
-    - "{{ common_dir }}/gluetun:/gluetun"
-  environment:
-    VPN_SERVICE_PROVIDER: "protonvpn"
-    VPN_PORT_FORWARDING: "on"
-    OPENVPN_USER: "{{ network_vpn.openvpn_user}}+pmp"
-    OPENVPN_PASSWORD: "{{ network_vpn.openvpn_pass }}"
-    SERVER_COUNTRIES: "Singapore"
-    FIREWALL_OUTBOUND_SUBNETS: "{{ network_cidr.lan }}"
-    HEALTH_TARGET_ADDRESS: "cloudflare.com:443"
-    HEALTH_VPN_DURATION_INITIAL: "10s"
-    HEALTH_VPN_DURATION_ADDITION: "30s"
-    HEALTH_SUCCESS_WAIT_DURATION: "60s"
+  container:
+    image: qmcgaw/gluetun:pr-1543
+    capabilities:
+      - net_admin
+    ports:
+      - "{{ network_svc.gluetun.port }}:8000"
+      - "{{ network_svc.qbittorrent.port }}:8080"
+    volumes:
+      - "{{ common_dir }}/gluetun:/gluetun"
+    env:
+      VPN_SERVICE_PROVIDER: "protonvpn"
+      VPN_PORT_FORWARDING: "on"
+      OPENVPN_USER: "{{ network_vpn.openvpn_user}}+pmp"
+      OPENVPN_PASSWORD: "{{ network_vpn.openvpn_pass }}"
+      SERVER_COUNTRIES: "Singapore"
+      FIREWALL_OUTBOUND_SUBNETS: "{{ network_cidr.lan }}"
+      HEALTH_TARGET_ADDRESS: "cloudflare.com:443"
+      HEALTH_VPN_DURATION_INITIAL: "10s"
+      HEALTH_VPN_DURATION_ADDITION: "30s"
+      HEALTH_SUCCESS_WAIT_DURATION: "60s"
 
   dependents:
     - qbittorrent

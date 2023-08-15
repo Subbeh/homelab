@@ -2,114 +2,95 @@
 version: "3"
 
 env:
-  ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
-  ANSIBLE_PLAYBOOK_DIR: "{{.ANSIBLE_DIR}}/playbooks"
+  ANSIBLE_PLAYBOOK_DIR: "playbooks"
 
 tasks:
   galaxy:
     desc: Install / Upgrade Ansible galaxy deps
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-galaxy install -r requirements.yml --force
 
   pip:
     desc: Install / Upgrade python deps
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - pip3 install --user --requirement requirements.txt
+      - pip3 install --requirement requirements.txt
 
   list:
     desc: List all the hosts
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible all --list-hosts
 
   ping:
     desc: Ping all the hosts
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - 'ansible {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}all:!exclude{{end}} --one-line -m "ping"'
 
   uptime:
     desc: Uptime of all the hosts
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}all:!exclude{{end}} --one-line -a 'uptime'
 
   reboot:
     desc: Reboot hosts
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible {{.CLI_ARGS}} --one-line -a 'reboot'
 
   playbook:
     desc: Run playbook
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/{{.CLI_ARGS}} -e "debug=true"
 
   update:
     desc: Update all the hosts
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook -f 5 {{.ANSIBLE_PLAYBOOK_DIR}}/update.yml {{.CLI_ARGS}}
 
-  app:
-    desc: Run app
-    dir: "{{.ANSIBLE_DIR}}"
-    cmds:
-      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags {{.CLI_ARGS}} -e "debug=true"
+  # app:
+  #   desc: Run app
+  #   cmds:
+  #     - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags {{.CLI_ARGS}} -e "debug=true"
 
-  appconfig:
-    desc: Generate service configs for app
-    dir: "{{.ANSIBLE_DIR}}"
-    cmds:
-      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags '{{.CLI_ARGS}},config' -e "debug=true"
+  # appconfig:
+  #   desc: Generate service configs for app
+  #   cmds:
+  #     - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags '{{.CLI_ARGS}},config' -e "debug=true"
 
   webconfig:
     desc: Generate Traefik config
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/task.yml -l bastion -e "role=traefik task=copy_config"
 
   test:
     desc: Run test playbook
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/test.yml {{.CLI_ARGS}}
 
   bastion:
     desc: Run bastion playbook
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/bastion.yml {{.CLI_ARGS}}
 
   services:
     desc: Run homelab services playbook
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/services.yml {{.CLI_ARGS}}
 
   plex:
     desc: Run plex playbook
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/plex.yml {{.CLI_ARGS}}
 
   nas:
     desc: Run nas playbook
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/nas.yml {{.CLI_ARGS}}
 
   pve:
     desc: Run pve bootstrap playbook
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/pve.yml --limit {{.CLI_ARGS}}
 
   k3s:
     desc: Create k3s cluster
-    dir: "{{.ANSIBLE_DIR}}"
     cmds:
       - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/k3s.yml {{.CLI_ARGS}}

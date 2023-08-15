@@ -1,10 +1,11 @@
 ---
 tautulli:
-  image: ghcr.io/tautulli/tautulli:v2.12.5
-  ports:
-    - "{{ network_svc.tautulli.port }}:8181"
-  volumes:
-    - "{{ common_dir }}/tautulli/config:/config"
+  container:
+    image: ghcr.io/tautulli/tautulli:v2.12.5
+    ports:
+      - "{{ network_svc.tautulli.port }}:8181"
+    volumes:
+      - "{{ common_dir }}/tautulli/config:/config"
 
   traefik:
     routers:

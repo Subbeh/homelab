@@ -1,12 +1,13 @@
 ---
 audiobookshelf:
-  image: ghcr.io/advplyr/audiobookshelf:2.3.3
-  ports:
-    - "{{ network_svc.audiobookshelf.port }}:80"
-  volumes:
-    - "{{ common_dir }}/audiobookshelf/config:/config"
-    - "{{ common_dir }}/audiobookshelf/metadata:/metadata"
-    - "{{ common_media_dir }}:/data"
+  container:
+    image: ghcr.io/advplyr/audiobookshelf:2.3.3
+    ports:
+      - "{{ network_svc.audiobookshelf.port }}:80"
+    volumes:
+      - "{{ common_dir }}/audiobookshelf/config:/config"
+      - "{{ common_dir }}/audiobookshelf/metadata:/metadata"
+      - "{{ common_media_dir }}:/data"
 
   traefik:
     rtr_middlewares:

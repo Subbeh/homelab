@@ -1,12 +1,13 @@
 ---
-
 redis:
-  image: redis:alpine
-  volumes:
-    - "{{ common_dir }}/redis/data:/data"
-  healthcheck:
-    test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-    start_period: 20s
-    interval: 30s
-    retries: 5
-    timeout: 3s
+  container:
+    image: redis:7-alpine
+    volumes:
+      - "{{ common_dir }}/redis/data:/data"
+    command: "redis-server --requirepass {{ redis_pass }}"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s

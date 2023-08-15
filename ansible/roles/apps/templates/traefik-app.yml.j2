@@ -1,8 +1,8 @@
 #jinja2: lstrip_blocks: True
 http:
   routers:
-  {% if app.traefik.routers is defined %}
-    {% for route in app.traefik.routers %}
+  {% if traefik_config.routers is defined %}
+    {% for route in traefik_config.routers %}
     {{ route.name }}-rtr:
       rule: "{{ route.rule }}"
       entryPoints:
@@ -18,45 +18,45 @@ http:
       {% if route.service is defined %}
       service: {{ route.service }}
       {% else %}
-      service: {{ app.name }}-svc
+      service: {{ _app_name }}-svc
       {% endif %}
     {% endfor %}
   {% else %}
-    {{ app.name }}-rtr:
-      rule: "Host(`{{ app.traefik.name | default(app.name) }}.{{ network_domain.tld }}`)"
+    {{ _app_name }}-rtr:
+      rule: "Host(`{{ traefik_config.name | default(_app_name) }}.{{ network_domain.tld }}`)"
       entryPoints:
         - websecure
       middlewares:
-      {% if app.traefik.rtr_middlewares is defined %}
-        {%- for middleware in app.traefik.rtr_middlewares %}
+      {% if traefik_config.rtr_middlewares is defined %}
+        {%- for middleware in traefik_config.rtr_middlewares %}
         - {{ middleware }}
         {% endfor %}
       {% else %}
         - local-only
       {% endif %}
-      service: {{ app.name }}-svc
+      service: {{ _app_name }}-svc
   {% endif %}
 
-  {% if app.traefik.middlewares is defined %}
+  {% if traefik_config.middlewares is defined %}
   middlewares:
-    {{ app.traefik.middlewares | indent(width=4) }}
+    {{ traefik_config.middlewares | indent(width=4) }}
   {%- endif %}
 
   services:
-  {% if app.traefik.services is defined %}
-    {{ app.traefik.services | indent(width=4) }}
+  {% if traefik_config.services is defined %}
+    {{ traefik_config.services | indent(width=4) }}
   {% else %}
-    {{ app.name }}-svc:
+    {{ _app_name }}-svc:
       loadBalancer:
         servers:
-        {% if app.traefik.url is defined %}
-          - url: "{{ app.traefik.url | indent(width=10) }}"
+        {% if traefik_config.url is defined %}
+          - url: "{{ traefik_config.url | indent(width=10) }}"
         {% else %}
-          - url: "http://{{ network_svc[app.name].host | default(network_svc[app.name].ip) }}:{{ network_svc[app.name].port }}"
+          - url: "http://{{ network_svc[_app].host | default(network_svc[_app].ip) }}:{{ network_svc[_app].port }}"
         {%- endif %}
   {%- endif %}
 
-  {% if app.traefik.serversTransports is defined %}
+  {% if traefik_config.serversTransports is defined %}
   serversTransports:
-    {{ app.traefik.serversTransports | indent(width=4) }}
+    {{ traefik_config.serversTransports | indent(width=4) }}
   {%- endif %}

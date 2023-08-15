@@ -1,0 +1,7 @@
+---
+- name: Load configs
+  ansible.builtin.include_vars:
+    dir: "{{ common_ansible_root }}/apps"
+    ignore_unknown_extensions: true
+    depth: 1
+    name: _configs
