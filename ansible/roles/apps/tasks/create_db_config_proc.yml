@@ -1,0 +1,22 @@
+---
+- name: Set config facts
+  ansible.builtin.set_fact:
+    _db_type: "{{ _db_item.type | default(_defaults.db.default) }}"
+
+- name: Set config facts
+  ansible.builtin.set_fact:
+    _config: "{{ _defaults.db[_db_type] | ansible.builtin.combine(_db_item | default([]), list_merge='replace') }}"
+
+- name: Create Postgres database
+  block:
+    - name: Set db name
+      ansible.builtin.set_fact:
+        _db_name: "{{ _config.name | default(_app) }}"
+
+    - name: Create database '{{ _db_name }}' on {{ _config.host }}
+      community.postgresql.postgresql_db:
+        name: "{{ _db_name }}"
+        login_host: "{{ _config.host }}"
+        login_user: "{{ _config.user }}"
+        login_password: "{{ _config.pass }}"
+  when: _db_type == "postgres"

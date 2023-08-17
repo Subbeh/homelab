@@ -3,5 +3,12 @@
   ansible.builtin.include_vars:
     dir: "{{ common_ansible_root }}/apps"
     ignore_unknown_extensions: true
+    ignore_files:
+      - _defaults.yml
     depth: 1
     name: _configs
+
+- name: Load defaults
+  ansible.builtin.include_vars:
+    file: "{{ common_ansible_root }}/apps/_defaults.yml"
+    name: _defaults

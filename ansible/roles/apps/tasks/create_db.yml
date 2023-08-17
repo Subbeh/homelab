@@ -1,0 +1,10 @@
+---
+- name: Set db facts
+  ansible.builtin.set_fact:
+    _db_config: "{{ _app_config.db }}"
+
+- name: Include create_db_config_proc task
+  ansible.builtin.include_tasks: create_db_config_proc.yml
+  loop: "{{ _db_config is mapping | ternary([_db_config], _db_config is iterable | ternary(_db_config, [{'placeholder': ''}])) }}"
+  loop_control:
+    loop_var: _db_item

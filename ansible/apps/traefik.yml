@@ -16,7 +16,7 @@ traefik:
       - "{{ common_dir }}/traefik/pve.pem:/pve.pem"
       - "{{ common_dir }}/traefik/.htpasswd:/.htpasswd"
     env:
-      CF_API_EMAIL: "{{ common_email }}"
+      CF_API_EMAIL: "{{ cloudflare_email }}"
       CF_API_KEY: "{{ cloudflare_api_global }}"
     labels:
       traefik.enable: "true"

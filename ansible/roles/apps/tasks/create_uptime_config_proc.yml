@@ -1,10 +1,13 @@
 ---
-- name: Set config facts
+- name: Set Uptime Kuma config facts
   ansible.builtin.set_fact:
-    _config: "{{ _configs.defaults.uptime | ansible.builtin.combine(_uptime_item | default([]), list_merge='replace') }}"
+    _config: "{{ _defaults.uptime | ansible.builtin.combine(_uptime_item | default([]), list_merge='replace') }}"
+
+- name: Set Uptime Kuma monitor name
+  ansible.builtin.set_fact:
     _monitor_name: "{{ _config.name | default(_app) }}"
 
-- name: Delete existing monitor configs for {{ _monitor_name }}
+- name: Delete existing Uptime Kuma monitor configs for {{ _monitor_name }}
   lucasheld.uptime_kuma.monitor:
     api_url: "{{ uptime_api_url }}"
     api_token: "{{ _uptimekuma_api_token }}"
@@ -12,7 +15,7 @@
     state: absent
   register: _result
 
-- name: Add {{ _config.type | default('http') | upper }} monitor config for {{ _monitor_name }}
+- name: Add {{ _monitor_name }} ({{ _config.type | default('http') | upper }}) monitor config for {{ _app }}
   lucasheld.uptime_kuma.monitor:
     api_url: "{{ uptime_api_url }}"
     api_token: "{{ _uptimekuma_api_token }}"

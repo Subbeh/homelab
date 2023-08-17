@@ -14,6 +14,12 @@
   ansible.builtin.set_fact:
     _app_name: "{{ _app_config.name | default(_app) }}"
 
+- name: Include create_db task
+  tags: db
+  ansible.builtin.include_tasks: create_db.yml
+  when:
+    - _app_config.db is defined
+
 - name: Include create_container task
   tags: container
   ansible.builtin.include_tasks: create_container.yml

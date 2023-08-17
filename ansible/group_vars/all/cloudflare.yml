@@ -1,4 +1,5 @@
 ---
+cloudflare_email: "{{ common_email_personal }}"
 cloudflare_api_global: "{{ vault_cloudflare_api_global }}"
 cloudflare_api_dns: "{{ vault_cloudflare_api_dns }}"
 cloudflare_ips:

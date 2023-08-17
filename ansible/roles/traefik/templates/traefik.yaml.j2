@@ -48,7 +48,7 @@ certificatesResolvers:
 {% if testing is defined %}
       caServer: https://acme-staging-v02.api.letsencrypt.org/directory
 {% endif %}
-      email: [[ common_email ]]
+      email: [[ cloudflare_email ]]
       storage: acme.json
       dnsChallenge:
         provider: cloudflare

@@ -24,6 +24,6 @@
 
 - name: Include create_uptime_config_proc task
   ansible.builtin.include_tasks: create_uptime_config_proc.yml
-  loop: "{{ _uptime_config is mapping | ternary([_uptime_config], _uptime_config is iterable | ternary(_uptime_config, [true])) }}"
+  loop: "{{ _uptime_config is mapping | ternary([_uptime_config], _uptime_config is iterable | ternary(_uptime_config, [{'placeholder': ''}])) }}"
   loop_control:
     loop_var: _uptime_item

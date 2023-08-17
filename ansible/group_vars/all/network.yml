@@ -4,7 +4,7 @@ network_domain:
   tld_local: int.sbbh.cloud
   tld_test: test.sbbh.cloud
   tld_k8s: k8s.sbbh.cloud
-  tld_personal: "{{ vault_tld_personal }}"
+  tld_personal: sterwindt.com
 
 network_cidr:
   lan: "10.11.0.0/16"

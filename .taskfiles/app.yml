@@ -13,7 +13,13 @@ tasks:
     desc: Create container
     cmds:
       - task: default
-        vars: { TAGS: "container" }
+        vars: { TAGS: "container,db" }
+
+  db:
+    desc: Create database
+    cmds:
+      - task: default
+        vars: { TAGS: "db" }
 
   traefik:
     desc: Create Traefik config

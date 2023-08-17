@@ -1,7 +1,7 @@
 ---
 - name: Set container facts
   ansible.builtin.set_fact:
-    container: "{{ _configs.defaults.container | ansible.builtin.combine(_app_config.container, list_merge='replace') }}"
+    container: "{{ _defaults.container | ansible.builtin.combine(_app_config.container, list_merge='append_rp', recursive=true) }}"
 
 - name: Set container parameters
   ansible.builtin.set_fact:
@@ -15,17 +15,18 @@
   delegate_to: "{{ container_host }}"
   community.docker.docker_network:
     name: "{{ item.name }}"
-    driver: "{{ _configs.networks[item.name].driver }}"
-    driver_options: "{{ _configs.networks[item.name].driver_options | default(omit) }}"
-    ipam_config: "{{ _configs.networks[item.name].ipam_config | default(omit) }}"
+    driver: "{{ _defaults.networks[item.name].driver }}"
+    driver_options: "{{ _defaults.networks[item.name].driver_options | default(omit) }}"
+    ipam_config: "{{ _defaults.networks[item.name].ipam_config | default(omit) }}"
   with_items: "{{ container.networks }}"
-  when: (container.networks is defined and container.networks != None) or _configs.networks is undefined
+  when: container.networks is defined and container.networks != None
 
 - name: Create container {{ container.name }}
   delegate_to: "{{ container_host }}"
   community.docker.docker_container:
     name: "{{ container.name | default(omit) }}"
     image: "{{ container.image | default(omit) }}"
+    volumes: "{{ container.volumes | default(omit) }}"
 
     api_version: "{{ container.api_version | default(omit) }}"
     docker_api_version: "{{ container.docker_api_version | default(omit) }}"
@@ -147,6 +148,5 @@
     validate_certs: "{{ container.validate_certs | default(omit) }}"
     tls_verify: "{{ container.tls_verify | default(omit) }}"
     volume_driver: "{{ container.volume_driver | default(omit) }}"
-    volumes: "{{ container.volumes | default(omit) }}"
     volumes_from: "{{ container.volumes_from | default(omit) }}"
     working_dir: "{{ container.working_dir | default(omit) }}"
