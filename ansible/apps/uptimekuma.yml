@@ -1,7 +1,7 @@
 ---
 uptimekuma:
   container:
-    image: louislam/uptime-kuma:1.22.1
+    image: louislam/uptime-kuma:1.23.0
     ports:
       - "{{ network_svc.uptimekuma.port }}:3001"
     volumes:
