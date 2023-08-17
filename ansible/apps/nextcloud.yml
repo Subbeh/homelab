@@ -7,6 +7,7 @@ nextcloud:
       - "{{ network_svc.nextcloud.port }}:80"
     volumes:
       - "{{ common_dir }}/nextcloud/html:/var/www/html"
+      - "{{ common_data_dir }}"
     env:
       POSTGRES_DB: "nextcloud"
       POSTGRES_HOST: "postgres:5432"
