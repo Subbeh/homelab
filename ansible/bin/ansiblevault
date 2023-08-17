@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd ${INFRA:?not set}/ansible
+ansible-vault edit group_vars/all/vault.yml
