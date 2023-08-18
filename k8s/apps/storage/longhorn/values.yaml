@@ -5,6 +5,6 @@ defaultSettings:
   defaultLonghornStaticStorageClass: longhorn
   defaultDataPath: /srv/longhorn
   createDefaultDiskLabeledNodes: true
-  backupTarget: nfs://nas.int.sbbh.cloud:/volume1/backups/longhorn
-  backupTargetCredentialSecret: doppler-longhorn
+  # backupTarget: nfs://nas.int.sbbh.cloud:/volume1/backups/longhorn
+  # backupTargetCredentialSecret: doppler-longhorn
   storageMinimalAvailablePercentage: 10

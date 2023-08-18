@@ -30,7 +30,6 @@ helmCharts:
 
 resources:
   - externalsecret.yaml
-  - externalsecret-postgres.yaml
   - cluster.yaml
   - ingressroute.yaml
   - pvc-cache.yaml

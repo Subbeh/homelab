@@ -43,8 +43,8 @@ spec:
       endpointURL: https://s3.sbbh.cloud
       s3Credentials:
         accessKeyId:
-          name: cloudnative-pg-secret
-          key: postgresUser
+          name: doppler-drone
+          key: DRONE_MINIO_USER
         secretAccessKey:
-          name: cloudnative-pg-secret
-          key: postgresPassword
+          name: doppler-drone
+          key: DRONE_MINIO_PASSWORD
