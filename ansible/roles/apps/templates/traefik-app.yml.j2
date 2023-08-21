@@ -13,7 +13,7 @@ http:
         - {{ middleware }}
         {% endfor %}
       {% else %}
-        - local-only
+        - chain-internal
       {% endif %}
       {% if route.service is defined %}
       service: {{ route.service }}
@@ -32,7 +32,7 @@ http:
         - {{ middleware }}
         {% endfor %}
       {% else %}
-        - local-only
+        - chain-internal
       {% endif %}
       service: {{ _app_name }}-svc
   {% endif %}

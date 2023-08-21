@@ -16,7 +16,7 @@ radarr:
       - name: "radarr-bypass"
         rule: "Host(`radarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_radarr_api }}`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media

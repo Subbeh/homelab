@@ -7,7 +7,7 @@ labels:
   type: syslog
 ---
 filenames:
-  - /logs/svc/traefik/*.log
+  - /logs/svc/traefik/access.log
 labels:
   type: traefik
 ---

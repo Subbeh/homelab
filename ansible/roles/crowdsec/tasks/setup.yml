@@ -1,10 +1,9 @@
 ---
-
-- name: Create crowdsec container
+- name: Include app role
   ansible.builtin.include_role:
     name: apps
   vars:
-    run_app: crowdsec
+    _app: crowdsec
 
 - name: Enroll into CrowdSec hub
   ansible.builtin.shell: |
@@ -26,12 +25,12 @@
     mode: 0600
   notify: restart crowdsec
 
-- name: Copy plex-whitelist.yaml to server
-  ansible.builtin.copy:
-    src: plex-whitelist.yaml
-    dest: '{{ common_dir }}/crowdsec/config/parsers/s01-parse/'
-    mode: 0600
-  notify: restart crowdsec
+# - name: Copy plex-whitelist.yaml to server
+#   ansible.builtin.copy:
+#     src: plex-whitelist.yaml
+#     dest: "{{ common_dir }}/crowdsec/config/parsers/s01-parse/"
+#     mode: 0600
+#   notify: restart crowdsec
 
 - name: Copy custom whitelists to server
   ansible.builtin.template:

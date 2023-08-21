@@ -3,7 +3,7 @@
 
 global:
   checkNewVersion: true
-  sendAnonymousUsage: true
+  sendAnonymousUsage: false
 
 api:
   dashboard: true
@@ -28,9 +28,6 @@ entryPoints:
           - main: "[[ network_domain.tld ]]"
             sans:
               - "*.[[ network_domain.tld ]]"
-          - main: "[[ network_domain.tld_personal ]]"
-            sans:
-              - "*.[[ network_domain.tld_personal ]]"
   traefik:
     address: :8080
 
@@ -48,6 +45,7 @@ certificatesResolvers:
 {% if testing is defined %}
       caServer: https://acme-staging-v02.api.letsencrypt.org/directory
 {% endif %}
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory
       email: [[ cloudflare_email ]]
       storage: acme.json
       dnsChallenge:
@@ -59,16 +57,17 @@ certificatesResolvers:
 
 log:
   filePath: /logs/traefik.log
-  level: DEBUG
+  level: INFO
 
 accessLog:
   filePath: /logs/access.log
   bufferingSize: 100
-  fields:
-    names:
-      StartUTC: drop
-  # filters:
-  #   statusCodes:
-  #     - "204-299"
-  #     - "400-499"
-  #     - "500-599"
+
+experimental:
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.1.13
+    cloudflarewarp:
+      modulename: github.com/BetterCorp/cloudflarewarp
+      version: v1.3.3

@@ -14,7 +14,7 @@ linx:
   traefik:
     name: upload
     rtr_middlewares:
-      - chain-no-auth
+      - chain-external-no-auth
 
   uptime:
     group: services

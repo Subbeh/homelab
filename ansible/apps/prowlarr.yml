@@ -14,7 +14,7 @@ prowlarr:
       - name: "prowlarr-bypass"
         rule: "Host(`prowlarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_prowlarr_api }}`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media

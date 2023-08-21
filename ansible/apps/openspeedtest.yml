@@ -8,7 +8,7 @@ openspeedtest:
   traefik:
     name: speedtest
     rtr_middlewares:
-      - chain-auth
+      - chain-external
       - buffer-limit
     middlewares: |
       buffer-limit:

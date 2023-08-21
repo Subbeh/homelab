@@ -16,7 +16,7 @@ sonarr:
       - name: "sonarr-bypass"
         rule: "Host(`sonarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_sonarr_api }}`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media

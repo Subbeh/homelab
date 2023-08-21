@@ -1,5 +1,6 @@
 ---
 redis:
+  name: redis
   container:
     image: redis:7-alpine
     volumes:

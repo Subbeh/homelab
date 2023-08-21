@@ -1,12 +1,11 @@
 ---
-
 - name: Include bouncer task for Traefik bouncer
   ansible.builtin.include_tasks: bouncer.yml
   vars:
     crowdsec_bouncer: traefik-bouncer
 
-- name: Create traefik cs bouncer container
-  ansible.builtin.include_role:
-    name: apps
-  vars:
-    run_app: "traefik_cs_bouncer"
+- name: Copy traefik middleware over
+  ansible.builtin.template:
+    src: crowdsec-traefik-bouncer.yaml.j2
+    dest: /opt/app_data/traefik/configs/middleware-crowdsec.yml
+  changed_when: false

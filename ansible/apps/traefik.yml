@@ -26,17 +26,44 @@ traefik:
       traefik.http.routers.traefik-rtr.tls.domains[0].main: "{{ network_domain.tld }}"
       traefik.http.routers.traefik-rtr.tls.domains[0].sans: "*.{{ network_domain.tld }}"
       traefik.http.routers.traefik-rtr.service: "api@internal"
-      traefik.http.routers.traefik-rtr.middlewares: "local-only@file"
+      traefik.http.routers.traefik-rtr.middlewares: "chain-internal@file"
+
+  dependents:
+    - redis_traefik_cs
+    - whoami
 
   uptime:
     group: system
     type: port
     port: "443"
 
+redis_traefik_cs:
+  name: redis-traefik-cs
+  container:
+    image: redis:7-alpine
+    volumes:
+      - "{{ common_dir }}/traefik/db:/data"
+    command: "redis-server --requirepass {{ vault_redis_cs_pass }}"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+
 whoami:
-  image: traefik/whoami
-  labels:
-    traefik.enable: "true"
-    traefik.http.routers.whoami-rtr.rule: "Host(`whoami.{{ network_domain.tld }}`)"
-    traefik.http.routers.whoami-rtr.entrypoints: "websecure"
-    traefik.http.routers.whoami-rtr.middlewares: "chain-no-auth@file"
+  container:
+    image: traefik/whoami
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.whoami-rtr.rule: "Host(`whoami.{{ network_domain.tld }}`)"
+      traefik.http.routers.whoami-rtr.entrypoints: "websecure"
+      traefik.http.routers.whoami-rtr.middlewares: "chain-external-no-auth@file"
+
+traefik_test:
+  traefik:
+    name: test
+    url: "http://whoami"
+    rtr-middlewares:
+      - crowdsec
+      - cloudflarewarp

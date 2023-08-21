@@ -17,7 +17,7 @@ wizarr:
       - name: "wizarr-bypass"
         rule: "Host(`invites.{{ network_domain.tld }}`) && (Path(`/join`, `/setup`) || PathPrefix(`/j/`, `/setup/`, `/static/`))"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media

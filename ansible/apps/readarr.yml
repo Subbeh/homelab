@@ -12,11 +12,11 @@ readarr_ebooks:
   traefik:
     routers:
       - name: "readarr-eb"
-        rule: "Host(`ebooks.{{ network_domain.tld }}`)"
+        rule: "Host(`readarr-eb.{{ network_domain.tld }}`)"
       - name: "readarr-eb-bypass"
-        rule: "Host(`ebooks.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_ebooks_api }}`)"
+        rule: "Host(`readarr-eb.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_ebooks_api }}`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media
@@ -34,11 +34,11 @@ readarr_audiobooks:
   traefik:
     routers:
       - name: "readarr-ab"
-        rule: "Host(`audiobooks.{{ network_domain.tld }}`)"
+        rule: "Host(`readarr-ab.{{ network_domain.tld }}`)"
       - name: "readarr-ab-bypass"
-        rule: "Host(`audiobooks.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_audiobooks_api }}`)"
+        rule: "Host(`readarr-ab.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_audiobooks_api }}`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media

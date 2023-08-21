@@ -1,5 +1,4 @@
 ---
-
 - name: Check for existing bouncer
   ansible.builtin.command: docker exec -t crowdsec cscli bouncers list -o raw
   changed_when: false
@@ -17,9 +16,9 @@
 
 - name: Register API key
   ansible.builtin.set_fact:
-    crowdsec_bouncer_api_key: "{{ _api_key.stdout }}"
+    _crowdsec_bouncer_api_key: "{{ _api_key.stdout }}"
 
 - ansible.builtin.fail:
-    msg: crowdsec_bouncer_api_key not specified
+    msg: _crowdsec_bouncer_api_key not specified
   when:
-    - crowdsec_bouncer_api_key == ""
+    - _crowdsec_bouncer_api_key == ""

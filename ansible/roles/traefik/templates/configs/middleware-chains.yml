@@ -1,20 +1,26 @@
 ---
-
 http:
   middlewares:
-    chain-no-auth:
+    chain-internal:
       chain:
         middlewares:
-          - crowdsec-bouncer
-          - rate-limit
-          - secure-headers
-          - compress
+          - local-whitelist
 
-    chain-auth:
+    chain-external:
       chain:
         middlewares:
-          - crowdsec-bouncer
+          - cloudflarewarp
+          - crowdsec
           - rate-limit
           - secure-headers
           - compress
           - authentik
+
+    chain-external-no-auth:
+      chain:
+        middlewares:
+          - cloudflarewarp
+          - crowdsec
+          - rate-limit
+          - secure-headers
+          - compress

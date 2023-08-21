@@ -22,7 +22,7 @@ qbittorrent:
 
   traefik:
     rtr_middlewares:
-      - chain-no-auth
+      - chain-external-no-auth
 
   uptime:
     group: media

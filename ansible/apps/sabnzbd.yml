@@ -15,7 +15,7 @@ sabnzbd:
       - name: "sabnzbd-bypass"
         rule: "Host(`sabnzbd.{{ network_domain.tld }}`) && Query(`apikey={{ media_sabnzbd_api }}`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media

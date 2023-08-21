@@ -14,7 +14,7 @@ tautulli:
       - name: "tautulli-pub"
         rule: "Host(`tautulli.{{ network_domain.tld }}`) && (PathPrefix(`/image/`) || PathPrefix(`/newsletter/`))"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media

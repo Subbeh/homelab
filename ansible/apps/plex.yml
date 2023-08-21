@@ -2,7 +2,7 @@
 plex:
   traefik:
     rtr_middlewares:
-      - chain-no-auth
+      - chain-external-no-auth
 
   uptime:
     - name: plex-webui

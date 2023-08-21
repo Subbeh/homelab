@@ -26,12 +26,12 @@ authentik_server:
       - name: "auth"
         rule: "Host(`auth.{{ network_domain.tld }}`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
         service: auth-svc
       - name: "auth-outpost"
         rule: "HostRegexp(`{subdomain:[a-z0-9-]+}.{{ network_domain.tld }}`) && PathPrefix(`/outpost.goauthentik.io/`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
         service: auth-outpost-svc
     services: |
       auth-svc:

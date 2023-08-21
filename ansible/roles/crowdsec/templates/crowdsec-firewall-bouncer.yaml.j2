@@ -10,7 +10,7 @@ log_max_size: 100
 log_max_backups: 3
 log_max_age: 30
 api_url: http://localhost:{{ network_svc.crowdsec.port }}/
-api_key: {{ crowdsec_bouncer_api_key }}
+api_key: {{ _crowdsec_bouncer_api_key }}
 insecure_skip_verify: false
 disable_ipv6: true
 deny_action: DROP

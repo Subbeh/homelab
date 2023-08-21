@@ -1,5 +1,4 @@
 ---
-
 - name: Create directory structure
   ansible.builtin.file:
     path: "{{ item }}"
@@ -41,7 +40,7 @@
   ansible.builtin.include_role:
     name: apps
   vars:
-    run_app: "{{ item }}"
+    _app: "{{ item }}"
   loop:
     - traefik
     - whoami

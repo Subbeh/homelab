@@ -10,8 +10,9 @@ audiobookshelf:
       - "{{ common_media_dir }}:/data"
 
   traefik:
+    name: audiobooks
     rtr_middlewares:
-      - crowdsec-bouncer
+      - crowdsec
       - rate-limit
       - compress
 

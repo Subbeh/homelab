@@ -2,23 +2,18 @@
 
 http:
   middlewares:
-    local-only:
-      ipWhiteList:
-        sourceRange:
-          - "127.0.0.1/32"
-          - "192.168.0.0/16"
-          - "10.11.0.0/16"
-          - "100.64.0.0/10"
 
-    basic-auth:
-      basicAuth:
-        usersFile: ".htpasswd"
-        realm: "Traefik 2 Basic Auth"
+    local-whitelist:
+      ipWhiteList:
+        sourceRange: {{ network_cidr.all }}
 
     rate-limit:
       rateLimit:
         average: 100
         burst: 50
+
+    compress:
+      compress: {}
 
     secure-headers:
       headers:
@@ -41,14 +36,6 @@ http:
           X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex,"
           server: ""
 
-    compress:
-      compress: {}
-
-    crowdsec-bouncer:
-      forwardauth:
-        address: http://traefik-cs-bouncer:8080/api/v1/forwardAuth
-        trustForwardHeader: true
-
     authentik:
       forwardAuth:
         address: "http://{{ network_svc.authentik_server.host }}:{{ network_svc.authentik_server.port }}/outpost.goauthentik.io/auth/traefik"
@@ -65,3 +52,8 @@ http:
           - X-authentik-meta-provider
           - X-authentik-meta-app
           - X-authentik-meta-version
+
+    cloudflarewarp:
+      plugin:
+        cloudflarewarp:
+          disableDefault: false

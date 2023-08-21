@@ -18,7 +18,7 @@ network_cidr:
   all:
     [
       "127.0.0.1/32",
-      "10.0.0.0/8",
+      "10.11.0.0/16",
       "192.168.0.0/16",
       "172.16.0.0/12",
       "100.64.0.0/10",
@@ -190,6 +190,8 @@ network_svc:
     port: "9056"
   redis:
     host: services
+  redis_traefik_cs:
+    host: bastion
   sabnzbd:
     host: nas
     port: "9091"

@@ -15,7 +15,7 @@ bazarr:
       - name: "bazarr-bypass"
         rule: "Host(`bazarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_bazarr_api }}`)"
         middlewares:
-          - chain-no-auth
+          - chain-external-no-auth
 
   uptime:
     group: media
