@@ -1,0 +1,20 @@
+filebrowser:
+  container:
+    image: filebrowser/filebrowser:s6
+    ports:
+      - "{{ network_svc.filebrowser.port }}:8080"
+    env:
+      PUID: "1026"
+      PGID: "101"
+    volumes:
+      - "{{ hostvars[network_svc.filebrowser.host]['common_dir'] }}/filebrowser/filebrowser.db:/database/filebrowser.db"
+      - "{{ hostvars[network_svc.filebrowser.host]['common_dir'] }}/filebrowser/settings.json:/config/settings.json"
+      - "{{ hostvars[network_svc.filebrowser.host]['common_media_dir'] }}:/srv"
+
+  traefik:
+    name: files
+    rtr_middlewares:
+      - chain-no-auth
+
+  uptime:
+    group: services

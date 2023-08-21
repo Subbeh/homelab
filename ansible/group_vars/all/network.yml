@@ -112,6 +112,9 @@ network_svc:
     bouncer_port: "9004"
   endlessh:
     host: bastion
+  filebrowser:
+    host: nas
+    port: "9027"
   freshrss:
     host: services
     port: "9026"
