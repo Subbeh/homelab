@@ -8,14 +8,20 @@
     _monitor_name: "{{ _config.name | default(_app) }}"
 
 - name: Delete existing Uptime Kuma monitor configs for {{ _monitor_name }}
+  delegate_to: localhost
+  become: false
   lucasheld.uptime_kuma.monitor:
     api_url: "{{ uptime_api_url }}"
     api_token: "{{ _uptimekuma_api_token }}"
     name: "{{ _monitor_name }}"
     state: absent
   register: _result
+  vars:
+    ansible_python_interpreter: "{{ _python_interpreter | default(omit) }}"
 
 - name: Add {{ _monitor_name }} ({{ _config.type | default('http') | upper }}) monitor config for {{ _app }}
+  delegate_to: localhost
+  become: false
   lucasheld.uptime_kuma.monitor:
     api_url: "{{ uptime_api_url }}"
     api_token: "{{ _uptimekuma_api_token }}"
@@ -39,3 +45,5 @@
     databaseQuery: "{{ _config.databaseQuery | default(omit) }}"
     notification_names: "{{ _config.notification_names | default(omit) }}"
     state: present
+  vars:
+    ansible_python_interpreter: "{{ _python_interpreter | default(omit) }}"

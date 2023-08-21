@@ -6,16 +6,20 @@
 
 - name: Set Ansible veritualenv location
   ansible.builtin.set_fact:
-    ansible_python_interpreter: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV') + '/bin/python' }}"
+    _python_interpreter: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV') + '/bin/python' }}"
   when: lookup('ansible.builtin.env', 'VIRTUAL_ENV')
 
 - block:
     - name: Login to Uptime Kuma and fetch token
+      delegate_to: localhost
+      become: false
       lucasheld.uptime_kuma.login:
         api_url: "{{ uptime_api_url }}"
         api_username: "{{ common_user }}"
         api_password: "{{ uptime_kuma_password }}"
       register: _result
+      vars:
+        ansible_python_interpreter: "{{ _python_interpreter | default(omit) }}"
 
     - name: Extract the token from the result and set it as fact
       ansible.builtin.set_fact:
