@@ -8,14 +8,13 @@ trigger:
     - main
 
 image_pull_secrets:
-  - DOCKER_CONF
+  - DOCKER_CONFIG
 
 steps:
   - name: lint
     image: git.sbbh.cloud/sysadm/ansible-runner:latest
     privileged: true
     commands:
-      - ip link set dev eth0 mtu 1450
       - .drone/lint.sh
     environment:
       ANSIBLE_VAULT_PASSWORD:
@@ -28,8 +27,8 @@ steps:
     environment:
       ANSIBLE_VAULT_PASSWORD:
         from_secret: ANSIBLE_VAULT_PASSWORD
-      SSH_KEY:
-        from_secret: SSH_KEY
+      DRONE_SSH_KEY:
+        from_secret: DRONE_SSH_KEY
     when:
       event:
         - push
@@ -39,9 +38,9 @@ steps:
     settings:
       username: Drone
       webhook_id:
-        from_secret: DISCORD_ID
+        from_secret: DRONE_DISCORD_ID
       webhook_token:
-        from_secret: DISCORD_TOKEN
+        from_secret: DRONE_DISCORD_TOKEN
       message: >
         {{#success build.status}}✅{{else}}⚠️{{/success}}
         repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
@@ -51,31 +50,55 @@ steps:
       event: [push]
 ---
 kind: secret
-name: DOCKER_CONF
+name: GITHUB_USER
 get:
   path: doppler-drone
-  name: DOCKER_CONF
+  name: GITHUB_USER
 ---
 kind: secret
-name: DISCORD_ID
+name: GITHUB_TOKEN
 get:
   path: doppler-drone
-  name: DISCORD_ID
+  name: GITHUB_TOKEN
 ---
 kind: secret
-name: DISCORD_TOKEN
+name: DOCKER_USER
 get:
   path: doppler-drone
-  name: DISCORD_TOKEN
+  name: DOCKER_USER
+---
+kind: secret
+name: DOCKER_PASSWORD
+get:
+  path: doppler-drone
+  name: DOCKER_PASSWORD
+---
+kind: secret
+name: DOCKER_CONFIG
+get:
+  path: doppler-drone
+  name: DOCKER_CONFIG
+---
+kind: secret
+name: DRONE_DISCORD_ID
+get:
+  path: doppler-drone
+  name: DRONE_DISCORD_ID
+---
+kind: secret
+name: DRONE_DISCORD_TOKEN
+get:
+  path: doppler-drone
+  name: DRONE_DISCORD_TOKEN
+---
+kind: secret
+name: DRONE_SSH_KEY
+get:
+  path: doppler-drone
+  name: DRONE_SSH_KEY
 ---
 kind: secret
 name: ANSIBLE_VAULT_PASSWORD
 get:
   path: doppler-drone
   name: ANSIBLE_VAULT_PASSWORD
----
-kind: secret
-name: SSH_KEY
-get:
-  path: doppler-drone
-  name: SSH_KEY

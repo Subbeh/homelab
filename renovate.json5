@@ -1,0 +1,9 @@
+{
+  /* managers */
+  ansible: {
+    fileMatch: ["ansible/apps/.+\\.ya?ml$"],
+  },
+  kubernetes: {
+    fileMatch: ["k8s/.+\\.yaml$"],
+  },
+}
