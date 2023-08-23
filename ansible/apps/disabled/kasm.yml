@@ -1,0 +1,13 @@
+---
+kasm:
+  traefik:
+    url: "https://{{ network_hosts.desktop }}"
+
+  uptime:
+    - group: services
+      ignoreTls: yes
+      url: "https://{{ network_hosts.desktop }}"
+    - name: desktop
+      group: servers
+      type: ping
+      hostname: "{{ network_hosts.desktop }}"

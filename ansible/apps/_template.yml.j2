@@ -1,0 +1,16 @@
+#jinja2:variable_start_string:'[[', variable_end_string:']]', trim_blocks: False
+---
+[[NAME]]:
+  container:
+    image: [[IMAGE]]
+    ports:
+      - "{{ network_svc.[[NAME]].port }}:[[PORT]]"
+    volumes:
+      - "{{ common_dir }}/[[NAME]]/data:/data"
+    env:
+      DUMMY: "text"
+
+  traefik:
+
+  uptime:
+    group: services

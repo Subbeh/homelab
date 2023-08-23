@@ -5,10 +5,10 @@ qbittorrent:
     network_mode: "container:gluetun"
     networks:
     volumes:
-      - "{{ common_dir }}/qbittorrent/config:/config"
-      - "{{ common_dir }}/qbittorrent/webui:/webui"
-      - "{{ common_dir }}/qbittorrent/mam_id:/mam_id"
-      - "{{ common_media_dir }}/downloads/torrents:/downloads"
+      - "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/config:/config"
+      - "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/webui:/webui"
+      - "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/mam_id:/mam_id"
+      - "{{ hostvars[network_svc.qbittorrent.host]['common_media_dir'] }}/downloads/torrents:/downloads"
     command: |
       bash -c "set -x &&
               while true; do

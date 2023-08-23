@@ -77,9 +77,6 @@ network_svc:
   adguard:
     host: "{{ network_hosts.opnsense }}"
     port: "5380"
-  apprise:
-    host: services
-    port: "9034"
   authentik_server:
     host: services
     port: "9000"
@@ -115,6 +112,9 @@ network_svc:
   filebrowser:
     host: nas
     port: "9027"
+  flatnotes:
+    host: services
+    port: "9028"
   freshrss:
     host: services
     port: "9026"
@@ -126,9 +126,6 @@ network_svc:
     host: nas
     ip: "192.168.100.100"
     port: "9005"
-  homer:
-    host: services
-    port: "9020"
   linkace:
     host: services
     port: "9036"
@@ -139,15 +136,6 @@ network_svc:
     host: services
     port: "9006"
     port_console: "9007"
-  netbootxyz:
-    host: nas
-    port: "9030"
-  nextcloud:
-    host: services
-    port: "9021"
-  ntfy:
-    host: services
-    port: "9035"
   openspeedtest:
     host: services
     port: "9031"
@@ -202,8 +190,6 @@ network_svc:
     host: services
     port: "9070"
   traefik:
-    host: bastion
-  traefik_cs_bouncer:
     host: bastion
   unpackerr:
     host: nas

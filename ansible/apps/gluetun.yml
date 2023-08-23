@@ -8,7 +8,7 @@ gluetun:
       - "{{ network_svc.gluetun.port }}:8000"
       - "{{ network_svc.qbittorrent.port }}:8080"
     volumes:
-      - "{{ common_dir }}/gluetun:/gluetun"
+      - "{{ hostvars[network_svc.gluetun.host]['common_dir'] }}/gluetun:/gluetun"
     env:
       VPN_SERVICE_PROVIDER: "protonvpn"
       VPN_PORT_FORWARDING: "on"
