@@ -11,10 +11,13 @@ extraVolumes:
     persistentVolumeClaim:
       claimName: docker-cache-pvc
 dind:
-  commandArgs:
-    - "--host"
-    - "tcp://localhost:2375"
-    - "--mtu=1450"
+  registry: docker.io
+  repository: docker
+  tag: 24-dind
+  # commandArgs:
+  #   - "--host"
+  #   - "tcp://localhost:2375"
+  #   - "--mtu=1450"
   extraVolumeMounts:
     - name: docker-cache
       mountPath: /var/cache/
