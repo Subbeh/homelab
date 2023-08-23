@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -gt 1 ] ; then
-  _host=$1
-  shift
+if [ $# -gt 1 ]; then
+	_host=$1
+	shift
 fi
 cd ${INFRA:?not set}/ansible
 ansible ${_host:-localhost} -m debug -a var=${1:?not set}

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd ${INFRA:?not set}/ansible/apps
+if [ $# -eq 1 ]; then
+	sed "1d;s/\[\[name\]\]/${1}/g" _template.yml.j2
+fi
