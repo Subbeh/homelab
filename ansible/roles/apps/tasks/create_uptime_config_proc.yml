@@ -7,43 +7,40 @@
   ansible.builtin.set_fact:
     _monitor_name: "{{ _config.name | default(_app) }}"
 
-- name: Delete existing Uptime Kuma monitor configs for {{ _monitor_name }}
-  delegate_to: localhost
-  become: false
-  lucasheld.uptime_kuma.monitor:
-    api_url: "{{ uptime_api_url }}"
-    api_token: "{{ _uptimekuma_api_token }}"
-    name: "{{ _monitor_name }}"
-    state: absent
-  register: _result
-  vars:
-    ansible_python_interpreter: "{{ _python_interpreter | default(omit) }}"
+- block:
+    - name: Delete existing Uptime Kuma monitor configs for {{ _monitor_name }}
+      delegate_to: localhost
+      become: false
+      lucasheld.uptime_kuma.monitor:
+        api_url: "{{ _uptime_api_url }}"
+        api_token: "{{ _uptimekuma_api_token }}"
+        name: "{{ _monitor_name }}"
+        state: absent
+      register: _result
 
-- name: Add {{ _monitor_name }} ({{ _config.type | default('http') | upper }}) monitor config for {{ _app }}
-  delegate_to: localhost
-  become: false
-  lucasheld.uptime_kuma.monitor:
-    api_url: "{{ uptime_api_url }}"
-    api_token: "{{ _uptimekuma_api_token }}"
-    name: "{{ _monitor_name }}"
-    parent_name: "{{ _config.group | default(omit) }}"
-    interval: "{{ _config.interval | default(omit) }}"
-    maxretries: "{{ _config.maxretries | default(omit) }}"
-    upsideDown: "{{ _config.upsideDown | default(omit) }}"
-    type: "{{ _config.type | default('http') }}"
-    url: |
-      {%- if (_config.url is defined) -%}{{ _config.url }}
-      {%- elif (network_svc[_app].host is defined and network_hosts[network_svc[_app].host] is defined) -%}http://{{ network_hosts[network_svc[_app].host] }}{{ ':' + network_svc[_app].port | default() }}
-      {%- elif (_app_config.traefik.name is defined) -%}https://{{ _app_config.traefik.name }}.{{ network_domain.tld }}
-      {%- else -%}https://{{ _app }}.{{ network_domain.tld }}
-      {%- endif -%}
-    port: "{{ (_config.port | default(network_svc[_app].port)) | default(omit) }}"
-    hostname: "{{ (_config.hostname | default(network_hosts[network_svc[_app].host])) | default(omit) }}"
-    ignoreTls: "{{ _config.ignoreTls | default(omit) }}"
-    keyword: "{{ _config.keyword | default(omit) }}"
-    databaseConnectionString: "{{ _config.databaseConnectionString | default(omit) }}"
-    databaseQuery: "{{ _config.databaseQuery | default(omit) }}"
-    notification_names: "{{ _config.notification_names | default(omit) }}"
-    state: present
-  vars:
-    ansible_python_interpreter: "{{ _python_interpreter | default(omit) }}"
+    - name: Add {{ _monitor_name }} ({{ _config.type | default('http') | upper }}) monitor config for {{ _app }}
+      delegate_to: localhost
+      become: false
+      lucasheld.uptime_kuma.monitor:
+        api_url: "{{ _uptime_api_url }}"
+        api_token: "{{ _uptimekuma_api_token }}"
+        name: "{{ _monitor_name }}"
+        parent_name: "{{ _config.group | default(omit) }}"
+        interval: "{{ _config.interval | default(omit) }}"
+        maxretries: "{{ _config.maxretries | default(omit) }}"
+        upsideDown: "{{ _config.upsideDown | default(omit) }}"
+        type: "{{ _config.type | default('http') }}"
+        url: |
+          {%- if (_config.url is defined) -%}{{ _config.url }}
+          {%- elif (network_svc[_app].host is defined and network_hosts[network_svc[_app].host] is defined) -%}http://{{ network_hosts[network_svc[_app].host] }}{{ ':' + network_svc[_app].port | default() }}
+          {%- elif (_app_config.traefik.name is defined) -%}https://{{ _app_config.traefik.name }}.{{ network_domain.tld }}
+          {%- else -%}https://{{ _app }}.{{ network_domain.tld }}
+          {%- endif -%}
+        port: "{{ (_config.port | default(network_svc[_app].port)) | default(omit) }}"
+        hostname: "{{ (_config.hostname | default(network_hosts[network_svc[_app].host])) | default(omit) }}"
+        ignoreTls: "{{ _config.ignoreTls | default(omit) }}"
+        keyword: "{{ _config.keyword | default(omit) }}"
+        databaseConnectionString: "{{ _config.databaseConnectionString | default(omit) }}"
+        databaseQuery: "{{ _config.databaseQuery | default(omit) }}"
+        notification_names: "{{ _config.notification_names | default(omit) }}"
+        state: present

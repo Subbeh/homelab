@@ -2,32 +2,34 @@
 - name: Set Uptime Kuma facts
   ansible.builtin.set_fact:
     _uptime_config: "{{ _app_config.uptime }}"
-    uptime_api_url: "http://{{ network_hosts[network_svc.uptimekuma.host] }}:{{ network_svc.uptimekuma.port }}"
+    _uptime_api_url: "http://{{ network_hosts[network_svc.uptimekuma.host] }}:{{ network_svc.uptimekuma.port }}"
 
-- name: Set Ansible veritualenv location
+- name: Set Ansible environment for ci pipeline
   ansible.builtin.set_fact:
-    _python_interpreter: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV') + '/bin/python' }}"
-  when: lookup('ansible.builtin.env', 'VIRTUAL_ENV')
+    _python_interpreter: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV') + '/bin/python' if lookup('ansible.builtin.env', 'VIRTUAL_ENV') != '' else lookup('ansible.builtin.pipe', 'which python') }}"
+    _user: "{{ 'root' if lookup('ansible.builtin.env', 'DRONE') == 'true' else ansible_user }}"
 
 - block:
-    - name: Login to Uptime Kuma and fetch token
-      delegate_to: localhost
-      become: false
-      lucasheld.uptime_kuma.login:
-        api_url: "{{ uptime_api_url }}"
-        api_username: "{{ common_user }}"
-        api_password: "{{ uptime_kuma_password }}"
-      register: _result
-      vars:
-        ansible_python_interpreter: "{{ _python_interpreter | default(omit) }}"
+    - block:
+        - name: Login to Uptime Kuma and fetch token
+          delegate_to: localhost
+          become: false
+          lucasheld.uptime_kuma.login:
+            api_url: "{{ _uptime_api_url }}"
+            api_username: "{{ common_user }}"
+            api_password: "{{ uptime_kuma_password }}"
+          register: _result
 
-    - name: Extract the token from the result and set it as fact
-      ansible.builtin.set_fact:
-        _uptimekuma_api_token: "{{ _result.token }}"
-  when: _uptimekuma_api_token is undefined
+        - name: Extract the token from the result and set it as fact
+          ansible.builtin.set_fact:
+            _uptimekuma_api_token: "{{ _result.token }}"
+      when: _uptimekuma_api_token is undefined
 
-- name: Include create_uptime_config_proc task
-  ansible.builtin.include_tasks: create_uptime_config_proc.yml
-  loop: "{{ _uptime_config is mapping | ternary([_uptime_config], _uptime_config is iterable | ternary(_uptime_config, [{'placeholder': ''}])) }}"
-  loop_control:
-    loop_var: _uptime_item
+    - name: Include create_uptime_config_proc task
+      ansible.builtin.include_tasks: create_uptime_config_proc.yml
+      loop: "{{ _uptime_config is mapping | ternary([_uptime_config], _uptime_config is iterable | ternary(_uptime_config, [{'placeholder': ''}])) }}"
+      loop_control:
+        loop_var: _uptime_item
+  vars:
+    ansible_python_interpreter: "{{ _python_interpreter }}"
+    ansible_user: "{{ _user }}"
