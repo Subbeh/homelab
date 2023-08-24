@@ -29,6 +29,8 @@ steps:
         from_secret: ANSIBLE_VAULT_PASSWORD
       DRONE_SSH_KEY:
         from_secret: DRONE_SSH_KEY
+      DRONE_SSH_PUB_KEY:
+        from_secret: DRONE_SSH__PUB_KEY
     when:
       event:
         - push
@@ -96,6 +98,12 @@ name: DRONE_SSH_KEY
 get:
   path: doppler-drone
   name: DRONE_SSH_KEY
+---
+kind: secret
+name: DRONE_SSH_PUB_KEY
+get:
+  path: doppler-drone
+  name: DRONE_SSH_PUB_KEY
 ---
 kind: secret
 name: ANSIBLE_VAULT_PASSWORD

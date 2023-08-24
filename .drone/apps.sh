@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -xeuo pipefail
 
 APP_PLAYBOOK=playbooks/app.yml
