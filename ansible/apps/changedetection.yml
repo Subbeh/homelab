@@ -24,7 +24,7 @@ changedetection:
     group: services
 
 changedetection_chrome:
-  name: changedetection-chrome
+  name: changedetection-chrome:1.59-chrome-stable
   container:
     image: browserless/chrome
     restart: false

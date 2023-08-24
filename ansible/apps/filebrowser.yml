@@ -1,6 +1,6 @@
 filebrowser:
   container:
-    image: filebrowser/filebrowser:s6
+    image: filebrowser/filebrowser:v2.24.2
     ports:
       - "{{ network_svc.filebrowser.port }}:8080"
     env:
