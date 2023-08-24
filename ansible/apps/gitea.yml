@@ -57,7 +57,6 @@ gitea:
       GITEA__log__MODE: "console,file"
       GITEA__log__ENABLE_XORM_LOG: "false"
       GITEA__log__DISABLE_ROUTER_LOG: "true"
-      GITEA__log__ENABLE_ACCESS_LOG: "false"
 
   traefik:
     name: "git"

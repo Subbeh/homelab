@@ -1,9 +1,15 @@
 {
   /* managers */
   ansible: {
-    fileMatch: ["ansible/apps/.+\\.ya?ml$"],
+    fileMatch: ["ansible/apps/.+\\.ya?ml$"]
   },
   kubernetes: {
-    fileMatch: ["k8s/.+\\.yaml$"],
+    fileMatch: ["k8s/.+\\.yaml$"]
+  },
+  helm-values: {
+    fileMatch: ["k8s/.+values.*\\.ya?ml$"]
+  },
+  argocd: {
+    fileMatch: ["k8s/argocd/applications/.+\\.ya?ml$"]
   },
 }
