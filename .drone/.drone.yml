@@ -32,8 +32,8 @@ steps:
       DRONE_SSH_PUB_KEY:
         from_secret: DRONE_SSH_PUB_KEY
     when:
-      event:
-        - push
+      status: [success]
+      event: [push, rollback, custom]
 
   - name: discord notification
     image: appleboy/drone-discord
@@ -47,9 +47,6 @@ steps:
         {{#success build.status}}✅{{else}}⚠️{{/success}}
         repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
                commit: `{{commit.message}}`
-    when:
-      status: [success, failure, changed]
-      event: [push]
 ---
 kind: secret
 name: GITHUB_USER
