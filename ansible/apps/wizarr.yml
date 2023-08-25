@@ -1,7 +1,7 @@
 ---
 wizarr:
   container:
-    image: ghcr.io/wizarrrr/wizarr:2.2.0
+    image: ghcr.io/wizarrrr/wizarr:3.0.1
     ports:
       - "{{ network_svc.wizarr.port }}:5690"
     volumes:
