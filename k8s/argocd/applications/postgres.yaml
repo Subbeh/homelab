@@ -7,7 +7,7 @@ metadata:
   namespace: argocd
 spec:
   source:
-    repoURL: https://git.sbbh.cloud/sysadm/homelab.git
+    repoURL: https://git.sbbh.cloud/infra/homelab.git
     path: k8s/apps/storage/postgres
     targetRevision: main
   destination:
