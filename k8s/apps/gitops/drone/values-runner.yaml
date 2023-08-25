@@ -4,6 +4,7 @@ env:
   # fix: https://community.harness.io/t/docker-mtu-problem/11246/8
   DRONE_RUNNER_NETWORK_OPTS: "com.docker.network.driver.mtu:1450"
   DRONE_RUNNER_NETWORKS: bridge
+  DRONE_RUNNER_CAPACITY: 1
 extraSecretNamesForEnvFrom:
   - doppler-drone
 extraVolumes:
@@ -17,10 +18,6 @@ dind:
   registry: docker.io
   repository: docker
   tag: 24-dind
-  # commandArgs:
-  #   - "--host"
-  #   - "tcp://localhost:2375"
-  #   - "--mtu=1450"
   extraVolumeMounts:
     - name: docker-cache
       mountPath: /var/cache/
