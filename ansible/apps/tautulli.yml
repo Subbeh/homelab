@@ -1,7 +1,7 @@
 ---
 tautulli:
   container:
-    image: ghcr.io/tautulli/tautulli:v2.12.5
+    image: ghcr.io/tautulli/tautulli:v2.13.1
     ports:
       - "{{ network_svc.tautulli.port }}:8181"
     volumes:
