@@ -5,5 +5,5 @@ molecule-plugins[podman]
 molecule-plugins[docker]
 ansible-lint
 netaddr==0.8.0
-kubernetes==26.1.0
+kubernetes==27.2.0
 uptime-kuma-api
