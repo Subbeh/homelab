@@ -7,6 +7,7 @@
   when: _preprocessed is undefined
 
 - name: Load app config for {{ _app }}
+  no_log: "{{ ci | default(false) }}"
   ansible.builtin.set_fact:
     _app_config: "{{ _configs[_app] | mandatory }}"
 

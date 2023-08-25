@@ -1,9 +1,11 @@
 ---
 - name: Set container facts
+  no_log: "{{ ci | default(false) }}"
   ansible.builtin.set_fact:
     container: "{{ _defaults.container | ansible.builtin.combine(_app_config.container, list_merge='append_rp', recursive=true) }}"
 
-- name: Set container parameters
+- name: Set container name fact
+  no_log: "{{ ci | default(false) }}"
   ansible.builtin.set_fact:
     container: "{{ container | combine({'name': _app_name}) }}"
 
@@ -12,6 +14,7 @@
     container_host: "{{ network_svc[_app].host | mandatory }}"
 
 - name: Ensure Docker network is present on {{ container_host }}
+  no_log: "{{ ci | default(false) }}"
   delegate_to: "{{ container_host }}"
   community.docker.docker_network:
     name: "{{ item.name }}"
@@ -22,6 +25,7 @@
   when: container.networks is defined and container.networks != None
 
 - name: Create container {{ container.name }}
+  no_log: "{{ ci | default(false) }}"
   delegate_to: "{{ container_host }}"
   community.docker.docker_container:
     name: "{{ container.name | default(omit) }}"
