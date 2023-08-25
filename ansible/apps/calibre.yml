@@ -1,7 +1,7 @@
 ---
 calibre:
   container:
-    image: lscr.io/linuxserver/calibre:6.24.0
+    image: lscr.io/linuxserver/calibre:6.25.0
     ports:
       - "{{ network_svc.calibre.port }}:8080"
       - "{{ network_svc.calibre.port_server }}:8081"
