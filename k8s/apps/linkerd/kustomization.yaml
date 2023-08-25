@@ -11,7 +11,7 @@ helmCharts:
 
   - name: linkerd-crds
     repo: https://helm.linkerd.io/stable
-    version: 1.6.1
+    version: 1.8.0
 
 resources:
   - namespace.yaml
