@@ -15,6 +15,6 @@ fi
 while read app; do
 	if [[ $app ]]; then
 		echo running app script for $app...
-		ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook "${APP_PLAYBOOK:?not set}" -e "app=$app"
+		ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook "${APP_PLAYBOOK:?not set}" -e "app=$app" -e "ci=true"
 	fi
 done <<<$(git diff --name-only --diff-filter=ACMR HEAD~1 main | grep -oP '(?<=ansible/)apps/[^/]*.ya?ml' | xargs awk -F: '/^[^ -]/{ print $1 }')

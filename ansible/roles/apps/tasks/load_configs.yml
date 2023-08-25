@@ -1,5 +1,6 @@
 ---
 - name: Load configs
+  no_log: "{{ ci | default(false) }}"
   ansible.builtin.include_vars:
     dir: "{{ common_ansible_root }}/apps"
     ignore_unknown_extensions: true
