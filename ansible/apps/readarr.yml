@@ -6,8 +6,8 @@ readarr_ebooks:
     ports:
       - "{{ network_svc.readarr_ebooks.port }}:8787"
     volumes:
-      - "{{ common_dir }}/readarr_ebooks/config:/config"
-      - "{{ common_media_dir }}:/data"
+      - "{{ hostvars[network_svc.readarr_ebooks.host]['common_dir'] }}/readarr_ebooks/config:/config"
+      - "{{ hostvars[network_svc.readarr_ebooks.host]['common_media_dir'] }}:/data"
 
   traefik:
     routers:
@@ -28,8 +28,8 @@ readarr_audiobooks:
     ports:
       - "{{ network_svc.readarr_audiobooks.port }}:8787"
     volumes:
-      - "{{ common_dir }}/readarr_audiobooks/config:/config"
-      - "{{ common_media_dir }}:/data"
+      - "{{ hostvars[network_svc.readarr_audiobooks.host]['common_dir'] }}/readarr_audiobooks/config:/config"
+      - "{{ hostvars[network_svc.readarr_audiobooks.host]['common_media_dir'] }}:/data"
 
   traefik:
     routers:
