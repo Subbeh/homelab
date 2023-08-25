@@ -12,7 +12,7 @@ image_pull_secrets:
 
 steps:
   - name: lint
-    image: git.sbbh.cloud/sysadm/ansible-runner:latest
+    image: git.sbbh.cloud/infra/ansible-runner:latest
     privileged: true
     commands:
       - .drone/lint.sh
@@ -21,7 +21,7 @@ steps:
         from_secret: ANSIBLE_VAULT_PASSWORD
 
   - name: apps
-    image: git.sbbh.cloud/sysadm/ansible-runner:latest
+    image: git.sbbh.cloud/infra/ansible-runner:latest
     commands:
       - /entry.sh .drone/apps.sh
     environment:
