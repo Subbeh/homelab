@@ -8,7 +8,7 @@ trigger:
     - main
 
 image_pull_secrets:
-  - DOCKER_CONFIG
+  - DRONE_DOCKER_CONFIG
 
 steps:
   - name: lint
@@ -76,10 +76,10 @@ get:
   name: DOCKER_PASSWORD
 ---
 kind: secret
-name: DOCKER_CONFIG
+name: DRONE_DOCKER_CONFIG
 get:
   path: doppler-drone
-  name: DOCKER_CONFIG
+  name: DRONE_DOCKER_CONFIG
 ---
 kind: secret
 name: DRONE_DISCORD_ID
