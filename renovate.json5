@@ -17,15 +17,10 @@
     {
       "matchPackagePatterns": [
         ".*\\/calibre-web",
-        ".*\\/overseerr"
-      ],
-      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-ls(?<build>\\d+)$"
-    },
-    {
-      "matchPackagePatterns": [
+        ".*\\/overseerr",
         ".*\\/prowlarr"
       ],
-      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d)$"
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-ls(?<build>\\d+)$"
     },
     {
       "matchPackagePatterns": [
