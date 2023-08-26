@@ -6,7 +6,7 @@ namespace: monitoring
 helmCharts:
   - name: grafana
     repo: https://grafana.github.io/helm-charts
-    version: 6.58.10
+    version: 6.59.0
     namespace: monitoring
     valuesFile: values.yaml
     releaseName: grafana
