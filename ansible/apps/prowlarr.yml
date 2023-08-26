@@ -1,7 +1,7 @@
 ---
 prowlarr:
   container:
-    image: lscr.io/linuxserver/prowlarr:1.8.1259
+    image: lscr.io/linuxserver/prowlarr:1.7.4
     ports:
       - "{{ network_svc.prowlarr.port }}:9696"
     volumes:
