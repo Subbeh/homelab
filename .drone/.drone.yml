@@ -34,6 +34,8 @@ steps:
     when:
       status: [success]
       event: [push]
+      ref:
+        include: [refs/remotes/origin/renovate/**]
 
   - name: discord notification
     image: appleboy/drone-discord
