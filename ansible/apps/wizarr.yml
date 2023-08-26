@@ -21,3 +21,6 @@ wizarr:
 
   uptime:
     group: media
+    type: port
+    port: "{{ network_svc.wizarr.port }}"
+    hostname: "{{ network_hosts[network_svc.wizarr.host] }}"
