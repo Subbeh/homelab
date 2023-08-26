@@ -23,6 +23,12 @@
     },
     {
       "matchPackagePatterns": [
+        ".*\\/prowlarr"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d)$"
+    },
+    {
+      "matchPackagePatterns": [
         ".*\\/qbittorrent"
       ],
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-r(?<revision>\\d)-ls(?<build>\\d+)$"
