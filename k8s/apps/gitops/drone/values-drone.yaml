@@ -5,6 +5,7 @@ env:
   DRONE_USER_CREATE: username:sysadm,admin:true
   DRONE_GIT_ALWAYS_AUTH: true
   DRONE_DATABASE_DRIVER: postgres
+  DRONE_REPO_BRANCH: main
 
 extraSecretNamesForEnvFrom:
   - doppler-drone
