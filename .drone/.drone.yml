@@ -35,23 +35,6 @@ steps:
     when:
       status: [success]
       event: [push]
-      ref:
-        include: [refs/remotes/origin/renovate/**]
-
-  - name: apps (custom)
-    image: git.sbbh.cloud/infra/ansible-runner:latest
-    commands:
-      - /entry.sh .drone/apps.sh
-    environment:
-      ANSIBLE_VAULT_PASSWORD:
-        from_secret: ANSIBLE_VAULT_PASSWORD
-      DRONE_SSH_KEY:
-        from_secret: DRONE_SSH_KEY
-      DRONE_SSH_PUB_KEY:
-        from_secret: DRONE_SSH_PUB_KEY
-    when:
-      status: [success]
-      event: [custom]
 
   - name: discord notification
     image: appleboy/drone-discord

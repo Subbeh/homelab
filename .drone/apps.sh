@@ -3,7 +3,10 @@
 set -xeuo pipefail
 
 APP_PLAYBOOK=playbooks/app.yml
-APP=${APP:-}
+
+if [[ ${DEBUG:-} ]]; then
+	sleep 600
+fi
 
 run_playbook() {
 	if [[ ${1:-} ]]; then
@@ -15,18 +18,25 @@ run_playbook() {
 main() {
 	pushd ansible
 
-	git config --global --add safe.directory /drone/src
-	echo "${ANSIBLE_VAULT_PASSWORD:?not set}" >$HOME/.ansible_vault
-	if [ ! -r $HOME/.ssh/id_ed25519 ]; then
-		mkdir -p $HOME/.ssh && echo "${DRONE_SSH_KEY:?not set}" >$HOME/.ssh/id_ed25519 && chmod -R 600 $HOME/.ssh
+	if [[ ${CI:-} ]]; then
+		git config --global --add safe.directory /drone/src
+		echo "${ANSIBLE_VAULT_PASSWORD:?not set}" >$HOME/.ansible_vault
+		if [ ! -r $HOME/.ssh/id_ed25519 ]; then
+			mkdir -p $HOME/.ssh && echo "${DRONE_SSH_KEY:?not set}" >$HOME/.ssh/id_ed25519 && chmod -R 600 $HOME/.ssh
+		fi
 	fi
 
-	if [[ $APP ]]; then
+	# custom build
+	if [[ ${APP:-} ]]; then
 		run_playbook $APP
 	else
-		while read app; do
-			run_playbook $app
-		done <<<$(git diff --name-only --diff-filter=ACMR HEAD~1 main | grep -oP '(?<=ansible/)apps/[^/]*.ya?ml' | xargs awk -F: '/^[^ -]/{ print $1 }')
+
+		# MR from Renovate
+		if git log -1 --oneline | grep -q "from renovate/.\+ into main$"; then
+			while read app; do
+				run_playbook $app
+			done <<<$(git diff --name-only --diff-filter=ACMR HEAD~1 main | grep -oP '(?<=ansible/)apps/[^/]*.ya?ml' | xargs awk -F: '/^[^ -]/{ print $1 }')
+		fi
 	fi
 }
 
