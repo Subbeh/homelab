@@ -1,0 +1,17 @@
+---
+webhook:
+  container:
+    image: almir/webhook:2.8.1
+    ports:
+      - "{{ network_svc.webhook.port }}:9000"
+    volumes:
+      - "{{ common_dir }}/webhook:/etc/webhook"
+    command: "-verbose -hooks=/etc/webhook/hooks.yaml -hotreload"
+    env:
+      PORTAINER_TOKEN: "{{ vault_portainer_token }}"
+      PORTAINER_URL: "http://portainer:9000"
+
+  traefik:
+
+  uptime:
+    group: services
