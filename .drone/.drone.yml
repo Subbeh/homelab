@@ -15,6 +15,7 @@ steps:
     image: git.sbbh.cloud/infra/ansible-runner:latest
     privileged: true
     commands:
+      - env
       - .drone/lint.sh
     environment:
       ANSIBLE_VAULT_PASSWORD:
