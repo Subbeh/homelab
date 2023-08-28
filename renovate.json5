@@ -15,18 +15,27 @@
 
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        ".*\\/calibre-web",
-        ".*\\/overseerr",
-        ".*\\/prowlarr"
+      "matchPackageNames": [
+        "lscr.io/linuxserver/calibre-web",
+        "lscr.io/linuxserver/overseerr",
+        "lscr.io/linuxserver/prowlarr"
       ],
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-ls(?<build>\\d+)$"
     },
     {
-      "matchPackagePatterns": [
-        ".*\\/qbittorrent"
+      "matchPackageNames": [
+        "lscr.io/linuxserver/qbittorrent"
       ],
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-r(?<revision>\\d)-ls(?<build>\\d+)$"
-    }
+    },
+
+    {
+      "matchPackageNames": [ "openspeedtest/latest" ],
+      "customChangelogUrl": "https://github.com/openspeedtest/Docker-Image"
+    },
+    {
+      "matchPackageNames": [ "lscr.io/linuxserver/apprise-api" ],
+      "customChangelogUrl": "https://github.com/linuxserver/docker-apprise-api"
+    },
   ],
 }
