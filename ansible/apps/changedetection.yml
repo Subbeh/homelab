@@ -22,11 +22,12 @@ changedetection:
 
   uptime:
     group: services
+    state: paused
 
 changedetection_chrome:
-  name: changedetection-chrome:1.59-chrome-stable
+  name: changedetection-chrome
   container:
-    image: browserless/chrome
+    image: browserless/chrome:1.59-chrome-stable
     restart: false
     state: stopped
     comparisons:
@@ -43,3 +44,7 @@ changedetection_chrome:
       DEFAULT_BLOCK_ADS: "true"
       DEFAULT_STEALTH: "true"
       DEFAULT_IGNORE_HTTPS_ERRORS: "true"
+
+  uptime:
+    group: services
+    state: paused
