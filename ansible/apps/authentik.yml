@@ -2,7 +2,7 @@
 authentik_server:
   name: authentik-server
   container:
-    image: ghcr.io/goauthentik/server:2023.6.1
+    image: ghcr.io/goauthentik/server:2023.8.1
     command: server
     ports:
       - "{{ network_svc.authentik_server.port }}:9000"
@@ -54,7 +54,7 @@ authentik_worker:
   name: authentik-worker
   container:
     container_name: authentik-worker
-    image: ghcr.io/goauthentik/server:2023.6.1
+    image: ghcr.io/goauthentik/server:2023.8.1
     command: worker
     volumes:
       - "{{ common_dir }}/authentik/media:/media"
