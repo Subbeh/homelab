@@ -56,10 +56,10 @@ ports:
         - "127.0.0.1/32"
         - "10.11.0.0/16"
 
-tlsStore:
-  default:
-    defaultCertificate:
-      secretName: k8s-sbbh-cloud-prd-tls
+# tlsStore:
+#   default:
+#     defaultCertificate:
+#       secretName: k8s-sbbh-cloud-prd-tls
 
 ingressRoute:
   dashboard:

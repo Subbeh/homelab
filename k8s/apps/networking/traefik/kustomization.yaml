@@ -12,6 +12,7 @@ helmCharts:
     releaseName: traefik
 
 resources:
+  - tlsstore.yaml
   - middlewares.yaml
   - ingressroute.yaml
   - service-metrics.yaml
