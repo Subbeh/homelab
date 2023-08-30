@@ -44,3 +44,13 @@
         databaseQuery: "{{ _config.databaseQuery | default(omit) }}"
         notification_names: "{{ _config.notification_names | default(omit) }}"
         state: present
+
+    - name: Change monitor state of {{ _monitor_name }}
+      delegate_to: localhost
+      become: false
+      lucasheld.uptime_kuma.monitor:
+        api_url: "{{ _uptime_api_url }}"
+        api_token: "{{ _uptimekuma_api_token }}"
+        name: "{{ _monitor_name }}"
+        state: "{{ _config.state }}"
+      when: _config.state is defined

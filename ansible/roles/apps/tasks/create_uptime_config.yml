@@ -32,4 +32,4 @@
         loop_var: _uptime_item
   vars:
     ansible_python_interpreter: "{{ _python_interpreter }}"
-    ansible_user: "{{ _user }}"
+    ansible_user: "{{ _user | default(common_user) }}"
