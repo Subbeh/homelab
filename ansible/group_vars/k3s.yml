@@ -1,5 +1,4 @@
 ---
-
 pip_install_packages:
   - kubernetes
   - jsonpatch
@@ -72,8 +71,10 @@ k3s_server_manifests_urls:
   - url: https://github.com/rancher/system-upgrade-controller/releases/latest/download/system-upgrade-controller.yaml
     filename: system-upgrade-controller.yaml
   # traefik
-  - url: https://raw.githubusercontent.com/traefik/traefik-helm-chart/master/traefik/crds/traefik.containo.us_ingressroutes.yaml
-    filename: traefik.containo.us_ingressroutes.yaml
+  - url: https://raw.githubusercontent.com/traefik/traefik/master/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
+    filename: kubernetes-crd-definition-v1.yml
+  - url: https://raw.githubusercontent.com/traefik/traefik/master/docs/content/reference/dynamic-configuration/kubernetes-crd-rbac.yml
+    filename: kubernetes-crd-rbac.yml
 
 # (list) A flat list of templates to deploy on the primary control plane
 # /var/lib/rancher/k3s/server/manifests
