@@ -5,9 +5,9 @@ radarr:
     ports:
       - "{{ network_svc.radarr.port }}:7878"
     volumes:
-      - "{{ common_dir }}/radarr/config:/config"
-      - "{{ common_dir }}/radarr/MediaCover:/config/MediaCover"
-      - "{{ common_media_dir }}:/data"
+      - "{{ hostvars[network_svc.radarr.host]['common_dir'] }}/radarr/config:/config"
+      - "{{ hostvars[network_svc.radarr.host]['common_dir'] }}/radarr/MediaCover:/config/MediaCover"
+      - "{{ hostvars[network_svc.radarr.host]['common_media_dir'] }}:/data"
 
   traefik:
     routers:

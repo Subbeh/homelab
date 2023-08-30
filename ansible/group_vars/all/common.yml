@@ -10,7 +10,7 @@ common_timezone: "Australia/Melbourne"
 
 common_language_iso_639: "en"
 common_country_iso_3166: "US"
-common_locale: "{{ common_language_iso_639 }}-{{ common_country_iso_3166 }}"
+common_locale: "{{ common_language_iso_639 }}_{{ common_country_iso_3166 }}"
 
 common_dir: "/opt/app_data"
 common_repo_root: "{{ lookup('lines', 'git rev-parse --show-toplevel') }}"

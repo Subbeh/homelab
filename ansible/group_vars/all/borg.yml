@@ -1,5 +1,5 @@
 ---
-borg_ssh_key: "{{ vault_borg_ssh_key }}"
+borg_ssh_key: "{{ vault_ssh_keys.priv.borg }}"
 borg_passphrase: "{{ vault_borg_passphrase }}"
 borg_hc_ping_url_default: "{{ vault_borg_hc_ping_url_default }}"
 
