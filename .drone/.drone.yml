@@ -34,7 +34,7 @@ steps:
         from_secret: DRONE_SSH_PUB_KEY
     when:
       status: [success]
-      event: [push]
+      event: [push, custom]
 
   - name: discord notification
     image: appleboy/drone-discord
