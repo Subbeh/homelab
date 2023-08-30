@@ -32,5 +32,6 @@ resources:
   - externalsecret.yaml
   - cluster.yaml
   - ingressroute.yaml
+  - deploy-tmate.yaml
   - pvc-cache.yaml
   - cm-docker.yaml
