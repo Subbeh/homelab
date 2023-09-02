@@ -1,7 +1,7 @@
 ---
 portainer:
   container:
-    image: portainer/portainer-ce:2.18.4
+    image: portainer/portainer-ce:2.19.0
     command: "-H unix:///var/run/docker.sock"
     ports:
       - "{{ network_svc.portainer.port }}:9000"
