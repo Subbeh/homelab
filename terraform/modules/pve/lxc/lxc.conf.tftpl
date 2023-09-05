@@ -1,0 +1,12 @@
+arch: amd64
+cores: ${cores}
+features: fuse=${fuse},mount=${mount},nesting=${nesting}
+hostname: ${hostname}
+memory: ${memory}
+net0: name=${network_name},bridge=${bridge},firewall=${firewall},hwaddr=${hwaddr},ip=${ip},ip6=dhcp,tag=${tag},type=veth
+onboot: ${onboot}
+ostype: ${ostype}
+rootfs: ${fs}:vm-${vmid}-disk-0,size=${size}
+startup: order=2
+swap: ${swap}
+${config}

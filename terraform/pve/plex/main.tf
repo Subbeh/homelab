@@ -16,30 +16,12 @@ module "lxc_container" {
   nesting = true
   mount = "nfs"
 
-  mountpoint = [
-    {
-      key = "0"
-      slot = 0
-      storage = "/dev/fb0"
-      volume  = "/dev/fb0"
-      mp      = "/dev/fb0"
-      size    = "32G"
-    },
-    {
-      key = "1"
-      slot = 1
-      storage = "/dev/dri"
-      volume  = "/dev/dri"
-      mp      = "/dev/dri"
-      size    = "32G"
-    },
-    {
-      key = "3"
-      slot = 3
-      storage = "/dev/dri/renderD128"
-      volume  = "/dev/dri/renderD128"
-      mp      = "/dev/dri/renderD128"
-      size    = "32G"
-    }
-  ]
+  extra_config = <<-EOT
+    lxc.cgroup2.devices.allow: c 226:0 rwm
+    lxc.cgroup2.devices.allow: c 226:128 rwm
+    lxc.cgroup2.devices.allow: c 29:0 rwm
+    lxc.mount.entry: /dev/fb0 dev/fb0 none bind,optional,create=file
+    lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir
+    lxc.mount.entry: /dev/dri/renderD128 dev/renderD128 none bind,optional,create=file
+    EOT
 }

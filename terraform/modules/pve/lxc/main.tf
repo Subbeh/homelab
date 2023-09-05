@@ -19,6 +19,51 @@ data "http" "ssh_keys" {
   url = "https://raw.githubusercontent.com/Subbeh/dotfiles/master/keys"
 }
 
+locals {
+  hwaddr = coalesce(var.hwaddr, "e6:2b:f2:4f:${replace(format("%04x", 1900),"/(.{2})(.{2})/","$${1}:$${2}")}")
+  network_name = "eth0"
+  bridge = "vmbr0"
+  tag = 20
+}
+
+resource "terraform_data" "pve_config" {
+  connection {
+    type     = "ssh"
+    user     = "root"
+    password = module.env.pm_password
+    host     = var.target_node
+  }
+
+  provisioner "file" {
+    content     = templatefile("${path.module}/lxc.conf.tftpl", {
+      cores     = var.cores
+      fuse      = var.fuse ? 1 : 0
+      mount     = var.mount
+      nesting   = var.nesting ? 1 : 0
+      hostname  = var.hostname
+      memory    = var.memory
+      network_name = local.network_name
+      bridge    = local.bridge
+      firewall  = var.firewall ? 1 : 0
+      hwaddr    = local.hwaddr
+      ip        = var.ip
+      tag       = local.tag
+      onboot    = var.onboot ? 1 : 0
+      ostype    = var.ostype
+      fs        = var.fs
+      vmid      = var.vmid
+      size      = var.size
+      swap      = var.swap
+      config    = var.extra_config
+    })
+    destination = "/etc/pve/lxc/${var.vmid}.conf"
+  }
+
+  depends_on = [
+    proxmox_lxc.this
+  ]
+}
+
 resource "proxmox_lxc" "this" {
   target_node  = var.target_node
   hostname     = var.hostname
@@ -48,24 +93,12 @@ resource "proxmox_lxc" "this" {
   }
 
   network {
-    name     = "eth0"
-    bridge   = "vmbr0"
+    name     = local.network_name
+    bridge   = local.bridge
+    tag      = local.tag
     ip       = var.ip
     gw       = var.gw
     hwaddr   = var.hwaddr
     firewall = var.firewall
-  }
-
-  dynamic "mountpoint" {
-    for_each = var.mountpoint
-    iterator = mounts
-    content {
-      key     = mounts.value.key
-      slot    = mounts.value.slot
-      storage = mounts.value.storage
-      volume  = mounts.value.volume
-      mp      = mounts.value.mp
-      size    = mounts.value.size
-    }
   }
 }

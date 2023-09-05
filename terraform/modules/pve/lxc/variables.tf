@@ -27,7 +27,7 @@ variable "ostemplate" {
 variable "password" {
   description = "The root password of the LXC container"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "unprivileged" {
@@ -45,7 +45,7 @@ variable "ostype" {
 variable "ssh_keys" {
   description = "The public SSH key(s) to add to the LXC container"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "nameserver" {
@@ -106,7 +106,7 @@ variable "gw" {
 variable "hwaddr" {
   description = "The MAC address of the LXC container"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "firewall" {
@@ -130,7 +130,7 @@ variable "nesting" {
 variable "mount" {
   description = "Enable mount types for LXC container"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "mountpoint" {
@@ -143,5 +143,11 @@ variable "mountpoint" {
     mp        = string
     size      = string
   }))
+  default     = null
+}
+
+variable "extra_config" {
+  description = "Extra config options to append to lxc config file"
+  type        = string
   default     = null
 }
