@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -xeuo pipefail
+
+. /env
+
+QB_USER="{{ common_user }}"
+QB_PASS="{{ vault_qbittorrent_pass }}"
+QB_URL="http://localhost:8080"
+QB_PREFS_URL="${QB_URL}/api/v2/app/setPreferences"
+QB_LOGIN_URL="${QB_URL}/api/v2/auth/login"
+GT_URL="http://localhost:8000/v1/openvpn/portforwarded"
+MAM_URL="https://t.myanonamouse.net/json/dynamicSeedbox.php"
+QB_COOKIE="/tmp/qb.cookies"
+MAM_COOKIE="/tmp/mam.cookies"
+
+while true; do
+	PORT="$(curl -Ls $GT_URL | awk -F'[{}:]' '/port/ { print $3 }')"
+	IP="$(curl ifconfig.me)"
+
+	echo DEBUG: "IP     - $IP:$PORT"
+	echo DEBUG: "MAM_ID - $MAM_ID"
+
+	# set VPN port
+	if [[ $PORT -gt 0 ]]; then
+		curl -s -b "$QB_COOKIE" -c "$QB_COOKIE" --header "Referer: $QB_URL" --data "username=${QB_USER}&password=${QB_PASS}" "$QB_LOGIN_URL"
+		curl -s -b "$QB_COOKIE" -c "$QB_COOKIE" "$QB_PREFS_URL" -d "json={\"listen_port\": $PORT}"
+	else
+		echo ERROR: port $PORT not valid. Restarting gluetun container..
+		curl -s --unix-socket /var/run/docker.sock -X POST http://dummy/containers/gluetun/restart
+		curl -s --unix-socket /var/run/docker.sock -X POST http://dummy/containers/qbittorrent/restart
+	fi
+
+	# set MAM cookie
+	curl -s -b "mam_id=${MAM_ID:?not set}" -c "$MAM_COOKIE" "$MAM_URL"
+
+	sleep 4000
+done
