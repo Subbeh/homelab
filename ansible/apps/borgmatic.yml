@@ -8,14 +8,14 @@ borgmatic_nas:
     devices:
       - /dev/fuse:/dev/fuse
     volumes:
-      - "{{ common_backup_dir | default('') }}/borg:/mnt/repo"
-      - "{{ common_dir }}:/mnt/app_data:ro"
-      - "{{ common_media_dir }}:/mnt/media:ro"
-      - "{{ common_dir }}/borgmatic/etc:/etc/borgmatic.d"
-      - "{{ common_dir }}/borgmatic/state:/root/.borgmatic"
-      - "{{ common_dir }}/borgmatic/config:/root/.config/borg"
-      - "{{ common_dir }}/borgmatic/ssh:/root/.ssh"
-      - "{{ common_dir }}/borgmatic/cache:/root/.cache/borg"
+      - "{{ hostvars[network_svc.borgmatic_nas.host]['common_backup_dir'] | default('') }}/borg:/mnt/repo"
+      - "{{ hostvars[network_svc.borgmatic_nas.host]['common_media_dir'] }}:/mnt/media:ro"
+      - "{{ hostvars[network_svc.borgmatic_nas.host]['common_dir'] }}:/mnt/app_data:ro"
+      - "{{ hostvars[network_svc.borgmatic_nas.host]['common_dir'] }}/borgmatic/etc:/etc/borgmatic.d"
+      - "{{ hostvars[network_svc.borgmatic_nas.host]['common_dir'] }}/borgmatic/state:/root/.borgmatic"
+      - "{{ hostvars[network_svc.borgmatic_nas.host]['common_dir'] }}/borgmatic/config:/root/.config/borg"
+      - "{{ hostvars[network_svc.borgmatic_nas.host]['common_dir'] }}/borgmatic/ssh:/root/.ssh"
+      - "{{ hostvars[network_svc.borgmatic_nas.host]['common_dir'] }}/borgmatic/cache:/root/.cache/borg"
     env:
       BORG_PASSPHRASE: "{{ borg_encryption_passphrase }}"
       BORG_RSH: "ssh -i ~/.ssh/borg"

@@ -3,7 +3,7 @@ version: "3"
 
 vars:
   KUBERNETES_DIR: "{{.ROOT_DIR}}/k8s"
-  TERRAFORM_DIR: "{{.ROOT_DIR}}/tf"
+  TERRAFORM_DIR: "{{.ROOT_DIR}}/terraform"
   ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
   ANSIBLE_PLAYBOOK_DIR: "playbooks"
 
@@ -49,6 +49,7 @@ tasks:
         python-pre-commit
         sops
         terraform
+        terragrunt
         tflint
         yamllint
         argocd
