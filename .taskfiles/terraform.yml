@@ -1,11 +1,7 @@
 ---
 version: "3"
 
-env:
-  TERRAFORM_DIR: "{{.ROOT_DIR}}/tf"
-
 tasks:
-
   init:
     desc: terraform init
     dir: "{{.USER_WORKING_DIR}}"
