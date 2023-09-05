@@ -33,8 +33,14 @@ tasks:
       - task: default
         vars: { TAGS: "uptime" }
 
+  files:
+    desc: Copy app files over
+    cmds:
+      - task: default
+        vars: { TAGS: "files" }
+
   config:
     desc: Create app configs
     cmds:
       - task: default
-        vars: { TAGS: "traefik,uptime" }
+        vars: { TAGS: "traefik,uptime,files" }

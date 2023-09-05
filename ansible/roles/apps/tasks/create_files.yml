@@ -1,0 +1,60 @@
+---
+- name: Set host facts
+  ansible.builtin.set_fact:
+    _remote_host: "{{ (_file.host | default(network_svc[_app].host)) | mandatory }}"
+
+- block:
+    - block:
+        - name: Set file facts
+          ansible.builtin.set_fact:
+            _src: "{{ common_apps_dir + '/files/' + _file.src }}"
+            _ext: "{{ _file.src | splitext }}"
+
+        - name: Get file stats
+          delegate_to: localhost
+          ansible.builtin.stat:
+            path: "{{ _src }}"
+          register: _stat
+
+        - ansible.builtin.fail:
+            msg: "File {{ _src }} does not exist"
+          when: _stat.stat.exists is false
+
+        - name: Copy template {{ _file.src }} over
+          ansible.builtin.template:
+            src: "{{ common_apps_dir }}/files/{{ _file.src }}"
+            dest: "{{ _file.dest }}"
+            owner: "{{ _file.owner | default(omit) }}"
+            group: "{{ _file.group | default(omit) }}"
+            mode: "{{ _file.mode | default(omit) }}"
+            force: "{{ _file.force | default(true) }}"
+          when: _ext[1] == '.j2'
+      when: _file.src is defined
+
+    - name: Copy file {{ _file.src }} over
+      ansible.builtin.copy:
+        src: "{{ _src | default(omit) }}"
+        content: "{{ _file.content | default(omit) }}"
+        dest: "{{ _file.dest }}"
+        owner: "{{ _file.owner | default(omit) }}"
+        group: "{{ _file.group | default(omit) }}"
+        mode: "{{ _file.mode | default(omit) }}"
+        force: "{{ _file.force | default(true) }}"
+      when:
+        - (_file.src is defined) or (_file.content is defined)
+        - _ext[1] != '.j2'
+
+    - block:
+        - name: Create empty file/directory
+          ansible.builtin.file:
+            path: "{{ _file.dest }}"
+            state: "{{ _file.state | default('touch') }}"
+            mode: "{{ _file.mode | default(omit) }}"
+            owner: "{{ _file.owner | default(omit) }}"
+            group: "{{ _file.group | default(omit) }}"
+            force: "{{ _file.force | default(false) }}"
+      when:
+        - _file.src is not defined
+        - _file.content is not defined
+  no_log: "{{ ci | default(false) }}"
+  delegate_to: "{{ _remote_host }}"

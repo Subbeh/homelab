@@ -15,6 +15,15 @@
   ansible.builtin.set_fact:
     _app_name: "{{ _app_config.name | default(_app) }}"
 
+- name: Include create_files task
+  tags: files
+  ansible.builtin.include_tasks: create_files.yml
+  loop: "{{ _app_config.files }}"
+  vars:
+    _file: "{{ item }}"
+  when:
+    - _app_config.files is defined
+
 - name: Include create_db task
   tags: db
   ansible.builtin.include_tasks: create_db.yml
