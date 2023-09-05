@@ -1,0 +1,10 @@
+#!/bin/bash
+
+MODULE=${1:?not set}
+
+ansible-doc $MODULE | awk '
+  match($0, /^> ([^ ]*)/, a) {
+  split(tolower(a[1]), m, ".")
+    print "https://docs.ansible.com/ansible/latest/collections", m[1], m[2], m[3] "_module.html"
+  }
+' OFS="/" | xargs xdg-open
