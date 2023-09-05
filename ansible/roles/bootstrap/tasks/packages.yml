@@ -1,8 +1,7 @@
 ---
-
 - name: Uninstall packages
   ansible.builtin.apt:
-    pkg: "{{ packages_uninstall }}"
+    pkg: "{{ bootstrap_pkg_rm }}"
     state: absent
     autoremove: true
 
@@ -12,12 +11,6 @@
     force_apt_get: yes
   changed_when: false
 
-# https://bugs.launchpad.net/ubuntu/+source/grub2-signed/+bug/2006050
-- name: Hold grub-efi-amd64-signed
-  ansible.builtin.dpkg_selections:
-    name: grub-efi-amd64-signed
-    selection: hold
-
 - name: Update packages
   ansible.builtin.apt:
     upgrade: dist
@@ -25,7 +18,7 @@
 
 - name: Install packages
   ansible.builtin.apt:
-    name: "{{ lookup('flattened', packages_global, packages_custom) }}"
+    name: "{{ lookup('flattened', bootstrap_pkg_extra, bootstrap_pkg) }}"
     state: present
     install_recommends: false
 
@@ -36,42 +29,68 @@
 - name: Install Python pip packages
   ansible.builtin.import_role:
     name: geerlingguy.pip
-
-- name: Install Intel microcode if needed
-  ansible.builtin.apt:
-    pkg: intel-microcode
-    state: present
-    default_release: '{{ ansible_distribution_release }}'
-  when: >
-    ansible_processor[0].find('Intel') != -1 and
-    ansible_architecture == 'x86_64'
-
-- name: Install AMD microcode if needed
-  ansible.builtin.apt:
-    pkg: amd64-microcode
-    state: present
-    default_release: '{{ ansible_distribution_release }}'
-  when: >
-    ansible_processor[0].find('AMD') != -1 and
-    ansible_architecture == 'x86_64'
-
-- name: Install unattended-upgrades
-  ansible.builtin.apt:
-    pkg: unattended-upgrades
-    state: present
-
-- name: Configure unattended-upgrades
-  ansible.builtin.lineinfile:
-    dest: /etc/apt/apt.conf.d/50unattended-upgrades
-    state: present
-    regex: "^{{ item.key }}"
-    line: "{{ item.key }} {{ item.value }};"
-    validate: "echo %s && unattended-upgrades --dry-run"
-  loop: "{{ items | dict2items }}"
   vars:
-    items:
-      "Unattended-Upgrade::MinimalSteps": "true"
-      "Unattended-Upgrade::Remove-Unused-Kernel-Packages": "true"
-      "Unattended-Upgrade::Remove-New-Unused-Dependencies": "true"
-      "Unattended-Upgrade::Remove-Unused-Dependencies": "true"
-  changed_when: false
+    pip_install_packages: "{{ lookup('flattened', bootstrap_pkg_pip_extra, bootstrap_pkg_pip) }}"
+
+- block:
+    - name: Install Intel microcode if needed
+      ansible.builtin.apt:
+        pkg: intel-microcode
+        state: present
+        default_release: "{{ ansible_distribution_release }}"
+      when: >
+        ansible_processor[0].find('Intel') != -1 and
+        ansible_architecture == 'x86_64'
+
+    - name: Install AMD microcode if needed
+      ansible.builtin.apt:
+        pkg: amd64-microcode
+        state: present
+        default_release: "{{ ansible_distribution_release }}"
+      when: >
+        ansible_processor[0].find('AMD') != -1 and
+        ansible_architecture == 'x86_64'
+  when: bootstrap_pkg_microcode is true
+
+- block:
+    - name: Enable unattended-upgrades
+      ansible.builtin.apt:
+        pkg: unattended-upgrades
+        state: present
+
+    - name: Configure unattended-upgrades
+      ansible.builtin.lineinfile:
+        dest: /etc/apt/apt.conf.d/50unattended-upgrades
+        state: present
+        regex: "^{{ item.key }}"
+        line: "{{ item.key }} {{ item.value }};"
+        validate: "echo %s && unattended-upgrades --dry-run"
+      loop: "{{ items | dict2items }}"
+      vars:
+        items:
+          "Unattended-Upgrade::MinimalSteps": "true"
+          "Unattended-Upgrade::Remove-Unused-Kernel-Packages": "true"
+          "Unattended-Upgrade::Remove-New-Unused-Dependencies": "true"
+          "Unattended-Upgrade::Remove-Unused-Dependencies": "true"
+      changed_when: false
+  when: bootstrap_pkg_unattended_upgrades is true
+
+- name: Clean up system
+  block:
+    - name: Remove useless packages from the cache
+      ansible.builtin.apt:
+        autoclean: true
+
+    - name: Remove dependencies that are no longer required
+      ansible.builtin.apt:
+        autoremove: true
+
+    - name: Run the equivalent of "apt-get clean" as a separate step
+      ansible.builtin.apt:
+        clean: true
+
+- name: Check if the reboot-required file exists
+  tags: always
+  ansible.builtin.stat: path=/var/run/reboot-required get_md5=no
+  register: reboot_required_file
+  notify: Check reboot

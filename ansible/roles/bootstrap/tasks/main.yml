@@ -1,38 +1,35 @@
 ---
+- name: Run prerequisites task
+  ansible.builtin.include_tasks: prereq.yml
 
-- ansible.builtin.import_tasks: prereq.yml
-  tags: prereq
+- name: Run package task
+  ansible.builtin.include_tasks: packages.yml
+  when: bootstrap.packages is true
 
-- ansible.builtin.import_tasks: user.yml
-  tags: user
+- name: Run system task
+  ansible.builtin.include_tasks: system.yml
+  when: bootstrap.system is true
 
-- ansible.builtin.import_tasks: system.yml
-  tags: system
-  when: "'vps' not in group_names"
+- name: Run user task
+  ansible.builtin.include_tasks: user.yml
+  when: bootstrap.user is true
 
-- ansible.builtin.import_tasks: network.yml
-  tags: network
-  when: "'vps' not in group_names"
+- name: Run network task
+  ansible.builtin.include_tasks: network.yml
+  when: bootstrap.network is true
 
-- ansible.builtin.import_tasks: packages.yml
-  tags: packages
+- name: Run ntp task
+  ansible.builtin.include_tasks: ntp.yml
+  when: bootstrap.ntp is true
 
-- ansible.builtin.import_tasks: dotfiles.yml
-  tags: dotfiles
+- name: Run filesystem task
+  ansible.builtin.include_tasks: filesystem.yml
+  when: bootstrap.filesystem is true
 
-- ansible.builtin.import_tasks: ssh.yml
-  tags: ssh
+- name: Run profile task
+  ansible.builtin.include_tasks: profile.yml
+  when: bootstrap.profile is true
 
-- ansible.builtin.import_role:
-    name: geerlingguy.security
-  tags: security
-
-- name: Flush handlers, reset connection and reset SSH port
-  block:
-    - ansible.builtin.set_fact:
-        ansible_user: "{{ common_user }}"
-    - ansible.builtin.meta: flush_handlers
-    - ansible.builtin.meta: reset_connection
-    - ansible.builtin.include_tasks: ../tasks/check_port.yml
-      vars:
-        ansible_become: false
+- name: Run locales task
+  ansible.builtin.include_tasks: locale.yml
+  when: bootstrap.locale is true

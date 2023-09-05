@@ -1,0 +1,18 @@
+---
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ bootstrap_user.name }}"
+    group: "{{ bootstrap_user.name }}"
+    mode: "0771"
+  loop: "{{ bootstrap_fs_directories }}"
+
+- name: Mount an NFS shares
+  ansible.posix.mount:
+    src: "{{ item.src }}"
+    path: "{{ item.dest }}"
+    opts: rw,sync,hard
+    state: mounted
+    fstype: nfs
+  loop: "{{ bootstrap_fs_mounts }}"

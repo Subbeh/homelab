@@ -1,15 +1,10 @@
 ---
+- name: Check if host is running Debian
+  ansible.builtin.fail:
+  when:
+    - (ansible_os_family is not defined) or (ansible_os_family != "Debian")
 
-- name: Import NTP role
-  ansible.builtin.import_role:
-    name: geerlingguy.ntp
-  vars:
-    ntp_manage_config: true
-    ntp_timezone: "{{ common_timezone }}"
-    ntp_servers:
-      - "{{ network_svc.gw.ip }} iburst"
-
-- name: Set defaults
-  community.general.alternatives:
-    name: editor
-    path: /usr/bin/vim
+- name: Sync time
+  ansible.builtin.command: hwclock --hctosys
+  failed_when: false
+  changed_when: false

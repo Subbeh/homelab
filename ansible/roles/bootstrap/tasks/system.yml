@@ -1,33 +1,65 @@
 ---
+- block:
+    - name: Disable swap at runtime
+      ansible.builtin.command: swapoff -a
+      when:
+        - ansible_swaptotal_mb > 0
 
-- name: Disable swap at runtime
-  ansible.builtin.command: swapoff -a
+    - name: Disable swap at boot
+      ansible.posix.mount:
+        name: "{{ item }}"
+        fstype: swap
+        state: absent
+      loop: ["none", "swap"]
   when:
-    - ansible_swaptotal_mb > 0
+    - bootstrap_sys_disable_swap is true
 
-- name: Disable swap at runtime
-  when: ansible_swaptotal_mb > 0
-  ansible.builtin.command: swapoff -a
+- block:
+    - name: Set Grub config parameters
+      ansible.builtin.replace:
+        path: /etc/default/grub
+        regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ item.key | regex_escape }}=).)*)(?:[" ]{{ item.key | regex_escape }}=\S+)?(.*")$'
+        replace: '\1 {{ item.key }}={{ item.value }}\2'
+      with_dict: "{{ bootstrap_sys_grub_config }}"
+      register: _grub_status
 
-- name: Disable swap at boot
-  ansible.posix.mount:
+    - name: Reconfigure grub and initramfs
+      when: _grub_status.changed
+      ansible.builtin.command: update-grub
+  when: bootstrap_sys_grub_config is defined
+
+- name: Stop and disable systemd service
+  ansible.builtin.service:
     name: "{{ item }}"
-    fstype: swap
-    state: absent
-  loop: ["none", "swap"]
+    enabled: false
+    state: stopped
+    masked: true
+  register: _systemd_result
+  failed_when: "_systemd_result is failed and 'Could not find the requested service' not in _systemd_result.msg"
+  loop: "{{ bootstrap_disable_svc }}"
+  when: bootstrap_disable_svc is defined
 
-- name: Disable mitigations
-  ansible.builtin.replace:
-    path: /etc/default/grub
-    regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ item.key | regex_escape }}=).)*)(?:[" ]{{ item.key | regex_escape }}=\S+)?(.*")$'
-    replace: '\1 {{ item.key }}={{ item.value }}\2'
-  with_dict: "{{ grub_config }}"
-  vars:
-    grub_config:
-      apparmor: "0"
-      mitigations: "off"
-  register: _grub_status
+- name: Check if cloud-init config exists
+  ansible.builtin.stat:
+    path: /etc/cloud/cloud.cfg
+  register: _stat_result
 
-- name: Reconfigure grub and initramfs
-  when: _grub_status.changed
-  ansible.builtin.command: update-grub
+- block:
+    - name: Disable cloud-init
+      ansible.builtin.file:
+        dest: /etc/cloud/cloud-init.disabled
+        state: touch
+        owner: root
+        mode: "0775"
+        modification_time: preserve
+        access_time: preserve
+      when: bootstrap_sys_disable_cloudinit is true
+
+    - name: Set cloud-init options
+      ansible.builtin.lineinfile:
+        path: /etc/cloud/cloud.cfg
+        regexp: "^{{ item.key }}:"
+        line: "{{ item.key }}: {{ item.value }}"
+      with_dict: "{{ bootstrap_sys_cloudinit_config }}"
+      when: bootstrap_sys_cloudinit_config is defined
+  when: _stat_result.stat.exists

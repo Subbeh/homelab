@@ -1,36 +1,23 @@
 ---
-
 - name: Ensure user is created
   ansible.builtin.user:
-    name: "{{ common_user }}"
+    name: "{{ bootstrap_user.name }}"
     createhome: true
-    password: "{{ common_pass | string | password_hash('sha512', 'mysecretsalt') }}"
+    password: "{{ bootstrap_user.password | string | password_hash('sha512', 'mysecretsalt') }}"
     shell: /bin/bash
     state: present
 
 - name: Add user to sudoers
   ansible.builtin.copy:
-    content: "{{ ansible_user }} ALL=(ALL:ALL) NOPASSWD:ALL"
-    dest: "/etc/sudoers.d/{{ common_user }}_nopasswd"
+    content: "{{ bootstrap_user.name }} ALL=(ALL:ALL) NOPASSWD:ALL"
+    dest: "/etc/sudoers.d/{{ bootstrap_user.name }}_nopasswd"
     mode: 0440
 
 - name: Silence the login prompt
   ansible.builtin.file:
-    dest: "/home/{{ common_user }}/.hushlogin"
+    dest: "/home/{{ bootstrap_user.name }}/.hushlogin"
     state: touch
-    owner: "{{ common_user }}"
+    owner: "{{ bootstrap_user.name }}"
     mode: 0775
     modification_time: preserve
     access_time: preserve
-
-- name: Create common directory
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ common_user }}"
-    group: "{{ common_group }}"
-    mode: "0771"
-  loop:
-    - "{{ common_dir }}"
-    - "{{ common_data_dir }}"
-

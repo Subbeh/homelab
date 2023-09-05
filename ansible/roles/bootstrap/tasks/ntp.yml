@@ -1,0 +1,9 @@
+---
+- name: Import NTP role
+  ansible.builtin.import_role:
+    name: geerlingguy.ntp
+  vars:
+    ntp_manage_config: true
+    ntp_timezone: "{{ bootstrap_ntp_timezone }}"
+    ntp_servers:
+      - "{{ bootstrap_ntp_server }} iburst"

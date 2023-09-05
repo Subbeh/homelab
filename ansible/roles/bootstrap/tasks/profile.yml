@@ -1,0 +1,15 @@
+---
+- name: Copy profile config files over
+  ansible.builtin.copy:
+    src: "{{ item.file }}"
+    dest: "/home/{{ bootstrap_user.name }}/{{ item.dest }}"
+    mode: 0640
+    owner: "{{ bootstrap_user.name }}"
+    group: "{{ bootstrap_user.name }}"
+  loop: "{{ bootstrap_profile_config }}"
+
+- name: Set app defaults
+  community.general.alternatives:
+    name: "{{ item.key }}"
+    path: "{{ item.value }}"
+  with_dict: "{{ bootstrap_profile_defaults }}"

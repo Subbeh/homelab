@@ -1,0 +1,60 @@
+---
+# bootstrap_tasks:
+#   update: true
+#   set_ntp: true
+#   set_hostname: true
+#   set_hosts_file: true
+#   set_dns: true
+#   set_ssh: true
+#   disable_swap: false
+#   disable_cloudinit: true
+#   create_user: true
+#   create_directories: true
+
+# bootstrap:
+#   locales:
+#     - "{{ common_locale }}"
+#   user:
+#     name: "{{ common_user }}"
+#     password: "{{ common_password }}"
+#     groups: "{{ common_user }}"
+#   timezone: "{{ common_timezone }}"
+#   ntp_server: "{{ network_svc.gw.ip }}"
+#   defaults:
+#     editor: /usr/bin/vim
+#   disable_cloudinit: true
+#   hostname: "{{ inventory_hostname_short }}.{{ network_domain.tld_local }}"
+#   dns_server: "{{ network_svc.dns.ip }}"
+#   dns_domain: "{{ network_domain.tld_local }}"
+#   grub_config:
+#     - apparmor: "0"
+#     - mitigations: off
+#   cloudinit_config:
+#     - preserve_hostname: true
+#   disable_systemd:
+#     - systemd-networkd-wait-online
+
+#   packages:
+#     present: "{{ lookup('flattened', packages_global, packages_custom) }}"
+#     remove: "{{ packages_uninstall }}"
+#     pip: "{{ packages_pip }}"
+#     microcode: true
+#     unattended_upgrades: true
+
+#   profile_files:
+#     - file: bashrc
+#       dest: ".bashrc"
+#     - file: vimrc
+#       dest: ".vimrc"
+
+#   ssh:
+#     authorizedkeys: "https://raw.githubusercontent.com/Subbeh/dotfiles/master/keys"
+#     config:
+#       PermitRootLogin: "no"
+#       PasswordAuthentication: "no"
+
+#   directories:
+#     - "{{ common_dir }}"
+#     - "{{ common_data_dir }}"
+
+#   mounts:

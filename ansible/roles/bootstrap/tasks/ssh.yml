@@ -1,10 +1,10 @@
 ---
-
-- name: Set authorized keys from GitHub
+- name: Set authorized keys
   ansible.posix.authorized_key:
-    user: "{{ common_user }}"
+    user: "{{ bootstrap_user.name }}"
+    key: "{{ item }}"
     state: present
-    key: https://raw.githubusercontent.com/Subbeh/dotfiles/master/keys
+  loop: "{{ bootstrap_ssh_authorizedkeys }}"
 
 - name: Generate root OpenSSH keypair
   community.crypto.openssh_keypair:
@@ -20,14 +20,24 @@
 
 - name: Generate user OpenSSH keypair
   community.crypto.openssh_keypair:
-    path: "/home/{{ common_user }}/.ssh/id_ed25519"
+    path: "/home/{{ bootstrap.user.name }}/.ssh/id_ed25519"
     type: ed25519
-    owner: "{{ common_user }}"
-    group: "{{ common_user }}"
+    owner: "{{ bootstrap.user.name }}"
+    group: "{{ bootstrap.user.name }}"
   register: _setup_user_ssh_key
 
 - name: Allow user self-SSH
   ansible.posix.authorized_key:
-    user: "{{ common_user }}"
+    user: "{{ bootstrap.user.name }}"
     state: present
     key: "{{ _setup_user_ssh_key.public_key }}"
+
+- name: Configure sshd
+  ansible.builtin.lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regex: "^(#)?{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+    state: present
+  with_dict: "{{ bootstrap.ssh.config }}"
+  notify:
+    - restart sshd
