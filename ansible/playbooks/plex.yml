@@ -1,54 +1,73 @@
 ---
-
-- hosts: plex
+- hosts: test
   gather_facts: true
   become: true
 
   vars:
-    borgbase_repo: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          36666565646663323938623431346138613935313630313834303562653037326438306530326164
-          3833383832623135623531303139366262616265393734610a653165343264656131623631616232
-          39643963353830666631396631356663356261363937316632343630376632363835623166643132
-          3961663536323337300a646165383162353736333639373332646530346362613134393136323465
-          30336332343338356234646261353635623033613637306266653832613361303832396133366633
-          62666138316464383161643930663237376634323231316665616666363864393931386562613435
-          336633303237623831383532386631326434
-    borg_repository:
-      - path: "{{ borg_server }}/plex"
-        label: local
-      - path: "{{ borgbase_repo }}"
-        label: borgbase
-    borg_source_directories:
-      - /var/lib/plexmediaserver/Library/Application Support/Plex Media Server
-    borg_exclude_patterns:
-      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache'
-      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Codecs'
-      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Crash Reports'
-      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Diagnostics'
-      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Drivers'
-      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Logs'
-      - '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Updates'
+    bootstrap:
+      packages: true
+      # user: true
+      # system: true
+      # network: true
+      # ntp: true
+      # profile: true
+      # locale: true
+      filesystem: true
 
-    borg_hc_ping_url: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          32303730313662646530613936623239643235663761346535323862343661306331383339626232
-          3861643037353465623230373338343639376234373336350a623563336661613438303964663264
-          65643962363134363061323261386362326537613635393233306663396364323438343836393038
-          3036323731366563320a313566336233386432313562653534643738323031643735323237613065
-          34366434363962353538303232646334303862353531356338363639656665323561356638666437
-          62303733646438323361386139396136363666366236663162663263333831376464636630323430
-          336437626233376435356365343235653837
-    borgmatic_timer_hour: 02
-    borgmatic_timer_minute: 30
+    bootstrap_user:
+      name: "{{ common_user }}"
+      password: "{{ common_pass }}"
 
-  handlers:
-    - name: Import common handlers
-      ansible.builtin.import_tasks: ../tasks/handlers.yml
+    bootstrap_pkg_rm: []
+    bootstrap_pkg: []
+    bootstrap_pkg_extra:
+      - nfs-common
+      - sudo
+      - vim
+    bootstrap_pkg_pip: []
+    bootstrap_pkg_pip_extra: []
+    bootstrap_pkg_microcode: true
+    bootstrap_pkg_unattended_upgrades: true
+
+    bootstrap_sys_disable_swap: true
+    bootstrap_sys_grub_config: []
+    bootstrap_sys_disable_svc: []
+    bootstrap_sys_disable_cloudinit: false
+    bootstrap_sys_cloudinit_options: []
+
+    bootstrap_net_hostname: "{{ inventory_hostname_short }}.{{ network_domain.tld_local }}"
+    bootstrap_net_set_hosts_file: true
+    bootstrap_net_set_dns: true
+    bootstrap_net_dns_server: "{{ network_svc.dns.ip }}"
+    bootstrap_net_dns_domain: "{{ network_domain.tld_local }}"
+
+    bootstrap_ssh_authorizedkeys:
+      - "{{ vault_ssh_keys.pub.master }}"
+      - "{{ vault_ssh_keys.pub.drone }}"
+
+    bootstrap_ntp_timezone: "{{ common_timezone }}"
+    bootstrap_ntp_server: "{{ network_svc.gw.ip }}"
+
+    bootstrap_profile_config:
+      - file: bashrc
+        dest: ".bashrc"
+      - file: vimrc
+        dest: ".vimrc"
+
+    bootstrap_profile_defaults:
+      - editor: /usr/bin/vim
+    bootstrap_locales:
+      - "{{ common_locale }}"
+
+    bootstrap_fs_directories:
+      - "{{ common_dir }}"
+      - "{{ common_data_dir }}"
+    bootstrap_fs_mounts:
+      - src: "nas:/volume1/media"
+        dest: "{{ common_data_dir }}"
 
   tasks:
-    - name: Import Borg backups role
-      tags: borg
+    - name: Import bootstrap role
+      tags: bootstrap
       ansible.builtin.import_role:
-        name: borg
-
+        name: bootstrap
