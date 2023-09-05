@@ -1,0 +1,9 @@
+---
+metamanager:
+  container:
+    image: meisnate12/plex-meta-manager:v1.19.0
+    volumes:
+      - "{{ common_dir }}/metamanager/config:/config"
+
+  uptime:
+    group: services

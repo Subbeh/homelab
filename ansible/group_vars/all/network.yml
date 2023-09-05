@@ -132,6 +132,8 @@ network_svc:
   linx:
     host: services
     port: "9024"
+  metamanager:
+    host: plex
   minio:
     host: services
     port: "9006"
