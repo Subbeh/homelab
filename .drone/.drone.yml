@@ -48,6 +48,8 @@ steps:
         {{#success build.status}}✅{{else}}⚠️{{/success}}
         repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
                commit: `{{commit.message}}`
+    when:
+      status: [failure]
 ---
 kind: secret
 name: GITHUB_USER
