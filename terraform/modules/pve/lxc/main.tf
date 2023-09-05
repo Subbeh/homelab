@@ -16,11 +16,11 @@ module "env" {
 }
 
 data "http" "ssh_keys" {
-  url = "https://raw.githubusercontent.com/Subbeh/dotfiles/master/keys"
+  url = module.env.ssh_keys_url
 }
 
 locals {
-  hwaddr = coalesce(var.hwaddr, "e6:2b:f2:4f:${replace(format("%04x", 1900),"/(.{2})(.{2})/","$${1}:$${2}")}")
+  hwaddr = coalesce(var.hwaddr, "e6:2b:f2:4f:${replace(format("%04x", var.vmid),"/(.{2})(.{2})/","$${1}:$${2}")}")
   network_name = "eth0"
   bridge = "vmbr0"
   tag = 20

@@ -18,6 +18,7 @@ data "sops_file" "env" {
 data "doppler_secrets" "this" {}
 
 locals {
+  env = yamldecode(file("${path.module}/../../env.yaml"))
   pm_vars = nonsensitive(jsondecode(data.doppler_secrets.this.map.PVE_SECRETS))
   doppler_token = data.sops_file.env.data["DOPPLER_TOKEN"]
 }

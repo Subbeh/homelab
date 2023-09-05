@@ -1,3 +1,7 @@
+output "ssh_keys_url" {
+  value = local.env.ssh_keys_url
+}
+
 output "doppler_token" {
   value = local.doppler_token
 }
