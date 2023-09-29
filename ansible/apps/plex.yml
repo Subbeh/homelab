@@ -10,4 +10,25 @@ plex:
       ignoreTls: yes
     - group: servers
       type: ping
-      hostname: "{{ network_hosts.plex }}"
+      hostname: "{{ net_hosts.plex.ip }}"
+
+plex_meta_manager:
+  name: plex-meta-manager
+  container:
+    image: meisnate12/plex-meta-manager:v1.19.0
+    network_mode: host
+    networks:
+    volumes:
+      - "{{ common_apps_dir }}/plex-meta-manager/config:/config"
+
+  files:
+    - dest: "{{ common_apps_dir }}/plex-meta-manager/config/assets"
+    - src: config.yml.j2
+      dest: "{{ common_apps_dir }}/plex-meta-manager/config/config.yml"
+      mode: "0660"
+    - src: config.yml.j2
+      dest: "{{ common_apps_dir }}/plex-meta-manager/config/config_manual.yml"
+      mode: "0660"
+    - src: run.sh.j2
+      dest: "{{ common_apps_dir }}/plex-meta-manager/run.sh"
+      mode: "0700"

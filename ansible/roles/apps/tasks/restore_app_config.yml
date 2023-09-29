@@ -1,0 +1,64 @@
+---
+- name: Set borg facts
+  ansible.builtin.set_fact:
+    _remote_host: "{{ net_svc[_app].host | mandatory }}"
+    _dir: "data/apps/{{ _app }}"
+
+- block:
+    - name: Check borg repository
+      ansible.builtin.command: borgmatic list --repo local
+      register: _cmd_repo
+      changed_when: false
+      failed_when: _cmd_repo.rc > 0
+
+    - ansible.builtin.fail:
+        msg: Unable to check borg repository
+      when: _cmd_repo.rc > 0
+
+    - name: Inspect borg backups
+      ansible.builtin.shell: borgmatic list --repo local --archive latest --path "{{ _dir }}" | grep {{ _dir }}
+      register: _cmd_backup
+      changed_when: false
+      failed_when: false
+
+    - ansible.builtin.fail:
+        msg: Unable to find /{{ _dir }} in latest borg backup
+      when: _cmd_backup.rc > 0
+
+    - name: Stop docker container
+      community.docker.docker_container:
+        name: "{{ _app_config.name | default(_app) }}"
+        state: stopped
+
+    - name: Create temporary backup of app directory
+      ansible.builtin.copy:
+        src: "/{{ _dir }}"
+        dest: "/tmp/borg-{{ _app }}-{{ '%Y%m%d-%H%M%S' | strftime }}"
+        remote_src: true
+      failed_when: false
+
+    - name: Delete app directory
+      ansible.builtin.file:
+        path: "/{{ _dir }}"
+        state: absent
+
+    - name: Extract latest backup for {{ _app }}
+      ansible.builtin.command: borgmatic extract --repository local --archive latest --path {{ _dir }} --destination /
+
+    - name: Restore database
+      block:
+        - name: Create temporary backup database directory
+          ansible.builtin.copy:
+            src: "{{ common_apps_dir }}/postgres"
+            dest: "/tmp/borg-postgres-{{ '%Y%m%d-%H%M%S' | strftime }}"
+            remote_src: true
+
+        - name: Restore database
+          ansible.builtin.command: borgmatic restore --repository local --archive latest --database {{ item.name }}
+          loop: "{{ _app_config.db }}"
+          when: item.type == "postgres"
+      when:
+        - _app_config.db is defined
+        - _app_config.db | selectattr('type', 'equalto', 'postgres') | list | count > 0
+  delegate_to: "{{ _remote_host }}"
+  become: true

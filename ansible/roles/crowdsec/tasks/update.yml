@@ -1,8 +1,0 @@
----
-
-- name: Update CrowdSec hub
-  no_log: "{{ debug is not defined | default(false) }}"
-  ansible.builtin.shell: |
-    docker exec -t crowdsec cscli hub update
-    docker exec -t crowdsec cscli hub upgrade --force
-  changed_when: false

@@ -1,0 +1,6 @@
+---
+- name: Update CrowdSec hub
+  become: true
+  ansible.builtin.shell: |
+    cscli hub update
+    cscli hub upgrade --force

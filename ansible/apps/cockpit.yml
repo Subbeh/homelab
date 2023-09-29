@@ -1,0 +1,26 @@
+---
+cockpit:
+  traefik:
+    routers:
+      - name: nas
+        rule: "Host(`nas.{{ net_domain.tld }}`)"
+        service: nas-svc
+    services: |
+      nas-svc:
+        loadBalancer:
+          serversTransport: nas
+          servers:
+            - url: "https://{{ net_hosts.nas.ip }}:{{ net_svc.cockpit.port }}"
+    serversTransports: |
+      nas:
+        insecureSkipVerify: true
+
+  uptime:
+    - name: nas-webui
+      group: services
+      url: "https://{{ net_hosts.nas.ip }}:{{ net_svc.cockpit.port }}"
+      ignoreTls: yes
+    - name: nas
+      group: servers
+      type: ping
+      hostname: "{{ net_hosts.nas.ip }}"

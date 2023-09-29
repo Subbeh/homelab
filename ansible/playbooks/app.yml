@@ -21,4 +21,5 @@
         loop_var: app_item
       vars:
         _app: "{{ app_item }}"
+        _tags: "{{ ansible_run_tags }}"
         _preprocessed: true

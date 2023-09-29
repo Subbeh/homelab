@@ -1,0 +1,5 @@
+---
+pve_img_dir: /data/ssd0/pve/cloudimg
+pve_template_dir: /data/ssd0/pve/cloudimg/templates
+pve_default_img: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2
+pve_authorized_keys: "{{ common_authorized_keys }}"

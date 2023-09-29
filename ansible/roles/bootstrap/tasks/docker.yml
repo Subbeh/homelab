@@ -1,0 +1,74 @@
+---
+- name: Ensure group "docker" exists with correct gid
+  ansible.builtin.group:
+    name: docker
+    state: present
+    gid: "{{ bootstrap_docker_gid | default(omit) }}"
+
+- name: Add Docker apt key
+  ansible.builtin.get_url:
+    url: "{{ bootstrap_docker_apt_gpg_key }}"
+    dest: /etc/apt/trusted.gpg.d/docker.asc
+    mode: "0644"
+    force: false
+  register: _repo_key
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "{{ bootstrap_docker_apt_repository }}"
+    state: present
+    update_cache: true
+
+- name: Install Docker packages
+  ansible.builtin.apt:
+    name: "{{ bootstrap_docker_packages }}"
+    state: present
+  notify: restart docker
+
+- name: Ensure app directory exists
+  ansible.builtin.file:
+    path: "{{ common_apps_dir }}"
+    state: directory
+    mode: 0755
+
+- block:
+    - name: Ensure /etc/docker/ directory exists
+      ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+        mode: 0755
+
+    - name: Configure Docker daemon options
+      ansible.builtin.copy:
+        content: "{{ docker_daemon_options | to_nice_json }}"
+        dest: /etc/docker/daemon.json
+        mode: 0644
+      notify: restart docker
+  when: docker_daemon_options.keys() | length > 0
+  notify: restart docker
+
+- name: Ensure Docker is started and enabled at boot
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Ensure main user is added to the docker group
+  ansible.builtin.user:
+    name: "{{ bootstrap_user.name }}"
+    groups: docker
+    append: true
+  notify: reset connection
+
+- name: Prune images daily
+  ansible.builtin.cron:
+    name: "docker image prune"
+    hour: "1"
+    minute: "0"
+    job: "docker image prune --filter 'label!=skip.prune=true' --all --force > /dev/null 2>&1"
+
+- name: Enable docker auto-completion
+  ansible.builtin.get_url:
+    url: "{{ bootstrap_docker_completion_url }}"
+    dest: /etc/bash_completion.d/docker.sh
+    mode: "0755"

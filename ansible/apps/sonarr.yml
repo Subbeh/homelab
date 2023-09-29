@@ -3,18 +3,18 @@ sonarr:
   container:
     image: lscr.io/linuxserver/sonarr:3.0.10
     ports:
-      - "{{ network_svc.sonarr.port }}:8989"
+      - "{{ net_svc.sonarr.port }}:8989"
     volumes:
-      - "{{ common_dir }}/sonarr/config:/config"
-      - "{{ common_dir }}/sonarr/MediaCover:/config/MediaCover"
-      - "{{ common_media_dir }}:/data"
+      - "{{ common_apps_dir }}/sonarr/config:/config"
+      - "{{ common_apps_dir }}/sonarr/MediaCover:/config/MediaCover"
+      - "/data:/data"
 
   traefik:
     routers:
       - name: "sonarr"
-        rule: "Host(`sonarr.{{ network_domain.tld }}`)"
+        rule: "Host(`sonarr.{{ net_domain.tld }}`)"
       - name: "sonarr-bypass"
-        rule: "Host(`sonarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_sonarr_api }}`)"
+        rule: "Host(`sonarr.{{ net_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_sonarr_api }}`)"
         middlewares:
           - chain-external-no-auth
 

@@ -2,9 +2,9 @@ flatnotes:
   container:
     image: dullage/flatnotes:v3.2.3
     ports:
-      - "{{ network_svc.flatnotes.port }}:8080"
+      - "{{ net_svc.flatnotes.port }}:8080"
     volumes:
-      - "{{ common_dir }}/flatnotes/data:/data"
+      - "{{ common_apps_dir }}/flatnotes/data:/data"
     env:
       FLATNOTES_AUTH_TYPE: "password"
       FLATNOTES_USERNAME: "{{ common_user }}"

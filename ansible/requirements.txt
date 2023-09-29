@@ -7,3 +7,5 @@ ansible-lint
 netaddr==0.8.0
 kubernetes==27.2.0
 uptime-kuma-api
+proxmoxer
+pexpect

@@ -29,7 +29,7 @@ k3s_etcd_datastore: true
 k3s_use_unsupported_config: true
 
 # (string) Control Plane registration address
-k3s_registration_address: "{{ network_svc.k8s.api }}"
+k3s_registration_address: "{{ net_svc.k8s.api }}"
 
 k3s_server_manifests_urls:
   # kube-vip

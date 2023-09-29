@@ -11,8 +11,8 @@
         fstype: swap
         state: absent
       loop: ["none", "swap"]
-  when:
-    - bootstrap_sys_disable_swap is true
+  notify: reboot
+  when: bootstrap_sys_disable_swap is true
 
 - block:
     - name: Set Grub config parameters
@@ -26,7 +26,23 @@
     - name: Reconfigure grub and initramfs
       when: _grub_status.changed
       ansible.builtin.command: update-grub
-  when: bootstrap_sys_grub_config is defined
+  notify: reboot
+
+- name: Add kernel modules
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    line: "{{ item }}"
+  loop: "{{ bootstrap_sys_kernel_modules }}"
+  notify: reboot
+
+- name: Set sysctls config parameters
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/99-ansible.conf
+    reload: true
+  with_dict: "{{ bootstrap_sys_ctl_config }}"
+  notify: reboot
 
 - name: Stop and disable systemd service
   ansible.builtin.service:
@@ -37,7 +53,6 @@
   register: _systemd_result
   failed_when: "_systemd_result is failed and 'Could not find the requested service' not in _systemd_result.msg"
   loop: "{{ bootstrap_disable_svc }}"
-  when: bootstrap_disable_svc is defined
 
 - name: Check if cloud-init config exists
   ansible.builtin.stat:
@@ -61,5 +76,5 @@
         regexp: "^{{ item.key }}:"
         line: "{{ item.key }}: {{ item.value }}"
       with_dict: "{{ bootstrap_sys_cloudinit_config }}"
-      when: bootstrap_sys_cloudinit_config is defined
+  notify: reboot
   when: _stat_result.stat.exists

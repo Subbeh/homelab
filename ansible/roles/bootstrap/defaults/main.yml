@@ -1,0 +1,61 @@
+---
+bootstrap_defaults:
+  packages: false
+  system: false
+  user: false
+  network: false
+  ntp: false
+  filesystem: false
+  profile: false
+  locale: false
+  ssh: false
+  docker: false
+  borg: false
+bootstrap: []
+bootstrap_pkg_repo: []
+bootstrap_pkg_repo_disable: []
+bootstrap_pkg_rm: []
+bootstrap_pkg: []
+bootstrap_pkg_prereq: []
+bootstrap_pkg_extra: []
+bootstrap_pkg_pip: []
+bootstrap_pkg_pip_extra: []
+bootstrap_pkg_microcode: false
+bootstrap_pkg_unattended_upgrades: false
+bootstrap_disable_svc: []
+bootstrap_sys_disable_swap: false
+bootstrap_sys_grub_config: []
+bootstrap_sys_kernel_modules: []
+bootstrap_sys_ctl_config: []
+bootstrap_sys_disable_svc: []
+bootstrap_sys_disable_cloudinit: false
+bootstrap_sys_cloudinit_config: []
+bootstrap_net_hostname: "{{ ansible_hostname }}"
+bootstrap_net_set_hosts_file: false
+bootstrap_net_set_dns: false
+bootstrap_net_dns_server: ""
+bootstrap_net_dns_domain: ""
+bootstrap_ssh_authorizedkeys: []
+bootstrap_sshd_config: {}
+bootstrap_ntp_timezone: ""
+bootstrap_ntp_server: ""
+bootstrap_profile_config: []
+bootstrap_profile_defaults: []
+bootstrap_locales: []
+bootstrap_fs_directories: []
+bootstrap_fs_mounts: []
+
+bootstrap_docker_gid:
+bootstrap_docker_app_data: "/opt/app_data"
+bootstrap_docker_edition: "ce"
+bootstrap_docker_packages:
+  - "docker-{{ bootstrap_docker_edition }}"
+  - "docker-{{ bootstrap_docker_edition }}-cli"
+  - "docker-{{ bootstrap_docker_edition }}-rootless-extras"
+  - "containerd.io"
+bootstrap_docker_repo_url: https://download.docker.com/linux
+bootstrap_docker_apt_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+bootstrap_docker_apt_repository: "deb [arch={{ bootstrap_docker_apt_arch }} signed-by=/etc/apt/trusted.gpg.d/docker.asc] {{ bootstrap_docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+bootstrap_docker_apt_gpg_key: "{{ bootstrap_docker_repo_url }}/{{ ansible_distribution | lower }}/gpg"
+docker_daemon_options: {}
+bootstrap_docker_completion_url: https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker

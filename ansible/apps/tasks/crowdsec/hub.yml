@@ -1,0 +1,10 @@
+---
+- name: Install collections
+  become: true
+  ansible.builtin.command: cscli collections install {{ item }}
+  loop: "{{ _vars.collections }}"
+
+- name: Install parsers
+  become: true
+  ansible.builtin.command: cscli parsers install {{ item }}
+  loop: "{{ _vars.parsers }}"

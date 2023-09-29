@@ -1,6 +1,11 @@
 ---
-- name: Run prerequisites task
-  ansible.builtin.include_tasks: prereq.yml
+- name: Set container facts
+  no_log: "{{ ci | default(false) }}"
+  ansible.builtin.set_fact:
+    _bootstrap: "{{ bootstrap_defaults | ansible.builtin.combine(bootstrap, list_merge='append_rp', recursive=true) }}"
+
+- name: Run pre-process task
+  ansible.builtin.include_tasks: preproc.yml
 
 - name: Run package task
   ansible.builtin.include_tasks: packages.yml
@@ -33,3 +38,15 @@
 - name: Run locales task
   ansible.builtin.include_tasks: locale.yml
   when: bootstrap.locale is true
+
+- name: Run ssh task
+  ansible.builtin.include_tasks: ssh.yml
+  when: bootstrap.ssh is true
+
+- name: Run docker task
+  ansible.builtin.include_tasks: docker.yml
+  when: bootstrap.docker is true
+
+- name: Run borg task
+  ansible.builtin.include_tasks: borg.yml
+  when: bootstrap.borg is true

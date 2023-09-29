@@ -1,9 +1,51 @@
 ---
+- name: Install prerequisite packages
+  ansible.builtin.apt:
+    name: "{{ bootstrap_pkg_prereq }}"
+    state: present
+    install_recommends: false
+
+- name: Update cache
+  ansible.builtin.apt:
+    update_cache: yes
+  changed_when: false
+
 - name: Uninstall packages
   ansible.builtin.apt:
     pkg: "{{ bootstrap_pkg_rm }}"
     state: absent
     autoremove: true
+
+- name: Add signing keys (get_url)
+  ansible.builtin.get_url:
+    url: "{{ item.key }}"
+    dest: "{{ item.key_dest | default(omit) }}"
+    validate_certs: "{{ item.validate_certs | default(true) }}"
+  with_items: "{{ bootstrap_pkg_repo }}"
+  when: item.key is defined
+
+- name: Add signing keys (apt_key)
+  ansible.builtin.apt_key:
+    url: "{{ item.apt_key.url | default(omit) }}"
+    keyring: "{{ item.apt_key.keyring | default(omit) }}"
+    state: present
+  with_items: "{{ bootstrap_pkg_repo }}"
+  when: item.apt_key is defined
+
+- name: Add repositories
+  ansible.builtin.apt_repository:
+    repo: "{{ item.repo }}"
+    state: present
+  with_items: "{{ bootstrap_pkg_repo }}"
+  when: item.repo is defined
+
+- name: Disable repositories
+  ansible.builtin.replace:
+    path: "{{ item.file }}"
+    regexp: "^{{ item.repo }}"
+    replace: "# {{ item.repo }}"
+  with_items: "{{ bootstrap_pkg_repo_disable }}"
+  when: item.repo is defined
 
 - name: Update repo and cache
   ansible.builtin.apt:
@@ -16,26 +58,49 @@
     upgrade: dist
     force_apt_get: yes
 
-- name: Install packages
+- name: Install base packages
   ansible.builtin.apt:
-    name: "{{ lookup('flattened', bootstrap_pkg_extra, bootstrap_pkg) }}"
+    name: "{{ bootstrap_pkg }}"
     state: present
     install_recommends: false
 
-- name: Gather installed packages
-  ansible.builtin.package_facts:
-    manager: auto
+- name: Install extra packages
+  ansible.builtin.apt:
+    name: "{{ item.name | default(omit) }}"
+    deb: "{{ item.deb | default(omit) }}"
+    default_release: "{{ item.default_release | default(omit) }}"
+    install_recommends: "{{ item.install_recommends | default(false) }}"
+    allow_unauthenticated: "{{ item.allow_unauthenticated | default(omit) }}"
+    state: present
+  loop: "{{ bootstrap_pkg_extra }}"
 
-- name: Install Python pip packages
-  ansible.builtin.import_role:
-    name: geerlingguy.pip
-  vars:
-    pip_install_packages: "{{ lookup('flattened', bootstrap_pkg_pip_extra, bootstrap_pkg_pip) }}"
+- block:
+    - name: Find python directories
+      ansible.builtin.find:
+        paths: /usr/lib
+        patterns: "python3.*"
+        file_type: directory
+      register: _python_dirs
+
+    - name: Remove EXTERNALLY-MANAGED file for python
+      ansible.builtin.file:
+        name: "{{ item.path }}/EXTERNALLY-MANAGED"
+        state: absent
+      loop: "{{ _python_dirs.files }}"
+
+    - name: Install Python pip packages
+      ansible.builtin.import_role:
+        name: geerlingguy.pip
+      vars:
+        pip_install_packages: "{{ lookup('flattened', bootstrap_pkg_pip_extra, bootstrap_pkg_pip, wantlist=True) }}"
+  when: lookup('flattened', bootstrap_pkg_pip_extra, bootstrap_pkg_pip, wantlist=True) | length
 
 - block:
     - name: Install Intel microcode if needed
       ansible.builtin.apt:
-        pkg: intel-microcode
+        name:
+          - iucode-tool
+          - intel-microcode
         state: present
         default_release: "{{ ansible_distribution_release }}"
       when: >
@@ -90,7 +155,7 @@
         clean: true
 
 - name: Check if the reboot-required file exists
-  tags: always
   ansible.builtin.stat: path=/var/run/reboot-required get_md5=no
-  register: reboot_required_file
-  notify: Check reboot
+  register: reboot_required
+  changed_when: reboot_required.stat.exists
+  notify: reboot

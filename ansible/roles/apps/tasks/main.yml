@@ -6,6 +6,9 @@
   ansible.builtin.include_tasks: load_configs.yml
   when: _preprocessed is undefined
 
+- ansible.builtin.set_fact:
+    _run_all: "{{ true if _tags is contains('all') else false }}"
+
 - name: Load app config for {{ _app }}
   no_log: "{{ ci | default(false) }}"
   ansible.builtin.set_fact:
@@ -15,41 +18,75 @@
   ansible.builtin.set_fact:
     _app_name: "{{ _app_config.name | default(_app) }}"
 
+- name: Include (pre) custom_tasks task
+  ansible.builtin.include_tasks: custom_tasks.yml
+  loop: "{{ _app_config.pre_tasks }}"
+  loop_control:
+    loop_var: _pre_task_item
+  vars:
+    _task: "{{ _pre_task_item }}"
+  when:
+    - _run_all or _tags is contains('tasks')
+    - _app_config.pre_tasks is defined
+
 - name: Include create_files task
-  tags: files
   ansible.builtin.include_tasks: create_files.yml
   loop: "{{ _app_config.files }}"
+  loop_control:
+    loop_var: _file_item
   vars:
-    _file: "{{ item }}"
+    _file: "{{ _file_item }}"
   when:
+    - _run_all or _tags is contains('files')
     - _app_config.files is defined
 
 - name: Include create_db task
-  tags: db
   ansible.builtin.include_tasks: create_db.yml
+  loop: "{{ _app_config.db }}"
+  loop_control:
+    loop_var: _db_item
+  vars:
+    _db: "{{ _db_item }}"
   when:
+    - _run_all or _tags is contains('db')
     - _app_config.db is defined
 
 - name: Include create_container task
-  tags: container
   ansible.builtin.include_tasks: create_container.yml
   when:
+    - _run_all or _tags is contains('container')
     - _app_config.container is defined
 
 - name: Include create_traefik_config task
-  tags: traefik
   ansible.builtin.include_tasks: create_traefik_config.yml
   when:
+    - _run_all or _tags is contains('traefik')
     - _app_config.traefik is defined
 
 - name: Include create_uptime_config task
-  tags: uptime
   ansible.builtin.include_tasks: create_uptime_config.yml
   when:
+    - _run_all or _tags is contains('uptime')
     - _app_config.uptime is defined
 
+- name: Include custom_tasks task
+  ansible.builtin.include_tasks: custom_tasks.yml
+  loop: "{{ _app_config.tasks }}"
+  loop_control:
+    loop_var: _task_item
+  vars:
+    _task: "{{ _task_item }}"
+  when:
+    - _run_all or _tags is contains('tasks')
+    - _app_config.tasks is defined
+
 - name: Include create_dependents task
-  tags: container
   ansible.builtin.include_tasks: create_dependents.yml
   when:
+    - _run_all or _tags is contains('container')
     - _app_config.dependents is defined
+
+- name: Include restore_app_config task
+  ansible.builtin.include_tasks: restore_app_config.yml
+  when:
+    - _tags is contains('restore')

@@ -4,7 +4,7 @@ apprise:
     volumes:
       - "{{ common_dir }}/apprise/config:/config"
     ports:
-      - "{{ network_svc.apprise.port }}:8000"
+      - "{{ net_svc.apprise.port }}:8000"
 
   traefik:
 

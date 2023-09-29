@@ -1,0 +1,50 @@
+---
+changedetection:
+  container:
+    image: ghcr.io/dgtlmoon/changedetection.io:0.44.2
+    restart: false
+    state: stopped
+    comparisons:
+      image: ignore
+    ports:
+      - "{{ net_svc.changedetection.port }}:5000"
+    volumes:
+      - "{{ common_dir }}/changedetection/datastore:/datastore"
+    env:
+      BASE_URL: "https://changedetection.{{ net_domain.tld }}"
+      PLAYWRIGHT_DRIVER_URL: "ws://changedetection-chrome:3000/?stealth=1&--disable-web-security=true"
+      HIDE_REFERER: "true"
+
+  dependents:
+    - changedetection_chrome
+
+  traefik:
+
+  uptime:
+    group: services
+    state: paused
+
+changedetection_chrome:
+  name: changedetection-chrome
+  container:
+    image: browserless/chrome:1.59-chrome-stable
+    restart: false
+    state: stopped
+    comparisons:
+      image: ignore
+    env:
+      SCREEN_WIDTH: "1920"
+      SCREEN_HEIGHT: "1024"
+      SCREEN_DEPTH: "16"
+      ENABLE_DEBUGGER: "false"
+      PREBOOT_CHROME: "true"
+      CONNECTION_TIMEOUT: "300000"
+      MAX_CONCURRENT_SESSIONS: "10"
+      CHROME_REFRESH_TIME: "600000"
+      DEFAULT_BLOCK_ADS: "true"
+      DEFAULT_STEALTH: "true"
+      DEFAULT_IGNORE_HTTPS_ERRORS: "true"
+
+  uptime:
+    group: services
+    state: paused

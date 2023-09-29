@@ -3,14 +3,13 @@ qbittorrent:
   container:
     image: lscr.io/linuxserver/qbittorrent:4.5.4
     network_mode: "container:gluetun"
-    networks:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/config:/config"
-      - "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/webui:/webui"
-      - "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/env:/env"
-      - "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/setenv.sh:/setenv.sh"
-      - "{{ hostvars[network_svc.qbittorrent.host]['common_media_dir'] }}/downloads/torrents:/downloads"
+      - "{{ common_apps_dir }}/qbittorrent/config:/config"
+      - "{{ common_apps_dir }}/qbittorrent/webui:/webui"
+      - "{{ common_apps_dir }}/qbittorrent/env:/env"
+      - "{{ common_apps_dir }}/qbittorrent/setenv.sh:/setenv.sh"
+      - "/data/downloads/torrents:/downloads"
     command: /setenv.sh
 
   traefik:
@@ -19,10 +18,9 @@ qbittorrent:
 
   uptime:
     group: media
-    url: "https://qbittorrent.{{ network_domain.tld }}"
+    url: "https://qbittorrent.{{ net_domain.tld }}"
 
   files:
-    - dest: "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/env"
-    - src: qbittorrent/setenv.sh.j2
-      dest: "{{ hostvars[network_svc.qbittorrent.host]['common_dir'] }}/qbittorrent/setenv.sh"
+    - src: setenv.sh.j2
+      dest: "{{ common_apps_dir }}/qbittorrent/setenv.sh"
       mode: "0700"

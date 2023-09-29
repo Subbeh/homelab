@@ -3,17 +3,18 @@ bazarr:
   container:
     image: lscr.io/linuxserver/bazarr:1.2.4
     ports:
-      - "{{ network_svc.bazarr.port }}:6767"
+      - "{{ net_svc.bazarr.port }}:6767"
     volumes:
-      - "{{ common_dir }}/bazarr/config:/config"
-      - "{{ common_media_dir }}:/data"
+      - "{{ common_apps_dir }}/bazarr/config:/config"
+      - "/data/media/movies:/data/movies"
+      - "/data/media/tv:/data/tv"
 
   traefik:
     routers:
       - name: "bazarr"
-        rule: "Host(`bazarr.{{ network_domain.tld }}`)"
+        rule: "Host(`bazarr.{{ net_domain.tld }}`)"
       - name: "bazarr-bypass"
-        rule: "Host(`bazarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_bazarr_api }}`)"
+        rule: "Host(`bazarr.{{ net_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_bazarr_api }}`)"
         middlewares:
           - chain-external-no-auth
 

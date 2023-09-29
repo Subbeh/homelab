@@ -1,4 +1,7 @@
 #!/bin/bash
 
 HOST=${1:?not set}
-ansible localhost -m debug -a msg="{{ network_hosts[network_svc[\'$HOST\'].host] }}:{{ network_svc[\'$HOST\'].port | default(80) }}"
+
+cd ${INFRA:?not set}/ansible
+
+ansible localhost -m debug -a msg="{{ net_hosts[net_svc[\'$HOST\'].host] }}:{{ net_svc[\'$HOST\'].port | default(80) }}"

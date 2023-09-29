@@ -1,9 +1,25 @@
 ---
-
-- name: restart rsyslog
+- name: restart sshd
   ansible.builtin.service:
-    name: rsyslog
+    name: sshd
     state: restarted
 
-- name: locale-gen
-  ansible.builtin.command: locale-gen
+- name: restart docker
+  ansible.builtin.service:
+    name: docker
+    state: restarted
+
+- name: reset connection
+  ansible.builtin.meta: reset_connection
+
+- name: change ansible_user
+  ansible.builtin.set_fact:
+    ansible_user: "{{ bootstrap_user.name }}"
+
+- name: reboot
+  ansible.builtin.reboot:
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 10
+    test_command: uptime

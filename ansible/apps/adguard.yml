@@ -1,4 +1,4 @@
 adguard:
   uptime:
-    url: "http://{{ network_svc.adguard.host }}:{{ network_svc.adguard.port }}"
+    url: "http://{{ net_svc.adguard.host }}:{{ net_svc.adguard.port }}"
     group: system

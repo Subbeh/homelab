@@ -1,14 +1,22 @@
 ---
-redis:
+redis_bastion:
   name: redis
   container:
     image: redis:7-alpine
+    restart_policy: always
     volumes:
-      - "{{ common_dir }}/redis/data:/data"
-    command: "redis-server --requirepass {{ redis_pass }}"
+      - "{{ common_apps_dir }}/redis/data:/data"
+    command: "redis-server --requirepass {{ vault_redis_pass }}"
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      test:
+        ["CMD-SHELL", "redis-cli -a {{ vault_redis_pass }} ping | grep PONG"]
       start_period: 20s
       interval: 30s
       retries: 5
       timeout: 3s
+
+  uptime:
+    - group: databases
+      type: redis
+      host: redis
+      name: "redis-bastion"

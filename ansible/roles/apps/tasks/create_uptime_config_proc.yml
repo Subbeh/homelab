@@ -7,6 +7,21 @@
   ansible.builtin.set_fact:
     _monitor_name: "{{ _config.name | default(_app) }}"
 
+- name: Set database facts
+  block:
+    - name: Set Postgres facts
+      ansible.builtin.set_fact:
+        _db_connection_string: "postgres://{{ common_user }}:{{ vault_postgres_pass }}@{{ _config.host | default(net_hosts[net_svc[_app].host].ip) }}:5432/{{ _config.dbname }}"
+        _monitor_name: "{{ 'postgres-' + net_svc[_app].host + '-' + _config.dbname }}"
+      when: _config.type == "postgres"
+
+    - name: Set Redis facts
+      ansible.builtin.set_fact:
+        _db_connection_string: "redis://:{{ vault_redis_pass }}@{{ _config.host | default(net_hosts[net_svc[_app].host].ip) }}:6379"
+        _monitor_name: "{{ 'redis' + net_svc[_app].host }}"
+      when: _config.type == "redis"
+  when: _config.type is defined
+
 - block:
     - name: Delete existing Uptime Kuma monitor configs for {{ _monitor_name }}
       delegate_to: localhost
@@ -17,6 +32,7 @@
         name: "{{ _monitor_name }}"
         state: absent
       register: _result
+      when: _config.type is undefined or _config.type != "group"
 
     - name: Add {{ _monitor_name }} ({{ _config.type | default('http') | upper }}) monitor config for {{ _app }}
       delegate_to: localhost
@@ -32,15 +48,15 @@
         type: "{{ _config.type | default('http') }}"
         url: |
           {%- if (_config.url is defined) -%}{{ _config.url }}
-          {%- elif (network_svc[_app].host is defined and network_hosts[network_svc[_app].host] is defined) -%}http://{{ network_hosts[network_svc[_app].host] }}{{ ':' + network_svc[_app].port | default() }}
-          {%- elif (_app_config.traefik.name is defined) -%}https://{{ _app_config.traefik.name }}.{{ network_domain.tld }}
-          {%- else -%}https://{{ _app }}.{{ network_domain.tld }}
+          {%- elif (net_svc[_app].host is defined and net_hosts[net_svc[_app].host].ip is defined) -%}http://{{ net_hosts[net_svc[_app].host].ip }}{{ ':' + net_svc[_app].port | default() }}
+          {%- elif (_app_config.traefik.name is defined) -%}https://{{ _app_config.traefik.name }}.{{ net_domain.tld }}
+          {%- else -%}https://{{ _app }}.{{ net_domain.tld }}
           {%- endif -%}
-        port: "{{ (_config.port | default(network_svc[_app].port)) | default(omit) }}"
-        hostname: "{{ (_config.hostname | default(network_hosts[network_svc[_app].host])) | default(omit) }}"
+        port: "{{ (_config.port | default(net_svc[_app].port)) | default(omit) }}"
+        hostname: "{{ (_config.hostname | default(net_hosts[net_svc[_app].host].ip)) | default(omit) }}"
         ignoreTls: "{{ _config.ignoreTls | default(omit) }}"
         keyword: "{{ _config.keyword | default(omit) }}"
-        databaseConnectionString: "{{ _config.databaseConnectionString | default(omit) }}"
+        databaseConnectionString: "{{ _db_connection_string | default(omit) }}"
         databaseQuery: "{{ _config.databaseQuery | default(omit) }}"
         notification_names: "{{ _config.notification_names | default(omit) }}"
         state: present

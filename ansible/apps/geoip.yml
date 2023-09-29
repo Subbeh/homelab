@@ -1,0 +1,11 @@
+---
+geoipupdate:
+  container:
+    image: maxmindinc/geoipupdate:v6.0
+    volumes:
+      - "{{ common_apps_dir }}/geoip/data:/usr/share/GeoIP"
+    env:
+      GEOIPUPDATE_ACCOUNT_ID: "{{ vault_geoip_account_id | string }}"
+      GEOIPUPDATE_LICENSE_KEY: "{{ vault_geoip_license_key }}"
+      GEOIPUPDATE_EDITION_IDS: "GeoLite2-City"
+      GEOIPUPDATE_FREQUENCY: "8"

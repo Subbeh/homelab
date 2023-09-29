@@ -4,8 +4,8 @@
     traefik_config: "{{ _app_config.traefik }}"
 
 - name: Create Traefik config for {{ _app }}
-  delegate_to: "{{ network_svc.traefik.host }}"
+  delegate_to: "{{ net_svc.traefik.host }}"
   become: true
   ansible.builtin.template:
     src: traefik-app.yml.j2
-    dest: "{{ hostvars[network_svc.traefik.host].common_dir }}/traefik/configs/app-{{ _app_name }}.yml"
+    dest: "{{ common_apps_dir }}/traefik/configs/app-{{ _app_name }}.yml"

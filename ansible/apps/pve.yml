@@ -15,7 +15,7 @@ pve:
             interval: 10s
             timeout: 3s
           servers:
-            - url: "https://{{ network_hosts.pve | first | regex_replace('_', '-') }}.{{ network_domain.tld_local }}:{{ network_svc.pve.port }}"
+            - url: "https://{{ net_hosts.pve | first | regex_replace('_', '-') }}.{{ net_domain.tld_local }}:{{ net_svc.pve.port }}"
 
       pve-backup-svc:
         loadBalancer:
@@ -24,29 +24,44 @@ pve:
             interval: 10s
             timeout: 3s
           servers:
-            - url: "https://{{ (network_hosts.pve | list)[1] | regex_replace('_', '-') }}.{{ network_domain.tld_local }}:{{ network_svc.pve.port }}"
+            - url: "https://{{ (net_hosts.pve | list)[1] | regex_replace('_', '-') }}.{{ net_domain.tld_local }}:{{ net_svc.pve.port }}"
   uptime:
-    - name: pve-nuc-01-webui
+    - name: pve
+      type: group
+    - name: pve-nas-webui
       group: pve
-      url: "https://{{ network_hosts.pve['pve_nuc_01'] }}:{{ network_svc.pve.port }}"
+      url: "https://{{ net_hosts.pve['pve_nas'] }}:{{ net_svc.pve.port }}"
       ignoreTls: yes
-    - name: pve-nuc-01
+    - name: pve-nas
       group: servers
       type: ping
-      hostname: "{{ network_hosts.pve['pve_nuc_01'] }}"
-    - name: pve-opti-01-webui
+      hostname: "{{ net_hosts.pve['pve_nas'] }}"
+    - name: pve-nuc-webui
       group: pve
-      url: "https://{{ network_hosts.pve['pve_opti_01'] }}:{{ network_svc.pve.port }}"
+      url: "https://{{ net_hosts.pve['pve_nuc'] }}:{{ net_svc.pve.port }}"
       ignoreTls: yes
-    - name: pve-opti-01
+    - name: pve-nuc
       group: servers
       type: ping
-      hostname: "{{ network_hosts.pve['pve_opti_01'] }}"
-    - name: pve-opti-02-webui
+      hostname: "{{ net_hosts.pve['pve_nuc'] }}"
+
+pbs:
+  traefik:
+    services: |
+      pbs-svc:
+        loadBalancer:
+          serversTransport: pbs
+          servers:
+            - url: "https://{{ net_hosts.pbs.ip }}:{{ net_svc.pbs.port }}"
+    serversTransports: |
+      pbs:
+        insecureSkipVerify: true
+
+  uptime:
+    - name: pbs-webui
       group: pve
-      url: "https://{{ network_hosts.pve['pve_opti_02'] }}:{{ network_svc.pve.port }}"
+      url: "https://{{ net_hosts.pbs.ip }}:{{ net_svc.pbs.port }}"
       ignoreTls: yes
-    - name: pve-opti-02
-      group: servers
+    - group: servers
       type: ping
-      hostname: "{{ network_hosts.pve['pve_opti_02'] }}"
+      hostname: "{{ net_hosts.pbs.ip }}"

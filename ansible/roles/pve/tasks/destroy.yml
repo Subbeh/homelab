@@ -1,0 +1,36 @@
+---
+- name: Destroy container
+  community.general.proxmox:
+    api_host: "{{ pve_container.node }}"
+    api_user: root@pam
+    api_password: "{{ vault_pve_api_pass }}"
+    vmid: "{{ pve_container.vmid }}"
+    state: "{{ item }}"
+  loop:
+    - stopped
+    - absent
+  when: pve_container is defined
+
+- name: Destroy VM
+  block:
+    - name: Get VM status
+      ansible.builtin.shell: pvesh get /cluster/resources --output-format json | jq -r '.[] | .id + " " + .node' | grep qemu/{{ _pve_vm.vmid }}
+      register: _status
+
+    - name: Set node fact
+      ansible.builtin.set_fact:
+        _node: "{{ _status.stdout.split()[1] }}"
+
+    - name: Stop VM
+      ansible.builtin.command: pvesh create /nodes/{{ _node }}/qemu/{{ _pve_vm.vmid }}/status/stop
+      register: _result
+      failed_when: _result.stderr != ''
+
+    - name: Destroy VM
+      ansible.builtin.command: pvesh delete /nodes/{{ _node }}/qemu/{{ _pve_vm.vmid }}
+      register: _result
+      failed_when: _result.stderr != ''
+  when: pve_vm is defined
+  delegate_to: "{{ pve_vm.provision_node | default(groups['pve'][0]) }}"
+  vars:
+    _pve_vm: "{{ pve_vm }}"

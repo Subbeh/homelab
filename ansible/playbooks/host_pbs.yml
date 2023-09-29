@@ -1,0 +1,92 @@
+---
+- hosts: [localhost, pbs]
+  gather_facts: false
+  become: false
+
+  vars:
+    # PVE vars
+    pve_container:
+      vmid: "{{ net_hosts.pbs.vmid }}"
+      hostname: pbs
+      node: pve-nas
+      ostemplate: "local:vztmpl/debian-11-standard_11.7-1_amd64.tar.zst"
+      storage: local-lvm
+      size: 10
+      cores: 2
+      memory: 2048
+      swap: 1024
+      features:
+        - nesting=1
+      network:
+        hwaddr: "{{ net_hosts.pbs.hwaddr }}"
+      mounts: '{"mp0":"/data/ssd0/pve/pbs,mp=/data/ssd0"}'
+
+    # bootstrap vars
+    bootstrap:
+      packages: true
+      system: true
+      network: true
+      filesystem: true
+      profile: true
+      locale: true
+      ssh: true
+    bootstrap_pkg_repo:
+      - repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }} main contrib
+      - repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-updates main contrib
+      - repo: deb http://security.debian.org/debian-security {{ ansible_distribution_release }}-security main contrib
+      - repo: deb http://download.proxmox.com/debian/pbs {{ ansible_distribution_release }} pbs-no-subscription
+        key: https://download.proxmox.com/debian/proxmox-release-{{ ansible_distribution_release }}.gpg
+        key_dest: /etc/apt/trusted.gpg.d/proxmox-release-{{ ansible_distribution_release }}.gpg
+        validate_certs: false
+    bootstrap_pkg_repo_disable:
+      - repo: deb https://enterprise.proxmox.com/debian/pbs {{ ansible_distribution_release }} pbs-enterprise
+        file: /etc/apt/sources.list.d/pbs-enterprise.list
+    bootstrap_pkg_extra:
+      - name: proxmox-backup-server
+      - deb: https://github.com/Jamesits/pve-fake-subscription/releases/download/v0.0.9/pve-fake-subscription_0.0.9+git-1_all.deb
+
+  tasks:
+    - block:
+        - name: Destory LXC container
+          tags: [never, destroy]
+          block:
+            - ansible.builtin.import_role:
+                name: pve
+                tasks_from: destroy
+            - ansible.builtin.meta: end_play
+
+        - name: Create LXC container
+          tags: lxc
+          ansible.builtin.import_role:
+            name: pve
+            tasks_from: container
+      vars:
+        ansible_python_interpreter: "{{ common_python_interpreter }}"
+      when: inventory_hostname == "localhost"
+
+    - name: Run bootstrap steps
+      tags: bootstrap
+      block:
+        - name: Check if sudo user has already been installed
+          block:
+            - ansible.builtin.wait_for_connection:
+                timeout: 5
+              register: _status
+          rescue:
+            - ansible.builtin.meta: clear_host_errors
+            - ansible.builtin.set_fact:
+                _user: root
+
+        - name: Run bootstrap steps
+          block:
+            - name: Get host facts
+              ansible.builtin.setup:
+
+            - name: Include bootstrap role
+              ansible.builtin.include_role:
+                name: bootstrap
+          any_errors_fatal: true
+          become: true
+          vars:
+            ansible_user: "{{ _user | default(bootstrap_user.name) }}"
+      when: inventory_hostname != "localhost"

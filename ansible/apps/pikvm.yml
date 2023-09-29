@@ -7,7 +7,7 @@ pikvm:
         loadBalancer:
           serversTransport: "pikvm"
           servers:
-            - url: "https://{{ network_hosts.pikvm }}"
+            - url: "https://{{ net_hosts.pikvm.ip }}"
     serversTransports: |
       pikvm:
         insecureSkipVerify: true
@@ -18,4 +18,4 @@ pikvm:
       ignoreTls: yes
     - group: servers
       type: ping
-      hostname: "{{ network_hosts.pikvm }}"
+      hostname: "{{ net_hosts.pikvm.ip }}"

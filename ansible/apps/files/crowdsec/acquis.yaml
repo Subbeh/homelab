@@ -1,0 +1,12 @@
+---
+filenames:
+  - /var/log/auth.log
+  - /var/log/syslog
+  - /var/log/kern.log
+labels:
+  type: syslog
+---
+filenames:
+  - /data/apps/logs/traefik/access.log
+labels:
+  type: traefik

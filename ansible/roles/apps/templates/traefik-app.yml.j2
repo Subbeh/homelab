@@ -23,7 +23,7 @@ http:
     {% endfor %}
   {% else %}
     {{ _app_name }}-rtr:
-      rule: "Host(`{{ traefik_config.name | default(_app_name) }}.{{ network_domain.tld }}`)"
+      rule: "Host(`{{ traefik_config.name | default(_app_name) }}.{{ net_domain.tld }}`)"
       entryPoints:
         - websecure
       middlewares:
@@ -52,7 +52,7 @@ http:
         {% if traefik_config.url is defined %}
           - url: "{{ traefik_config.url | indent(width=10) }}"
         {% else %}
-          - url: "http://{{ network_svc[_app].host | default(network_svc[_app].ip) }}:{{ network_svc[_app].port }}"
+          - url: "http://{{ net_svc[_app].host | default(net_svc[_app].ip) }}:{{ net_svc[_app].port }}"
         {%- endif %}
   {%- endif %}
 

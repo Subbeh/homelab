@@ -2,7 +2,7 @@ obsidian:
   container:
     image: ghcr.io/sytone/obsidian-remote:0.1.1
     ports:
-      - "{{ network_svc.obsidian.port }}:8080"
+      - "{{ net_svc.obsidian.port }}:8080"
     volumes:
       - "{{ common_dir }}/obsidian/vaults:/vaults"
       - "{{ common_dir }}/obsidian/config:/config"

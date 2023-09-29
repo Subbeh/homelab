@@ -3,16 +3,16 @@ prowlarr:
   container:
     image: lscr.io/linuxserver/prowlarr:1.7.4
     ports:
-      - "{{ network_svc.prowlarr.port }}:9696"
+      - "{{ net_svc.prowlarr.port }}:9696"
     volumes:
-      - "{{ hostvars[network_svc.prowlarr.host]['common_dir'] }}/prowlarr/config:/config"
+      - "{{ common_apps_dir }}/prowlarr/config:/config"
 
   traefik:
     routers:
       - name: "prowlarr"
-        rule: "Host(`prowlarr.{{ network_domain.tld }}`)"
+        rule: "Host(`prowlarr.{{ net_domain.tld }}`)"
       - name: "prowlarr-bypass"
-        rule: "Host(`prowlarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_prowlarr_api }}`)"
+        rule: "Host(`prowlarr.{{ net_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_prowlarr_api }}`)"
         middlewares:
           - chain-external-no-auth
 

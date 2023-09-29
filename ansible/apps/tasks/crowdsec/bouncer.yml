@@ -1,0 +1,32 @@
+---
+- block:
+    - ansible.builtin.set_fact:
+        _bouncer: "{{ _task.vars.bouncer }}"
+
+    - name: Check for existing bouncer
+      ansible.builtin.command: cscli bouncers list -o raw
+      changed_when: false
+      register: _bouncers
+
+    - name: Delete existing bouncer
+      ansible.builtin.command: cscli bouncers delete {{ _bouncer }}
+      register: _delete
+      when: _bouncer in _bouncers.stdout
+      changed_when: "'deleted successfully' in _delete.stderr"
+
+    - name: Create bouncer
+      ansible.builtin.command: cscli bouncers add {{ _bouncer }} -o raw
+      register: _api_key
+      changed_when: _api_key.stdout != ''
+
+    - name: Register API key
+      ansible.builtin.set_fact:
+        _bouncer_api_key: "{{ _api_key.stdout }}"
+      failed_when: _api_key.rc > 0
+
+    - ansible.builtin.fail:
+        msg: _bouncer_api_key not specified
+      when:
+        - _bouncer_api_key == ""
+  delegate_to: "{{ net_svc.crowdsec.host }}"
+  become: true

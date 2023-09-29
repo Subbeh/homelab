@@ -1,10 +1,9 @@
 ---
-
 - hosts: "{{ groups['pve'][0] }}"
   gather_facts: false
 
   vars:
-    nodes: ['pve-opti-01', 'pve-opti-02']
+    nodes: ["pve-opti-01", "pve-opti-02"]
     cloudimg_src: https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img
     cloudimg: "{{ cloudimg_src | basename }}"
     iso_dir: /mnt/pve/nas/template/iso
@@ -20,7 +19,6 @@
     vm_storage: nas
 
   tasks:
-
     - name: Create directories
       ansible.builtin.file:
         path: "{{ item }}"
@@ -48,7 +46,7 @@
 
     - name: Download public SSH keys
       ansible.builtin.get_url:
-        url: '{{ ssh_keys }}'
+        url: "{{ ssh_keys }}"
         dest: /tmp/authorized_keys
 
     - name: Create sudoers file
@@ -98,7 +96,7 @@
       ansible.builtin.command: "qm importdisk {{ vm_id }} {{ template }} {{ vm_storage }}"
 
     - name: Create vm - attach cloud-init disk
-      ansible.builtin.command: "qm set {{ vm_id }} --scsihw virtio-scsi-pci --scsi0 {{ vm_storage }}:{{ vm_id }}/vm-{{ vm_id }}-disk-0.raw"
+      ansible.builtin.command: "qm set {{ vm_id }} --scsihw virtio-scsi-pci --scsi0 '{{ vm_storage }}:{{ vm_id }}/vm-{{ vm_id }}-disk-0.raw'"
 
     - name: Create vm - assign bootdisk
       ansible.builtin.command: "qm set {{ vm_id }} --boot c --bootdisk scsi0"

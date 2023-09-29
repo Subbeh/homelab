@@ -1,0 +1,4 @@
+---
+- name: Enroll CrowdSec Security Engine
+  become: true
+  ansible.builtin.command: cscli console enroll {{ vault_crowdsec_instance_id }}

@@ -4,6 +4,7 @@
     name: "{{ bootstrap_user.name }}"
     createhome: true
     password: "{{ bootstrap_user.password | string | password_hash('sha512', 'mysecretsalt') }}"
+    uid: "{{ bootstrap_user.uid }}"
     shell: /bin/bash
     state: present
 

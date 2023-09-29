@@ -1,17 +1,11 @@
 ---
-redis_pass: "{{ vault_redis_pass }}"
-postgres_pass: "{{ vault_postgres_pass }}"
-pgadmin_pass: "{{ vault_pgadmin_pass }}"
-authentik_key: "{{ vault_authentik_key }}"
-geoip_account_id: "{{ vault_geoip_account_id }}"
-geoip_license_key: "{{ vault_geoip_license_key }}"
-geoip_edition_ids: "GeoLite2-ASN GeoLite2-City GeoLite2-Country"
-borg_encryption_passphrase: "{{ vault_borg_encryption_passphrase }}"
-minio_pass: "{{ vault_minio_pass }}"
-uptime_kuma_api: "{{ vault_uptime_kuma_api }}"
-uptime_kuma_password: "{{ vault_uptime_kuma_password }}"
-nextcloud_pass: "{{ vault_nextcloud_pass }}"
-linkace_key: "{{ vault_linkace_key }}"
-linkace_db_pass: "{{ vault_linkace_db_pass }}"
-freshrss_api: "{{ vault_freshrss_api }}"
-freshrss_pass: "{{ vault_freshrss_pass }}"
+# crowdsec
+crowdsec_hub: false
+crowdsec_whitelist:
+  ip:
+    - "172.0.0.1"
+  cidr:
+    - "192.168.0.0/16"
+    - "10.11.0.0/8"
+    - "172.16.0.0/12"
+crowdsec_geoip_edition_ids: "GeoLite2-ASN GeoLite2-City GeoLite2-Country"

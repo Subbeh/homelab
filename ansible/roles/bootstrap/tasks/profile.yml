@@ -1,12 +1,14 @@
 ---
 - name: Copy profile config files over
   ansible.builtin.copy:
-    src: "{{ item.file }}"
-    dest: "/home/{{ bootstrap_user.name }}/{{ item.dest }}"
+    src: "{{ item.0.file }}"
+    dest: "{{ '/root' if item.1 == 'root' else '/home/' + item.1 }}/{{ item.0.dest }}"
     mode: 0640
-    owner: "{{ bootstrap_user.name }}"
-    group: "{{ bootstrap_user.name }}"
-  loop: "{{ bootstrap_profile_config }}"
+    owner: "{{ item.1 }}"
+    group: "{{ item.1 }}"
+  with_subelements:
+    - "{{ bootstrap_profile_config }}"
+    - user
 
 - name: Set app defaults
   community.general.alternatives:

@@ -103,10 +103,22 @@ variable "gw" {
   default     = "10.11.20.1"
 }
 
+variable "bridge" {
+  description = "The network bridge of the LXC container"
+  type        = string
+  default     = "vmbr0"
+}
+
 variable "hwaddr" {
   description = "The MAC address of the LXC container"
   type        = string
   default     = null
+}
+
+variable "tag" {
+  description = "The VLAN tag of the LXC container"
+  type        = numbder
+  default     = 20
 }
 
 variable "firewall" {

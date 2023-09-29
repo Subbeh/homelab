@@ -3,18 +3,18 @@ radarr:
   container:
     image: lscr.io/linuxserver/radarr:4.7.5
     ports:
-      - "{{ network_svc.radarr.port }}:7878"
+      - "{{ net_svc.radarr.port }}:7878"
     volumes:
-      - "{{ hostvars[network_svc.radarr.host]['common_dir'] }}/radarr/config:/config"
-      - "{{ hostvars[network_svc.radarr.host]['common_dir'] }}/radarr/MediaCover:/config/MediaCover"
-      - "{{ hostvars[network_svc.radarr.host]['common_media_dir'] }}:/data"
+      - "{{ common_apps_dir }}/radarr/config:/config"
+      - "{{ common_apps_dir }}/radarr/MediaCover:/config/MediaCover"
+      - "/data:/data"
 
   traefik:
     routers:
       - name: "radarr"
-        rule: "Host(`radarr.{{ network_domain.tld }}`)"
+        rule: "Host(`radarr.{{ net_domain.tld }}`)"
       - name: "radarr-bypass"
-        rule: "Host(`radarr.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_radarr_api }}`)"
+        rule: "Host(`radarr.{{ net_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_radarr_api }}`)"
         middlewares:
           - chain-external-no-auth
 

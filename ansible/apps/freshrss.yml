@@ -3,43 +3,42 @@ freshrss:
   container:
     image: freshrss/freshrss:1.21.0
     ports:
-      - "{{ network_svc.freshrss.port }}:80"
+      - "{{ net_svc.freshrss.port }}:80"
     volumes:
-      - "{{ common_dir }}/freshrss/data:/var/www/FreshRSS/data"
-      - "{{ common_dir }}/freshrss/extensions:/var/www/FreshRSS/extensions"
+      - "{{ common_apps_dir }}/freshrss/data:/var/www/FreshRSS/data"
+      - "{{ common_apps_dir }}/freshrss/extensions:/var/www/FreshRSS/extensions"
     env:
-      TRUSTED_PROXY: "{{ network_svc.bastion.ip }}/32"
+      TRUSTED_PROXY: "{{ net_hosts.bastion.ip }}/32"
       DB_HOST: postgres
       DB_BASE: freshrss
       DB_USER: "{{ common_user }}"
-      DB_PASSWORD: "{{ postgres_pass }}"
+      DB_PASSWORD: "{{ vault_postgres_pass }}"
       CRON_MIN: "*/20"
       FRESHRSS_INSTALL: >
         --api_enabled
-        --base_url https://freshrss.{{ network_domain.tld }}
+        --base_url https://freshrss.{{ net_domain.tld }}
         --db-base freshrss
         --db-host postgres
-        --db-password {{ postgres_pass }}
+        --db-password {{ vault_postgres_pass }}
         --db-type pgsql
         --db-user {{ common_user }}
         --default_user {{ common_user }}
         --language en
       FRESHRSS_USER: >
-        --api_password {{ freshrss_api }}
-        --email freshrss@{{ network_domain.tld }}
+        --api_password {{ vault_freshrss_api }}
+        --email freshrss@{{ net_domain.tld }}
         --language en
-        --password {{ freshrss_pass }}
+        --password {{ vault_freshrss_pass }}
         --user {{ common_user }}
 
   traefik:
-    rtr_middlewares:
-      - chain-external-no-auth
 
   db:
+    - type: postgres
+      name: freshrss
 
   uptime:
     - group: services
     - group: databases
-      name: "postgres_freshrss"
       type: postgres
-      databaseConnectionString: "postgres://{{ common_user }}:{{ postgres_pass }}@{{ network_hosts[network_svc.postgres.host] }}:{{ network_svc.postgres.port }}/freshrss"
+      dbname: freshrss

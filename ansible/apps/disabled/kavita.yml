@@ -2,10 +2,10 @@ kavita:
   container:
     image: kizaing/kavita:0.7.8
     ports:
-      - "{{ network_svc.kavita.port }}:5000"
+      - "{{ net_svc.kavita.port }}:5000"
     volumes:
-      - "{{ hostvars[network_svc.kavita.host]['common_dir'] }}/kavita/config:/config"
-      - "{{ hostvars[network_svc.kavita.host]['common_media_dir'] }}/books/ebooks:/books:ro"
+      - "{{ hostvars[net_svc.kavita.host]['common_dir'] }}/kavita/config:/config"
+      - "{{ hostvars[net_svc.kavita.host]['common_media_dir'] }}/books/ebooks:/books:ro"
 
   traefik:
 

@@ -1,0 +1,46 @@
+#############
+## Config  ##
+#############
+
+umask 022
+
+# BASH
+if [ -f /etc/bash_completion ]; then
+	. /etc/bash_completion
+fi
+
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWUNTRACKEDFILES=1
+
+if [ ! -f /etc/bash_completion.d/git-prompt ]; then
+	alias __git_ps1=''
+fi
+export PS1='\[\e[01;32m\]\u@\[\e[0m\]\[\e[01;31m\]\h\[\e[0m\]\[\e[01;35m\]:\[\e[0m\]\[\e[01;34m\]\w\[\e[0m\]\[\e[00;35m\]{\[\e[0m\]\[\e[00;37m\]$?\[\e[0m\]\[\e[00;35m\]}\[\e[0m\]\[\e[01;33m\]$(__git_ps1)\[\e[0m\]\[\e[01;31m\]\$\[\e[0m\]\[\e[00;37m\] \[\e[0m\]'
+export LS_COLORS="di=34:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
+
+# Ansible
+export ANSIBLE_NOCOWS=1
+export HISTCONTROL=ignoredups
+
+shopt -s checkwinsize
+shopt -s expand_aliases
+[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
+
+if [ -f /usr/bin/most ]; then
+	export PAGER=most
+fi
+
+#############
+##  Alias  ##
+#############
+
+# Commands
+alias ls='ls --color'
+alias grep='grep --color'
+alias egrep='egrep --color'
+alias ll='ls -lah'
+alias lt='ls -ltr'
+
+[ -f ~/.bash_functions ] && . ~/.bash_functions
+[ -f ~/.bashrc_local ] && . ~/.bashrc_local

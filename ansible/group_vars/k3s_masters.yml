@@ -10,7 +10,7 @@ k3s_server:
   node-ip: "{{ ansible_host }}"
   # node-taint: "node-role.kubernetes.io/master=true:NoSchedule"
   tls-san:
-    - "{{ network_svc.k8s.api }}"
+    - "{{ net_svc.k8s.api }}"
   # Disable Docker - this will use the default containerd CRI
   docker: false
   flannel-backend: "none" # This needs to be in quotes

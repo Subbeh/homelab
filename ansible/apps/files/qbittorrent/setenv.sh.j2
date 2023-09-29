@@ -2,8 +2,6 @@
 
 set -xeuo pipefail
 
-. /env
-
 QB_USER="{{ common_user }}"
 QB_PASS="{{ vault_qbittorrent_pass }}"
 QB_URL="http://localhost:8080"
@@ -11,6 +9,7 @@ QB_PREFS_URL="${QB_URL}/api/v2/app/setPreferences"
 QB_LOGIN_URL="${QB_URL}/api/v2/auth/login"
 GT_URL="http://localhost:8000/v1/openvpn/portforwarded"
 MAM_URL="https://t.myanonamouse.net/json/dynamicSeedbox.php"
+MAM_ID="{{ vault_mam_id }}"
 QB_COOKIE="/tmp/qb.cookies"
 MAM_COOKIE="/tmp/mam.cookies"
 

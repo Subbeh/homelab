@@ -1,0 +1,8 @@
+---
+- name: Run PVE bootstrap task
+  ansible.builtin.include_tasks: pve_bootstrap.yml
+  when: pve.repos is true
+
+- name: Run ACME task
+  ansible.builtin.include_tasks: acme.yml
+  when: pve.acme is true

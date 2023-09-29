@@ -1,17 +1,18 @@
 ---
 - name: Set host facts
   ansible.builtin.set_fact:
-    _remote_host: "{{ (_file.host | default(network_svc[_app].host)) | mandatory }}"
+    _remote_host: "{{ (_file.host | default(net_svc[_app].host)) | mandatory }}"
 
 - block:
     - block:
         - name: Set file facts
           ansible.builtin.set_fact:
-            _src: "{{ common_apps_dir + '/files/' + _file.src }}"
+            _src: "{{ common_ansible_apps + '/files/' + _app + '/' + _file.src }}"
             _ext: "{{ _file.src | splitext }}"
 
-        - name: Get file stats
+        - name: Get local file stats
           delegate_to: localhost
+          become: false
           ansible.builtin.stat:
             path: "{{ _src }}"
           register: _stat
@@ -22,7 +23,7 @@
 
         - name: Copy template {{ _file.src }} over
           ansible.builtin.template:
-            src: "{{ common_apps_dir }}/files/{{ _file.src }}"
+            src: "{{ _src }}"
             dest: "{{ _file.dest }}"
             owner: "{{ _file.owner | default(omit) }}"
             group: "{{ _file.group | default(omit) }}"
@@ -48,13 +49,16 @@
         - name: Create empty file/directory
           ansible.builtin.file:
             path: "{{ _file.dest }}"
-            state: "{{ _file.state | default('touch') }}"
+            state: "{{ _file.state | default('directory') }}"
             mode: "{{ _file.mode | default(omit) }}"
             owner: "{{ _file.owner | default(omit) }}"
             group: "{{ _file.group | default(omit) }}"
-            force: "{{ _file.force | default(false) }}"
+            modification_time: "{{ _file.modification_time | default(omit) }}"
+            access_time: "{{ _file.access_time | default(omit) }}"
+            recurse: "{{ true if (_file.state is undefined or _file.state == 'directory') else omit }}"
       when:
         - _file.src is not defined
         - _file.content is not defined
   no_log: "{{ ci | default(false) }}"
   delegate_to: "{{ _remote_host }}"
+  become: "{{ _file.become | default(true) }}"

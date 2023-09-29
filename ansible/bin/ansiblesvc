@@ -3,7 +3,7 @@
 INPUT_FILE="${INFRA:?not set}/ansible/group_vars/all/network.yml"
 
 yq '
-  .network_svc | to_entries | .[] | [
+  .net_svc | to_entries | .[] | [
     .key,
     ((
       select(.value.host | type == "!!str").value.host,

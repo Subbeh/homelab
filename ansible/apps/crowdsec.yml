@@ -1,23 +1,42 @@
 ---
 crowdsec:
-  container:
-    image: crowdsecurity/crowdsec:v1.5.2
-    ports:
-      - "{{ network_svc.crowdsec.port }}:8080"
-    env:
-      COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/linux-lpe crowdsecurity/sshd crowdsecurity/endlessh crowdsecurity/base-http-scenarios crowdsecurity/unifi"
-      PARSERS: "crowdsecurity/geoip-enrich crowdsecurity/whitelists"
-      GID: "{{ common_user_id | string }}"
-      CUSTOM_HOSTNAME: "{{ network_svc.crowdsec.host }}"
-    volumes:
-      - "/var/log:/logs/var:ro"
-      - "{{ common_dir }}/logs:/logs/svc:ro"
-      - "{{ common_dir }}/crowdsec/data:/var/lib/crowdsec/data"
-      - "{{ common_dir }}/crowdsec/config:/etc/crowdsec"
+  files:
+    - src: config.yaml.j2
+      dest: /etc/crowdsec/config.yaml
+      mode: "0600"
+    - src: acquis.yaml
+      dest: /etc/crowdsec/acquis.yaml
+      mode: "0600"
+    - src: profiles.yaml
+      dest: /etc/crowdsec/profiles.yaml
+      mode: "0600"
+    - src: crowdsec-cloudflare-bouncer.yaml.j2
+      dest: /etc/crowdsec/bouncers/crowdsec-cloudflare-bouncer.yaml
+      mode: "0600"
+    - dest: /etc/crowdsec/config/parsers/s02-enrich
+    - src: custom-whitelists.yaml.j2
+      dest: /etc/crowdsec/config/parsers/s02-enrich/custom-whitelists.yaml
+      mode: "0600"
+    - dest: /etc/crowdsec/notifications
+    - src: discord.yaml.j2
+      dest: /etc/crowdsec/notifications/discord.yaml
+      mode: "0600"
 
-  traefik:
-    url: http://crowdsec:8080
-
-  uptime:
-    group: system
-    type: port
+  tasks:
+    - file: crowdsec/setup.yml
+    - file: crowdsec/update.yml
+    - file: crowdsec/hub.yml
+      vars:
+        collections:
+          - crowdsecurity/base-http-scenarios
+          - crowdsecurity/http-cve
+          - crowdsecurity/iptables
+          - crowdsecurity/linux
+          - crowdsecurity/linux-lpe
+          - crowdsecurity/sshd
+          - crowdsecurity/traefik
+          - crowdsecurity/whitelist-good-actors
+        parsers:
+          - crowdsecurity/geoip-enrich
+          - crowdsecurity/whitelists
+    - file: crowdsec/restart.yml

@@ -3,24 +3,24 @@ wizarr:
   container:
     image: ghcr.io/wizarrrr/wizarr:3.0.1
     ports:
-      - "{{ network_svc.wizarr.port }}:5690"
+      - "{{ net_svc.wizarr.port }}:5690"
     volumes:
-      - "{{ common_dir }}/wizarr/config:/data/database"
+      - "{{ common_apps_dir }}/wizarr/config:/data/database"
     env:
-      APP_URL: "https://invites.{{ network_domain.tld }}"
+      APP_URL: "https://invites.{{ net_domain.tld }}"
       DISABLE_BUILTIN_AUTH: "true"
 
   traefik:
     routers:
       - name: "wizarr"
-        rule: "Host(`invites.{{ network_domain.tld }}`)"
+        rule: "Host(`invites.{{ net_domain.tld }}`)"
       - name: "wizarr-bypass"
-        rule: "Host(`invites.{{ network_domain.tld }}`) && (Path(`/join`, `/setup`) || PathPrefix(`/j/`, `/setup/`, `/static/`))"
+        rule: "Host(`invites.{{ net_domain.tld }}`) && (Path(`/join`, `/setup`) || PathPrefix(`/j/`, `/setup/`, `/static/`))"
         middlewares:
           - chain-external-no-auth
 
   uptime:
     group: media
     type: port
-    port: "{{ network_svc.wizarr.port }}"
-    hostname: "{{ network_hosts[network_svc.wizarr.host] }}"
+    port: "{{ net_svc.wizarr.port }}"
+    hostname: "{{ net_hosts[net_svc.wizarr.host].ip }}"

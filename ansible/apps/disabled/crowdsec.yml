@@ -1,0 +1,23 @@
+---
+crowdsec:
+  container:
+    image: crowdsecurity/crowdsec:v1.5.2
+    ports:
+      - "{{ net_svc.crowdsec.port }}:8080"
+    env:
+      COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/linux-lpe crowdsecurity/sshd crowdsecurity/endlessh crowdsecurity/base-http-scenarios crowdsecurity/unifi"
+      PARSERS: "crowdsecurity/geoip-enrich crowdsecurity/whitelists"
+      GID: "{{ common_user_id | string }}"
+      CUSTOM_HOSTNAME: "{{ net_svc.crowdsec.host }}"
+    volumes:
+      - "/var/log:/logs/var:ro"
+      - "{{ common_dir }}/logs:/logs/svc:ro"
+      - "{{ common_dir }}/crowdsec/data:/var/lib/crowdsec/data"
+      - "{{ common_dir }}/crowdsec/config:/etc/crowdsec"
+
+  traefik:
+    url: http://crowdsec:8080
+
+  uptime:
+    group: system
+    type: port

@@ -1,0 +1,31 @@
+tcp:
+  routers:
+    k8s-passthrough:
+      rule: "HostSNIRegexp(`k8s.{{ net_domain.tld }}`, `{subdomain:[a-z]+}.k8s.{{ net_domain.tld }}`)"
+      priority: 99
+      service: k8s-passthrough
+      middlewares:
+        - k8s-whitelist
+      tls:
+        passthrough: true
+    k8s-passthrough-drone:
+      rule: "HostSNI(`drone.k8s.{{ net_domain.tld }}`)"
+      priority: 100
+      service: k8s-passthrough
+      tls:
+        passthrough: true
+
+  middlewares:
+    k8s-whitelist:
+      ipWhiteList:
+        sourceRange:
+          - "127.0.0.1/32"
+          - "{{ net_cidr.lan }}"
+          - "{{ net_cidr.tailscale }}"
+
+  services:
+    k8s-passthrough:
+      loadbalancer:
+        proxyProtocol:
+        servers:
+          - address: "{{ net_hosts.k8s.ingress }}:443"

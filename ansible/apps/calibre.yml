@@ -3,30 +3,30 @@ calibre:
   container:
     image: lscr.io/linuxserver/calibre:6.25.0
     ports:
-      - "{{ network_svc.calibre.port }}:8080"
-      - "{{ network_svc.calibre.port_server }}:8081"
+      - "{{ net_svc.calibre.port }}:8080"
+      - "{{ net_svc.calibre.port_server }}:8081"
     volumes:
-      - "{{ hostvars[network_svc.calibre.host]['common_dir'] }}/calibre:/config"
-      - "{{ hostvars[network_svc.calibre.host]['common_media_dir'] }}/books/ebooks:/books"
-      - "{{ hostvars[network_svc.calibre.host]['common_media_dir'] }}/downloads:/downloads"
+      - "{{ common_apps_dir }}/calibre:/config"
+      - "/data/media/books/ebooks:/books"
+      - "/data/downloads:/downloads"
 
   traefik:
     routers:
       - name: "calibre"
-        rule: "Host(`calibre.{{ network_domain.tld }}`)"
+        rule: "Host(`calibre.{{ net_domain.tld }}`)"
         service: calibre-svc
       - name: "calibre-server"
-        rule: "Host(`calibre-server.{{ network_domain.tld }}`)"
+        rule: "Host(`calibre-server.{{ net_domain.tld }}`)"
         service: calibre-server-svc
     services: |
       calibre-svc:
         loadBalancer:
           servers:
-            - url: "http://{{ network_svc.calibre.host }}:{{ network_svc.calibre.port }}"
+            - url: "http://{{ net_svc.calibre.host }}:{{ net_svc.calibre.port }}"
       calibre-server-svc:
         loadBalancer:
           servers:
-            - url: "http://{{ network_svc.calibre.host }}:{{ network_svc.calibre.port_server }}"
+            - url: "http://{{ net_svc.calibre.host }}:{{ net_svc.calibre.port_server }}"
 
   uptime:
     group: media
@@ -38,10 +38,10 @@ calibre_web:
     env:
       DOCKER_MODS: linuxserver/mods:universal-calibre
     ports:
-      - "{{ network_svc.calibre_web.port }}:8083"
+      - "{{ net_svc.calibre_web.port }}:8083"
     volumes:
-      - "{{ hostvars[network_svc.calibre_web.host]['common_dir'] }}/calibre-web:/config"
-      - "{{ hostvars[network_svc.calibre_web.host]['common_media_dir'] }}/books/ebooks:/books"
+      - "{{ common_apps_dir }}/calibre-web:/config"
+      - "/data/media/books/ebooks:/books"
 
   traefik:
     name: books

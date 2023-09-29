@@ -7,7 +7,7 @@ tasks:
     vars:
       TAGS: 'untagged,{{default "all" .TAGS}}'
     cmds:
-      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/test.yml -e 'app="{{.CLI_ARGS}}"' --tags {{.TAGS}}
+      - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml -e 'app="{{.CLI_ARGS}}"' --tags {{.TAGS}}
 
   container:
     desc: Create container
@@ -20,6 +20,12 @@ tasks:
     cmds:
       - task: default
         vars: { TAGS: "db" }
+
+  tasks:
+    desc: Run app tasks
+    cmds:
+      - task: default
+        vars: { TAGS: "tasks" }
 
   traefik:
     desc: Create Traefik config
@@ -44,3 +50,9 @@ tasks:
     cmds:
       - task: default
         vars: { TAGS: "traefik,uptime,files" }
+
+  restore:
+    desc: Restore app configs from backup
+    cmds:
+      - task: default
+        vars: { TAGS: "restore" }

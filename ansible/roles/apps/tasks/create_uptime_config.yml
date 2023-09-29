@@ -2,7 +2,7 @@
 - name: Set Uptime Kuma facts
   ansible.builtin.set_fact:
     _uptime_config: "{{ _app_config.uptime }}"
-    _uptime_api_url: "http://{{ network_hosts[network_svc.uptimekuma.host] }}:{{ network_svc.uptimekuma.port }}"
+    _uptime_api_url: "http://{{ net_hosts[net_svc.uptimekuma.host].ip }}:{{ net_svc.uptimekuma.port }}"
 
 - name: Set Ansible environment for ci pipeline
   ansible.builtin.set_fact:
@@ -17,7 +17,7 @@
           lucasheld.uptime_kuma.login:
             api_url: "{{ _uptime_api_url }}"
             api_username: "{{ common_user }}"
-            api_password: "{{ uptime_kuma_password }}"
+            api_password: "{{ vault_uptime_kuma_pass }}"
           register: _result
 
         - name: Extract the token from the result and set it as fact

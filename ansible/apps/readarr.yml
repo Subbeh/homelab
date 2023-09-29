@@ -4,17 +4,17 @@ readarr_ebooks:
   container:
     image: lscr.io/linuxserver/readarr:0.3.3-develop
     ports:
-      - "{{ network_svc.readarr_ebooks.port }}:8787"
+      - "{{ net_svc.readarr_ebooks.port }}:8787"
     volumes:
-      - "{{ hostvars[network_svc.readarr_ebooks.host]['common_dir'] }}/readarr_ebooks/config:/config"
-      - "{{ hostvars[network_svc.readarr_ebooks.host]['common_media_dir'] }}:/data"
+      - "{{ common_apps_dir }}/readarr_ebooks/config:/config"
+      - "/data:/data"
 
   traefik:
     routers:
       - name: "readarr-eb"
-        rule: "Host(`readarr-eb.{{ network_domain.tld }}`)"
+        rule: "Host(`readarr-eb.{{ net_domain.tld }}`)"
       - name: "readarr-eb-bypass"
-        rule: "Host(`readarr-eb.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_ebooks_api }}`)"
+        rule: "Host(`readarr-eb.{{ net_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_ebooks_api }}`)"
         middlewares:
           - chain-external-no-auth
 
@@ -26,17 +26,17 @@ readarr_audiobooks:
   container:
     image: lscr.io/linuxserver/readarr:0.3.3-develop
     ports:
-      - "{{ network_svc.readarr_audiobooks.port }}:8787"
+      - "{{ net_svc.readarr_audiobooks.port }}:8787"
     volumes:
-      - "{{ hostvars[network_svc.readarr_audiobooks.host]['common_dir'] }}/readarr_audiobooks/config:/config"
-      - "{{ hostvars[network_svc.readarr_audiobooks.host]['common_media_dir'] }}:/data"
+      - "{{ common_apps_dir }}/readarr_audiobooks/config:/config"
+      - "/data:/data"
 
   traefik:
     routers:
       - name: "readarr-ab"
-        rule: "Host(`readarr-ab.{{ network_domain.tld }}`)"
+        rule: "Host(`readarr-ab.{{ net_domain.tld }}`)"
       - name: "readarr-ab-bypass"
-        rule: "Host(`readarr-ab.{{ network_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_audiobooks_api }}`)"
+        rule: "Host(`readarr-ab.{{ net_domain.tld }}`) && Headers(`X-API-KEY`, `{{ media_readarr_audiobooks_api }}`)"
         middlewares:
           - chain-external-no-auth
 

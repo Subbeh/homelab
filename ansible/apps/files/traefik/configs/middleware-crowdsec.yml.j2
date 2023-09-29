@@ -1,0 +1,15 @@
+---
+http:
+  middlewares:
+    crowdsec:
+      plugin:
+        bouncer:
+          enabled: true
+          logLevel: DEBUG
+          crowdsecLapiKey: {{ _bouncer_api_key }}
+          crowdsecLapiHost: {{ net_svc.crowdsec.host }}:8080
+          clientTrustedIPs: {{ net_cidr.all }}
+          redisCacheEnabled: true
+          redisCacheHost: redis:6379
+          redisCachePassword: {{ vault_redis_pass }}
+          redisCacheDatabase: 3

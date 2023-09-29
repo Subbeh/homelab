@@ -1,0 +1,28 @@
+---
+
+http:
+  routers:
+    catach-all-rtr:
+      rule: HostRegexp(`{host:.+}`)
+      priority: 1
+      entryPoints:
+        - websecure
+      middlewares:
+        - catch-all
+      service: catch-all-svc
+
+  services:
+    catch-all-svc:
+      loadbalancer:
+        servers:
+          - url: "http://{{ net_svc.gw.ip }}:8888"
+
+  middlewares:
+    catch-all:
+      errors:
+        status:
+          - "404"
+          - "418"
+          - "500-599"
+        service: catch-all-svc
+        query: "/maintenance.html"

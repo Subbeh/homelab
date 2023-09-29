@@ -1,0 +1,9 @@
+---
+- name: Restart CrowdSec
+  become: true
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - crowdsec
+    - crowdsec-firewall-bouncer

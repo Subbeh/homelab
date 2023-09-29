@@ -8,6 +8,11 @@
       - _defaults.yml
     depth: 1
     name: _configs
+  register: _load_configs
+
+- ansible.builtin.fail:
+    msg: "{{ _load_configs }}"
+  when: _configs is undefined
 
 - name: Load defaults
   ansible.builtin.include_vars:

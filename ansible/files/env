@@ -1,5 +1,0 @@
-PUID={{ common_user_id }}
-PGID={{ common_group_id }}
-TZ="{{ common_timezone }}"
-DOCKERDIR="{{ common_dir }}"
-DATADIR="{{ common_data_dir }}"

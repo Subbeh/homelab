@@ -1,0 +1,70 @@
+#jinja2:variable_start_string:'[[', variable_end_string:']]', trim_blocks: False
+---
+
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+api:
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+    forwardedHeaders:
+      trustedIPs: [[ net_cloudflare_ips + net_cidr.all ]]
+    http:
+      tls:
+        options: tls-opts@file
+        certresolver: dns-cloudflare
+        domains:
+          - main: "[[ net_domain.tld ]]"
+            sans:
+              - "*.[[ net_domain.tld ]]"
+  traefik:
+    address: :8080
+
+providers:
+  file:
+    directory: /configs
+    watch: true
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false
+
+certificatesResolvers:
+  dns-cloudflare:
+    acme:
+      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # uncomment for prod
+      email: [[ vault_cloudflare_email ]]
+      storage: acme.json
+      dnsChallenge:
+        provider: cloudflare
+        delayBeforeCheck: 60
+        resolvers:
+          - 1.1.1.1:53
+          - 1.0.0.1:53
+
+log:
+  filePath: /logs/traefik.log
+  level: INFO
+
+accessLog:
+  filePath: /logs/access.log
+  bufferingSize: 100
+
+experimental:
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.1.16
+    cloudflarewarp:
+      modulename: github.com/BetterCorp/cloudflarewarp
+      version: v1.3.3

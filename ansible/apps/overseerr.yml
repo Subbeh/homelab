@@ -3,9 +3,9 @@ overseerr:
   container:
     image: lscr.io/linuxserver/overseerr:1.33.2
     ports:
-      - "{{ network_svc.overseerr.port }}:5055"
+      - "{{ net_svc.overseerr.port }}:5055"
     volumes:
-      - "{{ common_dir }}/overseerr/config:/config"
+      - "{{ common_apps_dir }}/overseerr/config:/config"
 
   traefik:
     name: requests

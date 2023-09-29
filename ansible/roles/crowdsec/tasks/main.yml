@@ -1,5 +1,0 @@
----
-- ansible.builtin.include_tasks: setup.yml
-- ansible.builtin.include_tasks: update.yml
-- ansible.builtin.include_tasks: firewall.yml
-- ansible.builtin.include_tasks: traefik.yml

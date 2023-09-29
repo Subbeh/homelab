@@ -1,0 +1,13 @@
+{{ common_apps_dir }}/logs/traefik/*.log {
+  daily
+  rotate 4
+  missingok
+  notifempty
+  compress
+  dateext
+  dateformat .%Y-%m-%d
+  create 0644 root root
+  postrotate
+  docker kill --signal="USR1" $(docker ps | grep '\btraefik\b' | awk '{print $1}')
+  endscript
+}

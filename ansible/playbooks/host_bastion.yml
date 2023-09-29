@@ -1,0 +1,160 @@
+---
+- hosts: [localhost, bastion]
+  gather_facts: false
+  become: false
+
+  vars:
+    # PVE vars
+    pve_vm:
+      vmid: "{{ net_hosts.bastion.vmid }}"
+      node: "{{ net_hosts.bastion.node }}"
+      hostname: bastion
+      storage: local-lvm
+      size: 30
+      cores: 2
+      memory: 8192
+      swap: 8192
+      network:
+        hwaddr: "{{ net_hosts.bastion.hwaddr }}"
+        tag: 5
+
+    # bootstrap vars
+    bootstrap:
+      # packages: true
+      # system: true
+      # user: true
+      # network: true
+      # ntp: true
+      # filesystem: true
+      # profile: true
+      # locale: true
+      # ssh: true
+      # docker: true
+      borg: true
+
+    bootstrap_pkg_extra:
+      - name: debian-archive-keyring
+      - name: rsyslog
+      - name: crowdsec
+      - name: crowdsec-firewall-bouncer-iptables
+      - name: crowdsec-cloudflare-bouncer
+      - name: postgresql-client
+    bootstrap_pkg_repo:
+      - repo: deb [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/debian {{ ansible_distribution_release }} main
+        apt_key:
+          url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+          keyring: /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
+    bootstrap_net_dns_server: "10.11.5.1"
+    bootstrap_ntp_server: "10.11.5.1"
+    bootstrap_profile_config:
+      - file: bashrc
+        dest: ".bashrc"
+        user:
+          - root
+          - "{{ common_user }}"
+      - file: vimrc
+        dest: ".vimrc"
+        user:
+          - root
+          - "{{ common_user }}"
+
+    # borg backup vars
+    borg_repository:
+      - path: "{{ borg_server }}/bastion"
+        label: local
+      - path: "{{ vault_borgbase.bastion }}"
+        label: borgbase
+    borg_source_directories:
+      - "/data/apps"
+    borg_hc_ping_url: "{{ vault_borg_hc.bastion }}"
+    borg_db_postgres: true
+    borgmatic_timer_hour: 02
+    borgmatic_timer_minute: 00
+
+  tasks:
+    - block:
+        - name: Destory VM
+          tags: [never, destroy]
+          block:
+            - ansible.builtin.import_role:
+                name: pve
+                tasks_from: destroy
+            - ansible.builtin.meta: end_play
+
+        - name: Create VM
+          tags: vm
+          ansible.builtin.import_role:
+            name: pve
+            tasks_from: create_vm
+      when: inventory_hostname == "localhost"
+
+    - block:
+        - name: Run bootstrap steps
+          tags: bootstrap
+          block:
+            - name: Get host facts
+              ansible.builtin.setup:
+
+            - name: Include bootstrap role
+              ansible.builtin.include_role:
+                name: bootstrap
+          any_errors_fatal: true
+          become: true
+
+        - name: Configure Crowdsec
+          tags: crowdsec
+          block:
+            - name: Include apps role to copy files over
+              ansible.builtin.include_role:
+                name: apps
+              vars:
+                _app: crowdsec
+
+        - name: Configure Authentik
+          tags: authentik
+          block:
+            - name: Include apps role
+              ansible.builtin.include_role:
+                name: apps
+              vars:
+                _app: "{{ item }}"
+                _tags:
+                  - container
+                  - db
+                  - traefik
+              loop:
+                - redis_bastion
+                - postgres_bastion
+                - geoipupdate
+                - authentik_server
+                - authentik_worker
+
+        - name: Configure Traefik
+          tags: traefik
+          block:
+            - name: Include apps role
+              ansible.builtin.include_role:
+                name: apps
+              vars:
+                _app: "{{ item }}"
+                _tags:
+                  - files
+                  - container
+                  - tasks
+              loop:
+                - redis_bastion
+                - traefik
+                - whoami
+
+        - name: Configure Uptime Kuma
+          tags: uptime
+          block:
+            - name: Include apps role
+              ansible.builtin.include_role:
+                name: apps
+              vars:
+                _app: uptimekuma
+                _tags:
+                  - container
+                  - traefik
+      when: inventory_hostname != "localhost"

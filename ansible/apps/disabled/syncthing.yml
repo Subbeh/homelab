@@ -2,7 +2,7 @@ syncthing:
   image: lscr.io/linuxserver/syncthing:1.23.7
   hostname: "syncthing"
   ports:
-    - "{{ network_svc.syncthing.port }}:8384"
+    - "{{ net_svc.syncthing.port }}:8384"
     - 22000:22000/tcp
     - 22000:22000/udp
     - 21027:21027/udp
@@ -15,5 +15,5 @@ syncthing:
   uptime:
     group: services
     type: port
-    port: "{{ network_svc.syncthing.port }}"
-    hostname: "{{ network_hosts[network_svc.syncthing.host] }}"
+    port: "{{ net_svc.syncthing.port }}"
+    hostname: "{{ net_hosts[net_svc.syncthing.host] }}"

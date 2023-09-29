@@ -1,7 +1,7 @@
 ---
 - name: Set authorized keys
   ansible.posix.authorized_key:
-    user: "{{ bootstrap_user.name }}"
+    user: "{{ _def_user }}"
     key: "{{ item }}"
     state: present
   loop: "{{ bootstrap_ssh_authorizedkeys }}"
@@ -20,15 +20,15 @@
 
 - name: Generate user OpenSSH keypair
   community.crypto.openssh_keypair:
-    path: "/home/{{ bootstrap.user.name }}/.ssh/id_ed25519"
+    path: "{{ _def_user_home }}/.ssh/id_ed25519"
     type: ed25519
-    owner: "{{ bootstrap.user.name }}"
-    group: "{{ bootstrap.user.name }}"
+    owner: "{{ _def_user }}"
+    group: "{{ _def_user }}"
   register: _setup_user_ssh_key
 
 - name: Allow user self-SSH
   ansible.posix.authorized_key:
-    user: "{{ bootstrap.user.name }}"
+    user: "{{ _def_user }}"
     state: present
     key: "{{ _setup_user_ssh_key.public_key }}"
 
@@ -38,6 +38,16 @@
     regex: "^(#)?{{ item.key }}"
     line: "{{ item.key }} {{ item.value }}"
     state: present
-  with_dict: "{{ bootstrap.ssh.config }}"
+  with_dict: "{{ bootstrap_sshd_config }}"
   notify:
+    - change ansible_user
     - restart sshd
+
+# https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
+- name: Fix - create cron job to create /run/sshd on reboot
+  ansible.builtin.cron:
+    name: "fix sshd service"
+    special_time: reboot
+    job: "mkdir -p -m0755 /run/sshd && systemctl restart ssh.service"
+    user: root
+    cron_file: sshd_fix

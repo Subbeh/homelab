@@ -1,0 +1,21 @@
+---
+- block:
+    - ansible.builtin.set_fact:
+        _path: "{{ common_ansible_apps + '/tasks/' + _task.file }}"
+    - name: Get local taskfile stats
+      delegate_to: localhost
+      become: false
+      ansible.builtin.stat:
+        path: "{{ _path }}"
+      register: _stat
+
+    - ansible.builtin.fail:
+        msg: "File {{ _src }} does not exist"
+      when: _stat.stat.exists is false
+
+    - name: Run task {{ _task }}
+      ansible.builtin.include_tasks:
+        file: "{{ _path }}"
+      vars:
+        _vars: "{{ _task.vars | default({}) }}"
+  delegate_to: "{{ net_svc[_app].host }}"

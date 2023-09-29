@@ -1,12 +1,11 @@
 ---
-network_domain:
+net_domain:
   tld: sbbh.cloud
   tld_local: int.sbbh.cloud
   tld_test: test.sbbh.cloud
   tld_k8s: k8s.sbbh.cloud
-  tld_personal: sterwindt.com
 
-network_cidr:
+net_cidr:
   lan: "10.11.0.0/16"
   servers: "10.11.10.0/24"
   dmz: "10.11.5.0/30"
@@ -24,79 +23,103 @@ network_cidr:
       "100.64.0.0/10",
     ]
 
-network_hosts:
-  gw: "{{ ansible_default_ipv4.gateway | default('') }}"
-  opnsense: "{{ network_cidr.lan | ansible.utils.ipsubnet(24, -2) | ansible.utils.nthhost(1) }}"
-  nas: "{{ network_cidr.servers | ansible.utils.nthhost(10) }}"
-  pbk: "{{ network_cidr.servers | ansible.utils.nthhost(20) }}"
-  pikvm: "{{ network_cidr.servers | ansible.utils.nthhost(254) }}"
-  bastion: "{{ network_cidr.dmz | ansible.utils.nthhost(2) }}"
-  services: "{{ network_cidr.vms | ansible.utils.nthhost(100) }}"
-  plex: "{{ network_cidr.vms | ansible.utils.nthhost(30) }}"
-  pve:
-    pve_nuc_01: "{{ network_cidr.servers | ansible.utils.nthhost(21) }}"
-    pve_opti_01: "{{ network_cidr.servers | ansible.utils.nthhost(22) }}"
-    pve_opti_02: "{{ network_cidr.servers | ansible.utils.nthhost(23) }}"
-  k8s:
-    master_1: "{{ network_cidr.k8s | ansible.utils.nthhost(11) }}"
-    master_2: "{{ network_cidr.k8s | ansible.utils.nthhost(12) }}"
-    master_3: "{{ network_cidr.k8s | ansible.utils.nthhost(13) }}"
-    worker_1: "{{ network_cidr.k8s | ansible.utils.nthhost(21) }}"
-    worker_2: "{{ network_cidr.k8s | ansible.utils.nthhost(22) }}"
-    worker_3: "{{ network_cidr.k8s | ansible.utils.nthhost(23) }}"
-    api: "{{ network_cidr.k8s | ansible.utils.nthhost(80) }}"
-    ingress: "{{ network_cidr.k8s | ansible.utils.nthhost(100) }}"
+net_cloudflare_ips:
+  [
+    "173.245.48.0/20",
+    "103.21.244.0/22",
+    "103.22.200.0/22",
+    "103.31.4.0/22",
+    "141.101.64.0/18",
+    "108.162.192.0/18",
+    "190.93.240.0/20",
+    "188.114.96.0/20",
+    "197.234.240.0/22",
+    "198.41.128.0/17",
+    "162.158.0.0/15",
+    "104.16.0.0/13",
+    "104.24.0.0/14",
+    "172.64.0.0/13",
+    "131.0.72.0/22",
+  ]
 
-network_vpn:
+net_hosts:
+  gw: "{{ ansible_default_ipv4.gateway | default('') }}"
+  opnsense: "{{ net_cidr.lan | ansible.utils.ipsubnet(24, -2) | ansible.utils.nthhost(1) }}"
+  pikvm:
+    ip: "{{ net_cidr.servers | ansible.utils.nthhost(254) }}"
+  bastion:
+    ip: "{{ net_cidr.dmz | ansible.utils.nthhost(2) }}"
+    hwaddr: "b6:80:83:80:64:2b"
+    node: pve-nuc
+    vmid: 202
+  nas:
+    ip: "{{ net_cidr.vms | ansible.utils.nthhost(10) }}"
+    hwaddr: "96:96:e4:b0:a1:8c"
+    node: pve-nas
+    vmid: 210
+  pbs:
+    ip: "{{ net_cidr.vms | ansible.utils.nthhost(20) }}"
+    hwaddr: "0a:b9:3c:8f:96:b7"
+    node: pve-nas
+    vmid: 220
+  media:
+    ip: "{{ net_cidr.vms | ansible.utils.nthhost(30) }}"
+    hwaddr: "32:63:bd:e4:e0:09"
+    node: pve-nas
+    vmid: 230
+  services:
+    ip: "{{ net_cidr.vms | ansible.utils.nthhost(40) }}"
+    hwaddr: "f2:c4:78:b6:16:11"
+    node: pve-nuc
+    vmid: 240
+  plex:
+    ip: "{{ net_cidr.vms | ansible.utils.nthhost(50) }}"
+    hwaddr: "6a:1b:53:c1:2f:d2"
+    node: pve-nuc
+    vmid: 250
+  windows:
+    ip: "{{ net_cidr.vms | ansible.utils.nthhost(90) }}"
+    hwaddr: "aa:69:12:a3:17:bd"
+    node: pve-nuc
+    vmid: 290
+  pve:
+    pve_nas: "{{ net_cidr.servers | ansible.utils.nthhost(10) }}"
+    pve_nuc: "{{ net_cidr.servers | ansible.utils.nthhost(11) }}"
+  k8s:
+    master_1: "{{ net_cidr.k8s | ansible.utils.nthhost(11) }}"
+    master_2: "{{ net_cidr.k8s | ansible.utils.nthhost(12) }}"
+    master_3: "{{ net_cidr.k8s | ansible.utils.nthhost(13) }}"
+    worker_1: "{{ net_cidr.k8s | ansible.utils.nthhost(21) }}"
+    worker_2: "{{ net_cidr.k8s | ansible.utils.nthhost(22) }}"
+    worker_3: "{{ net_cidr.k8s | ansible.utils.nthhost(23) }}"
+    api: "{{ net_cidr.k8s | ansible.utils.nthhost(80) }}"
+    ingress: "{{ net_cidr.k8s | ansible.utils.nthhost(100) }}"
+
+net_vpn:
   openvpn_user: "{{ vault_openvpn_user }}"
   openvpn_pass: "{{ vault_openvpn_pass }}"
 
-network_svc:
-  gw:
-    ip: "{{ ansible_default_ipv4.gateway | default('') }}"
-  dns:
-    ip: "{{ ansible_default_ipv4.gateway | default('') }}"
-  nas:
-    host: nas
-    ip: "{{ network_cidr.servers | ansible.utils.nthhost(10) }}"
-    port: "5000"
-  bastion:
-    ip: "{{ network_cidr.dmz | ansible.utils.nthhost(2) }}"
-  services:
-    ip: "{{ network_cidr.vms | ansible.utils.nthhost(100) }}"
-  k8s:
-    host: "{{ network_hosts.k8s | first }}"
-  pbk:
-    host: pbk
-    port: "8007"
-  pve:
-    host: "{{ network_hosts.pve | first }}"
-    port: "8006"
-
-  # services
+net_svc:
   adguard:
-    host: "{{ network_hosts.opnsense }}"
+    host: "{{ net_hosts.opnsense }}"
     port: "5380"
-  authentik_server:
-    host: services
+  authentik:
+    host: bastion
     port: "9000"
   authentik_worker:
-    host: services
-    port: "9010"
+    host: bastion
   audiobookshelf:
-    host: nas
+    host: media
     port: "9060"
   bazarr:
-    host: nas
+    host: media
     port: "9053"
-  borgmatic_nas:
-    host: nas
   calibre:
-    host: nas
+    host: media
     port: "9061"
     port_server: "9062"
   calibre_web:
-    host: nas
+    host: media
     port: "9063"
   changedetection:
     host: services
@@ -106,11 +129,10 @@ network_svc:
   crowdsec:
     host: bastion
     port: "9003"
-    bouncer_port: "9004"
   endlessh:
     host: bastion
   filebrowser:
-    host: nas
+    host: media
     port: "9027"
   flatnotes:
     host: services
@@ -118,12 +140,14 @@ network_svc:
   freshrss:
     host: services
     port: "9026"
+  geoipupdate:
+    host: bastion
   gitea:
     host: services
     port: "9023"
     port_ssh: "9022"
   gluetun:
-    host: nas
+    host: media
     ip: "192.168.100.100"
     port: "9005"
   linkace:
@@ -132,18 +156,22 @@ network_svc:
   linx:
     host: services
     port: "9024"
-  metamanager:
-    host: plex
   minio:
     host: services
     port: "9006"
     port_console: "9007"
+  cockpit:
+    host: nas
+    port: "9090"
   openspeedtest:
     host: services
     port: "9031"
   overseerr:
-    host: services
+    host: plex
     port: "9071"
+  pbs:
+    host: pbs
+    port: "8007"
   pgadmin:
     host: services
     port: "9025"
@@ -152,51 +180,59 @@ network_svc:
   plex:
     host: plex
     port: "32400"
+  plex_meta_manager:
+    host: plex
   portainer:
     host: services
     port: "9001"
-    agent_port: "9002"
+    port_agent: "9002"
   portainer_agent_bastion:
     host: bastion
-  portainer_agent_nas:
-    host: nas
-  postgres:
+  portainer_agent_media:
+    host: media
+  portainer_agent_plex:
+    host: plex
+  postgres_bastion:
+    host: bastion
+    port: "5432"
+  postgres_services:
     host: services
     port: "5432"
   prowlarr:
-    host: nas
+    host: media
     port: "9054"
+  pve:
+    host: none
+    port: "8006"
   qbittorrent:
-    host: nas
+    host: media
     port: "9090"
   radarr:
-    host: nas
+    host: media
     port: "9050"
   readarr_ebooks:
-    host: nas
+    host: media
     port: "9055"
   readarr_audiobooks:
-    host: nas
+    host: media
     port: "9056"
-  redis:
-    host: services
-  redis_traefik_cs:
+  redis_bastion:
     host: bastion
   sabnzbd:
-    host: nas
+    host: media
     port: "9091"
   sonarr:
-    host: nas
+    host: media
     port: "9051"
   tautulli:
-    host: services
+    host: plex
     port: "9070"
   traefik:
     host: bastion
   unpackerr:
-    host: nas
+    host: media
   uptimekuma:
-    host: services
+    host: bastion
     port: "9032"
   whoami:
     host: bastion

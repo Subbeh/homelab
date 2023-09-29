@@ -1,5 +1,4 @@
 ---
-
 - name: Mount Longhorn disks
   ansible.posix.mount:
     path: /srv/longhorn
@@ -52,7 +51,7 @@
 - name: Create resolv config
   ansible.builtin.copy:
     dest: "/etc/rancher/k3s/resolv.conf"
-    content: "nameserver {{ network_svc.dns.ip }}"
+    content: "nameserver {{ net_svc.dns.ip }}"
 
 - name: Create kubelet config
   ansible.builtin.copy:

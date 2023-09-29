@@ -24,12 +24,12 @@ container:
     env: strict
     labels: strict
 
-db:
-  default: postgres
-  postgres:
-    host: "{{ network_svc.postgres.host }}"
-    user: "{{ common_user }}"
-    pass: "{{ postgres_pass }}"
+# db:
+#   default: postgres
+#   postgres:
+#     host: "{{ net_svc.postgres.host }}"
+#     user: "{{ common_user }}"
+#     pass: "{{ vault_postgres_pass }}"
 
 uptime:
   interval: 60

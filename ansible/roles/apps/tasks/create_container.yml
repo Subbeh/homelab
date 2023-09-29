@@ -11,7 +11,7 @@
 
 - name: Set container host
   ansible.builtin.set_fact:
-    _remote_host: "{{ network_svc[_app].host | mandatory }}"
+    _remote_host: "{{ net_svc[_app].host | mandatory }}"
 
 - name: Ensure Docker network is present on {{ _remote_host }}
   no_log: "{{ ci | default(false) }}"
@@ -22,7 +22,7 @@
     driver_options: "{{ _defaults.networks[item.name].driver_options | default(omit) }}"
     ipam_config: "{{ _defaults.networks[item.name].ipam_config | default(omit) }}"
   with_items: "{{ _container.networks }}"
-  when: container.networks is defined and container.networks != None
+  when: _container.network_mode is undefined
 
 - name: Create container {{ _container.name }}
   no_log: "{{ ci | default(false) }}"
@@ -30,6 +30,7 @@
   community.docker.docker_container:
     name: "{{ _container.name | default(omit) }}"
     image: "{{ _container.image | default(omit) }}"
+    networks: "{{ _container.networks if _container.net_mode is undefined else omit }}"
     volumes: "{{ _container.volumes | default(omit) }}"
 
     api_version: "{{ _container.api_version | default(omit) }}"
@@ -109,7 +110,6 @@
     memory_swappiness: "{{ _container.memory_swappiness | default(omit) }}"
     mounts: "{{ _container.mounts | default(omit) }}"
     network_mode: "{{ _container.network_mode | default(omit) }}"
-    networks: "{{ _container.networks | default(omit) }}"
     networks_cli_compatible: "{{ _container.networks_cli_compatible | default(omit) }}"
     oom_killer: "{{ _container.oom_killer | default(omit) }}"
     oom_score_adj: "{{ _container.oom_score_adj | default(omit) }}"

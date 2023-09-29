@@ -2,7 +2,6 @@
 - name: Set hostname
   ansible.builtin.hostname:
     name: "{{ bootstrap_net_hostname }}"
-  notify: restart rsyslog
   when: bootstrap_net_hostname is defined
 
 - name: Clean up hosts file
@@ -12,7 +11,6 @@
     mode: 0644
     owner: root
     group: root
-  notify: restart rsyslog
   when: bootstrap_net_set_hosts_file is true
 
 - name: Set up nameserver

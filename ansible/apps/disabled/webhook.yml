@@ -3,7 +3,7 @@ webhook:
   container:
     image: almir/webhook:2.8.1
     ports:
-      - "{{ network_svc.webhook.port }}:9000"
+      - "{{ net_svc.webhook.port }}:9000"
     volumes:
       - "{{ common_dir }}/webhook:/etc/webhook"
     command: "-verbose -hooks=/etc/webhook/hooks.yaml -hotreload"

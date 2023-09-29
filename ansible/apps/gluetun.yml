@@ -5,45 +5,48 @@ gluetun:
     capabilities:
       - net_admin
     ports:
-      - "{{ network_svc.gluetun.port }}:8000"
-      - "{{ network_svc.qbittorrent.port }}:8080"
+      - "{{ net_svc.gluetun.port }}:8000"
+      - "{{ net_svc.qbittorrent.port }}:8080"
     volumes:
-      - "{{ hostvars[network_svc.gluetun.host]['common_dir'] }}/gluetun:/gluetun"
+      - "{{ common_apps_dir }}/gluetun:/gluetun"
     env:
       VPN_SERVICE_PROVIDER: "protonvpn"
       VPN_PORT_FORWARDING: "on"
-      OPENVPN_USER: "{{ network_vpn.openvpn_user}}+pmp"
-      OPENVPN_PASSWORD: "{{ network_vpn.openvpn_pass }}"
+      OPENVPN_USER: "{{ net_vpn.openvpn_user}}+pmp"
+      OPENVPN_PASSWORD: "{{ net_vpn.openvpn_pass }}"
       SERVER_COUNTRIES: "Singapore"
-      FIREWALL_OUTBOUND_SUBNETS: "{{ network_cidr.lan }}"
+      FIREWALL_OUTBOUND_SUBNETS: "{{ net_cidr.lan }}"
       HEALTH_TARGET_ADDRESS: "cloudflare.com:443"
       HEALTH_VPN_DURATION_INITIAL: "10s"
       HEALTH_VPN_DURATION_ADDITION: "30s"
       HEALTH_SUCCESS_WAIT_DURATION: "60s"
 
-  dependents:
-    - qbittorrent
+  # dependents:
+  #   - qbittorrent
 
   uptime:
+    - name: gluetun
+      type: group
+      group: services
     - name: gluetun_dns
       type: keyword
-      url: "http://{{ network_hosts[network_svc.gluetun.host] }}:{{ network_svc.gluetun.port }}/v1/dns/status"
+      url: "http://{{ net_hosts[net_svc.gluetun.host].ip }}:{{ net_svc.gluetun.port }}/v1/dns/status"
       keyword: running
       group: gluetun
     - name: gluetun_vpn
       type: keyword
-      url: "http://{{ network_hosts[network_svc.gluetun.host] }}:{{ network_svc.gluetun.port }}/v1/openvpn/status"
+      url: "http://{{ net_hosts[net_svc.gluetun.host].ip }}:{{ net_svc.gluetun.port }}/v1/openvpn/status"
       keyword: running
       group: gluetun
     - name: gluetun_ip
       type: keyword
-      url: "http://{{ network_hosts[network_svc.gluetun.host] }}:{{ network_svc.gluetun.port }}/v1/publicip/ip"
+      url: "http://{{ net_hosts[net_svc.gluetun.host].ip }}:{{ net_svc.gluetun.port }}/v1/publicip/ip"
       upsideDown: yes
       keyword: "{{ lookup('ansible.builtin.url', 'http://ifconfig.me', http_agent='curl/8.2.1') }}"
       group: gluetun
     - name: gluetun_port
       type: keyword
-      url: "http://{{ network_hosts[network_svc.gluetun.host] }}:{{ network_svc.gluetun.port }}/v1/openvpn/portforwarded"
+      url: "http://{{ net_hosts[net_svc.gluetun.host].ip }}:{{ net_svc.gluetun.port }}/v1/openvpn/portforwarded"
       upsideDown: yes
       keyword: ":0"
       group: gluetun

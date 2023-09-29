@@ -1,0 +1,190 @@
+---
+- hosts: [localhost, nas]
+  gather_facts: false
+  become: false
+
+  vars:
+    # PVE vars
+    pve_container:
+      vmid: "{{ net_hosts.nas.vmid }}"
+      hostname: nas
+      node: "{{ net_hosts.nas.node }}"
+      ostemplate: "local:vztmpl/debian-11-standard_11.7-1_amd64.tar.zst"
+      storage: local-lvm
+      size: 10
+      cores: 2
+      memory: 2048
+      swap: 1024
+      unprivileged: false
+      network:
+        hwaddr: "{{ net_hosts.nas.hwaddr }}"
+      mounts:
+        mp0: "/data/ssd0/downloads,mp=/data/ssd/downloads"
+        mp1: "/data/ssd0/backups,mp=/data/ssd/backups"
+        mp2: "/data/hdd0/media,mp=/data/hdd/media"
+        mp3: "/data/hdd0/backups,mp=/data/hdd/backups"
+      config:
+        - "features: mount=nfs;cifs,nesting=1"
+
+    # bootstrap vars
+    bootstrap:
+      # packages: true
+      # user: true
+      # network: true
+      # profile: true
+      # ssh: true
+      borg: true
+    bootstrap_pkg_repo:
+      - repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main contrib
+      - repo: deb [arch=amd64 signed-by=/usr/share/keyrings/45drives-archive-keyring.gpg] https://repo.45drives.com/debian focal main
+        apt_key:
+          url: https://repo.45drives.com/key/gpg.asc
+          keyring: /usr/share/keyrings/45drives-archive-keyring.gpg
+      - repo: deb [arch=amd64] https://download.nfs-ganesha.org/5/LATEST/Debian/{{ ansible_distribution_release }}/amd64/apt {{ ansible_distribution_release }} main
+        apt_key:
+          url: https://download.nfs-ganesha.org/5/rsa.pub
+    bootstrap_pkg_extra:
+      - name: cockpit
+        default_release: "{{ ansible_distribution_release }}-backports"
+      - name: cockpit-navigator
+      - name: cockpit-identities
+      - name: cockpit-file-sharing
+      - name: nfs-kernel-server
+      - name: borgbackup
+    bootstrap_profile_config:
+      - file: bashrc
+        dest: ".bashrc"
+        user:
+          - root
+          - "{{ common_user }}"
+      - file: vimrc
+        dest: ".vimrc"
+        user:
+          - root
+          - "{{ common_user }}"
+
+    # borg backup vars
+    borg_repository:
+      - path: "/data/ssd/backups/borg/repos/nas"
+        label: local
+      - path: "{{ vault_borgbase.nas }}"
+        label: borgbase
+    borg_source_directories:
+      - /data/hdd/media/books/audiobooks
+      - /data/hdd/media/books/ebooks
+    borg_hc_ping_url: "{{ vault_borg_hc.nas }}"
+    borgmatic_timer_hour: 02
+    borgmatic_timer_minute: 40
+
+    # nfs shares
+    nfs_exports:
+      - path: /data/hdd/media
+        options: 10.11.100.0/24(rw,sync,no_subtree_check) 10.11.20.0/24(rw,sync,no_subtree_check)
+      - path: /data/ssd/downloads
+        options: 10.11.100.0/24(rw,sync,no_subtree_check) 10.11.20.0/24(rw,sync,no_subtree_check)
+
+    # borg backup
+    borg_repo_user: borg
+    borg_repo_group: borg
+    borg_repo_home: /data/ssd/backups/borg
+    borg_repo_pool: /data/ssd/backups/borg/repos
+    borg_repo_key: "{{ vault_ssh_keys.pub.borg }}"
+
+  tasks:
+    - block:
+        - name: Destory LXC container
+          tags: [never, destroy]
+          block:
+            - ansible.builtin.import_role:
+                name: pve
+                tasks_from: destroy
+            - ansible.builtin.meta: end_play
+
+        - name: Create LXC container
+          tags: container
+          ansible.builtin.import_role:
+            name: pve
+            tasks_from: create_container
+      vars:
+        ansible_python_interpreter: "{{ common_python_interpreter }}"
+      when: inventory_hostname == "localhost"
+
+    - name: Run bootstrap steps
+      tags: bootstrap
+      block:
+        - name: Check if sudo user has already been installed
+          block:
+            - ansible.builtin.wait_for_connection:
+                timeout: 5
+              register: _status
+          rescue:
+            - ansible.builtin.meta: clear_host_errors
+            - ansible.builtin.set_fact:
+                _user: root
+
+        - name: Run bootstrap steps
+          block:
+            - name: Get host facts
+              ansible.builtin.setup:
+
+            - name: Include bootstrap role
+              ansible.builtin.include_role:
+                name: bootstrap
+          any_errors_fatal: true
+          become: true
+          vars:
+            ansible_user: "{{ _user | default(bootstrap_user.name) }}"
+      when: inventory_hostname != "localhost"
+
+    - name: Set up NFS shares
+      tags: nfs
+      become: true
+      block:
+        - name: Create exports file
+          ansible.builtin.lineinfile:
+            path: /etc/exports.d/cockpit-file-sharing.exports
+            regexp: '^"{{ item.path }}"'
+            line: '"{{ item.path }}" {{ item.options }}'
+            create: true
+          loop: "{{ nfs_exports }}"
+
+        - name: Export shares
+          ansible.builtin.command: exportfs -rav
+
+      when: inventory_hostname != "localhost"
+
+    - name: Set up borg backup server
+      tags: borg
+      become: true
+      block:
+        - name: Create borg users group
+          ansible.builtin.group:
+            name: "{{ borg_repo_group }}"
+            state: present
+
+        - name: Create borg user
+          ansible.builtin.user:
+            name: "{{ borg_repo_user }}"
+            home: "{{ borg_repo_home }}"
+            password: "*"
+            shell: /bin/bash
+            state: present
+
+        - name: Create directories
+          ansible.builtin.file:
+            path: "{{ item }}"
+            owner: "{{ borg_repo_user }}"
+            group: "{{ borg_repo_group }}"
+            mode: 0700
+            state: directory
+          loop:
+            - "{{ borg_repo_home }}"
+            - "{{ borg_repo_pool }}"
+            - "{{ borg_repo_home }}/.ssh"
+
+        - name: Create authorizedkeys file
+          ansible.posix.authorized_key:
+            user: "{{ borg_repo_user }}"
+            key: "{{ borg_repo_key }}"
+            key_options: 'command="cd {{ borg_repo_pool }};borg serve --restrict-to-path {{ borg_repo_pool }}",restrict'
+      when: inventory_hostname != "localhost"

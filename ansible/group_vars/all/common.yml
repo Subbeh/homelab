@@ -2,29 +2,31 @@
 common_user: sysadm
 common_group: sysadm
 common_pass: "{{ vault_common_pass }}"
-common_user_id: "1000"
-common_group_id: "1000"
-common_root_id: "0"
-common_root_group: "0"
+common_user_id: 2000
+common_group_id: 2000
+# common_group_id_docker: "3000"
 common_timezone: "Australia/Melbourne"
 
 common_language_iso_639: "en"
 common_country_iso_3166: "US"
 common_locale: "{{ common_language_iso_639 }}_{{ common_country_iso_3166 }}"
 
-common_dir: "/opt/app_data"
+common_data_dir: "/data"
+common_apps_dir: "/data/apps"
 common_repo_root: "{{ lookup('lines', 'git rev-parse --show-toplevel') }}"
 common_ansible_root: "{{ common_repo_root }}/ansible"
-common_tasks_dir: "{{ common_ansible_root }}/tasks"
-common_apps_dir: "{{ common_ansible_root }}/apps"
+common_ansible_tasks: "{{ common_ansible_root }}/tasks"
+common_ansible_apps: "{{ common_ansible_root }}/apps"
 common_k8s_root: "{{ common_repo_root }}/k8s"
-common_data_dir: "/data"
 common_media_dir:
 
-common_vault: "{{ lookup('file', '.ansible_vault') }}"
+common_python_interpreter: "{{ common_ansible_root }}/.direnv/python-3.11/bin/python"
+
+# common_vault: "{{ lookup('file', '.ansible_vault') }}"
 
 common_git_user: "sysadm"
 common_git_pass: "{{ vault_common_git_pass }}"
+common_authorized_keys: "https://raw.githubusercontent.com/Subbeh/dotfiles/master/keys"
 
 common_email_server: "smtp.gmail.com"
 common_email_port: "587"

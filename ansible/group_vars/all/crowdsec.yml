@@ -1,5 +1,5 @@
 ---
-crowdsec_port: "{{ network_svc.crowdsec.port }}"
+crowdsec_port: "{{ net_svc.crowdsec.port }}"
 crowdsec_hub: false
 
 crowdsec_whitelist:

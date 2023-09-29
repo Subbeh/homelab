@@ -1,0 +1,97 @@
+---
+- hosts: [localhost, services]
+  gather_facts: false
+  become: false
+
+  vars:
+    # PVE vars
+    pve_host: services
+    pve_container:
+      ostemplate: "local:vztmpl/debian-11-standard_11.7-1_amd64.tar.zst"
+      size: 30
+      cores: 2
+      memory: 8192
+      swap: 8192
+      unprivileged: false
+      features:
+        - nesting=1
+
+    # bootstrap vars
+    bootstrap:
+      packages: true
+      user: true
+      network: true
+      profile: true
+      ssh: true
+      docker: true
+      borg: true
+    bootstrap_profile_config:
+      - file: bashrc
+        dest: ".bashrc"
+        user:
+          - root
+          - "{{ common_user }}"
+      - file: vimrc
+        dest: ".vimrc"
+        user:
+          - root
+          - "{{ common_user }}"
+
+    # borg backup vars
+    borg_repository:
+      - path: "{{ borg_server }}/services"
+        label: local
+      - path: "{{ vault_borgbase.services }}"
+        label: borgbase
+    borg_source_directories:
+      - "/data/apps"
+    borg_hc_ping_url: "{{ vault_borg_hc.services }}"
+    borg_db_postgres: true
+    borgmatic_timer_hour: 02
+    borgmatic_timer_minute: 30
+
+  tasks:
+    - block:
+        - name: Destory LXC container
+          tags: [never, destroy]
+          block:
+            - ansible.builtin.import_role:
+                name: pve
+                tasks_from: destroy
+            - ansible.builtin.meta: end_play
+
+        - name: Create LXC container
+          tags: container
+          ansible.builtin.import_role:
+            name: pve
+            tasks_from: create_container
+      vars:
+        ansible_python_interpreter: "{{ common_python_interpreter }}"
+      when: inventory_hostname == "localhost"
+
+    - name: Run bootstrap steps
+      tags: bootstrap
+      block:
+        - name: Check if sudo user has already been installed
+          block:
+            - ansible.builtin.wait_for_connection:
+                timeout: 5
+              register: _status
+          rescue:
+            - ansible.builtin.meta: clear_host_errors
+            - ansible.builtin.set_fact:
+                _user: root
+
+        - name: Run bootstrap steps
+          block:
+            - name: Get host facts
+              ansible.builtin.setup:
+
+            - name: Include bootstrap role
+              ansible.builtin.include_role:
+                name: bootstrap
+          any_errors_fatal: true
+          become: true
+          vars:
+            ansible_user: "{{ _user | default(bootstrap_user.name) }}"
+      when: inventory_hostname != "localhost"

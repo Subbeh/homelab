@@ -45,16 +45,6 @@ tasks:
     cmds:
       - ansible-playbook -f 5 {{.ANSIBLE_PLAYBOOK_DIR}}/update.yml {{.CLI_ARGS}}
 
-  # app:
-  #   desc: Run app
-  #   cmds:
-  #     - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags {{.CLI_ARGS}} -e "debug=true"
-
-  # appconfig:
-  #   desc: Generate service configs for app
-  #   cmds:
-  #     - ansible-playbook {{.ANSIBLE_PLAYBOOK_DIR}}/app.yml --tags '{{.CLI_ARGS}},config' -e "debug=true"
-
   webconfig:
     desc: Generate Traefik config
     cmds:

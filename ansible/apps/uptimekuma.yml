@@ -3,20 +3,20 @@ uptimekuma:
   container:
     image: louislam/uptime-kuma:1.23.1
     ports:
-      - "{{ network_svc.uptimekuma.port }}:3001"
+      - "{{ net_svc.uptimekuma.port }}:3001"
     volumes:
-      - "{{ common_dir }}/uptimekuma:/app/data"
+      - "{{ common_apps_dir }}/uptimekuma:/app/data"
 
   traefik:
     routers:
       - name: "uptime"
-        rule: "Host(`uptime.{{ network_domain.tld }}`)"
+        rule: "Host(`uptime.{{ net_domain.tld }}`)"
       - name: "uptime-bypass"
-        rule: "Host(`uptime.{{ network_domain.tld }}`) && Headers(`Authorization`, `Basic {{ (':' ~ uptime_kuma_api) | b64encode }}`)"
+        rule: "Host(`uptime.{{ net_domain.tld }}`) && Headers(`Authorization`, `Basic {{ (':' ~ vault_uptime_kuma_api) | b64encode }}`)"
         middlewares:
           - chain-external-no-auth
       - name: "status"
-        rule: "Host(`status.{{ network_domain.tld }}`)"
+        rule: "Host(`status.{{ net_domain.tld }}`)"
         middlewares:
           - chain-external-no-auth
           - uptimekuma-status

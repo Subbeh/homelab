@@ -1,5 +1,4 @@
 ---
-
 packages_global:
   - acl
   - apt-transport-https
@@ -11,7 +10,7 @@ packages_global:
   - gawk
   - git
   - gnupg
-  - hdparm
+  # - hdparm
   - hping3
   - htop
   - iftop
@@ -19,12 +18,12 @@ packages_global:
   - iperf3
   - iptraf-ng
   - iputils-ping
-  - ipvsadm
+  # - ipvsadm
   - jq
   - locales
   - lsb-release
   - lsof
-  - lynx
+  # - lynx
   - make
   - ncdu
   - netcat

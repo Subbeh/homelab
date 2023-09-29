@@ -1,0 +1,63 @@
+---
+- name: Set facts
+  ansible.builtin.set_fact:
+    _host: "{{ pve_container.hostname | default(pve_host) }}"
+    _node: "{{ pve_container.node | default(net_hosts[pve_host].node) }}"
+    _vmid: "{{ pve_container.vmid | default(net_hosts[pve_host].vmid) }}"
+
+- name: Download LXC image
+  delegate_to: "{{ _node }}"
+  remote_user: root
+  ansible.builtin.command: pveam download {{ pve_container.ostemplate.split(":")[0] }} {{ pve_container.ostemplate.split(":")[1].split("/")[1] }}
+  register: _cmd
+  changed_when: '"no need to download" not in _cmd.stdout'
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+
+- name: Create container
+  community.general.proxmox:
+    api_user: root@pam
+    api_password: "{{ vault_pve_api_pass }}"
+    api_host: "{{ _node }}"
+    vmid: "{{ _vmid }}"
+    node: "{{ _node }}"
+    hostname: "{{ _host }}"
+    ostemplate: "{{ pve_container.ostemplate }}"
+    disk: "{{ pve_container.storage | default('local-lvm') }}:{{ pve_container.size }}"
+    cores: "{{ pve_container.cores }}"
+    memory: "{{ pve_container.memory }}"
+    swap: "{{ pve_container.swap }}"
+    onboot: "{{ pve_container.onboot | default('true') }}"
+    timezone: "{{ common_timezone }}"
+    unprivileged: "{{ pve_container.unprivileged | default('true') }}"
+    features: "{{ pve_container.features | default(omit) }}"
+    nameserver: "{{ net_cidr.vms | ansible.utils.nthhost(1) }}"
+    searchdomain: "{{ net_domain.tld_local }}"
+    password: "{{ vault_common_pass }}"
+    pubkey: "{{ vault_ssh_keys.pub.master }}"
+    netif: '{"net0":"name=eth0,bridge=vmbr0,firewall={{ pve_container.network.firewall | default(1) }},hwaddr={{ pve_container.network.hwaddr | default(net_hosts[pve_host].hwaddr) }},ip={{ pve_container.network.ip | default("dhcp") }},tag={{ pve_container.network.tag | default(20) }},type=veth"}'
+    mounts: "{{ (pve_container.mounts | regex_replace('\n', '')) if pve_container.mounts is defined else omit }}"
+
+- name: Add additional configurations to LXC config file
+  delegate_to: "{{ _node }}"
+  remote_user: root
+  ansible.builtin.lineinfile:
+    path: "/etc/pve/lxc/{{ _vmid }}.conf"
+    line: "{{ item }}"
+  with_items: "{{ pve_container.config | default([]) }}"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+
+- name: Start container
+  community.general.proxmox:
+    api_host: "{{ _node }}"
+    api_user: root@pam
+    api_password: "{{ vault_pve_api_pass }}"
+    vmid: "{{ _vmid }}"
+    state: started
+
+- name: Wait for container to be online
+  ansible.builtin.wait_for:
+    host: "{{ _host }}"
+    port: 22
+    delay: 5

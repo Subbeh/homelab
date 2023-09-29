@@ -4,9 +4,9 @@
   container:
     image: [[IMAGE]]
     ports:
-      - "{{ network_svc.[[NAME]].port }}:[[PORT]]"
+      - "{{ net_svc.[[NAME]].port }}:[[PORT]]"
     volumes:
-      - "{{ common_dir }}/[[NAME]]/data:/data"
+      - "{{ common_apps_dir }}/[[NAME]]/data:/data"
     env:
       DUMMY: "text"
 

@@ -3,17 +3,17 @@ sabnzbd:
   container:
     image: lscr.io/linuxserver/sabnzbd:4.0.3
     ports:
-      - "{{ network_svc.sabnzbd.port }}:8080"
+      - "{{ net_svc.sabnzbd.port }}:8080"
     volumes:
-      - "{{ common_dir }}/sabnzbd/config:/config"
-      - "{{ common_media_dir }}:/data"
+      - "{{ common_apps_dir }}/sabnzbd/config:/config"
+      - "/data/downloads/nzb:/data"
 
   traefik:
     routers:
       - name: "sabnzbd"
-        rule: "Host(`sabnzbd.{{ network_domain.tld }}`)"
+        rule: "Host(`sabnzbd.{{ net_domain.tld }}`)"
       - name: "sabnzbd-bypass"
-        rule: "Host(`sabnzbd.{{ network_domain.tld }}`) && Query(`apikey={{ media_sabnzbd_api }}`)"
+        rule: "Host(`sabnzbd.{{ net_domain.tld }}`) && Query(`apikey={{ media_sabnzbd_api }}`)"
         middlewares:
           - chain-external-no-auth
 

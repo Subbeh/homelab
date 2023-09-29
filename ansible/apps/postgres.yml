@@ -1,40 +1,69 @@
 ---
-postgres:
+postgres_bastion:
+  name: postgres
   container:
     image: postgres:12-alpine
+    restart_policy: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       start_period: 20s
       interval: 30s
       retries: 5
       timeout: 5s
     ports:
-      - "{{ network_svc.postgres.port }}:5432"
+      - "{{ net_svc.postgres_bastion.port }}:5432"
     volumes:
-      - "{{ common_dir }}/postgresql/data:/var/lib/postgresql/data"
+      - "{{ common_apps_dir }}/postgres/data:/var/lib/postgresql/data"
     env:
       POSTGRES_USER: "{{ common_user }}"
-      POSTGRES_PASSWORD: "{{ postgres_pass }}"
+      POSTGRES_PASSWORD: "{{ vault_postgres_pass }}"
 
   uptime:
-    group: databases
-    name: "postgres_{{ network_svc.postgres.host }}"
-    type: postgres
-    databaseConnectionString: "postgres://{{ common_user }}:{{ postgres_pass }}@{{ network_hosts[network_svc.postgres.host] }}:{{ network_svc.postgres.port }}/postgres"
+    - group: databases
+      type: postgres
+      dbname: postgres
+
+postgres_services:
+  name: postgres
+  container:
+    image: postgres:12-alpine
+    restart_policy: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    ports:
+      - "{{ net_svc.postgres_services.port }}:5432"
+    volumes:
+      - "{{ common_apps_dir }}/postgres/data:/var/lib/postgresql/data"
+    env:
+      POSTGRES_USER: "{{ common_user }}"
+      POSTGRES_PASSWORD: "{{ vault_postgres_pass }}"
+
+  uptime:
+    - group: databases
+      type: postgres
+      dbname: postgres
 
 pgadmin:
   container:
     image: dpage/pgadmin4:7.6
     ports:
-      - "{{ network_svc.pgadmin.port }}:80"
+      - "{{ net_svc.pgadmin.port }}:80"
     volumes:
-      - "{{ common_dir }}/pgadmin/lib:/var/lib/pgadmin"
+      - "{{ common_apps_dir }}/pgadmin/lib:/var/lib/pgadmin"
     env:
-      PGADMIN_DEFAULT_EMAIL: "{{ common_email }}"
-      PGADMIN_DEFAULT_PASSWORD: "{{ pgadmin_pass }}"
+      PGADMIN_DEFAULT_EMAIL: "pgadmin@{{ net_domain.tld }}"
+      PGADMIN_DEFAULT_PASSWORD: "{{ vault_pgadmin_pass }}"
       PGADMIN_DISABLE_POSTFIX: "true"
 
   traefik:
 
   uptime:
     group: databases
+
+  files:
+    - dest: "{{ common_apps_dir }}/pgadmin/lib"
+      owner: "5050"

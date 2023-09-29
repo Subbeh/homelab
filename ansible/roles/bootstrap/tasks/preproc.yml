@@ -1,0 +1,22 @@
+---
+- name: Check if host is running Debian
+  ansible.builtin.fail:
+  when:
+    - (ansible_os_family is not defined) or (ansible_os_family != "Debian")
+
+- name: Sync time
+  ansible.builtin.command: hwclock --hctosys
+  failed_when: false
+  changed_when: false
+
+- name: Set default user
+  ansible.builtin.set_fact:
+    _def_user: "{{ bootstrap_user.name }}"
+    _def_user_home: "/home/{{ bootstrap_user.name }}"
+  when: (bootstrap.user is defined) and (bootstrap.user is true)
+
+- name: Set default user to root
+  ansible.builtin.set_fact:
+    _def_user: root
+    _def_user_home: /root
+  when: (bootstrap.user is not defined) or (bootstrap.user is false)

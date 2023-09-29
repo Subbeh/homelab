@@ -6,64 +6,74 @@ traefik:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
+      - "8181:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ common_dir }}/logs/traefik:/logs"
-      - "{{ common_dir }}/traefik/configs:/configs"
-      - "{{ common_dir }}/traefik/traefik.yaml:/traefik.yaml"
-      - "{{ common_dir }}/traefik/acme.json:/acme.json"
-      - "{{ common_dir }}/traefik/pve.pem:/pve.pem"
-      - "{{ common_dir }}/traefik/.htpasswd:/.htpasswd"
+      - "{{ common_apps_dir }}/logs/traefik:/logs"
+      - "{{ common_apps_dir }}/traefik/configs:/configs"
+      - "{{ common_apps_dir }}/traefik/traefik.yaml:/traefik.yaml"
+      - "{{ common_apps_dir }}/traefik/acme.json:/acme.json"
+      - "{{ common_apps_dir }}/traefik/pve.pem:/pve.pem"
     env:
-      CF_API_EMAIL: "{{ cloudflare_email }}"
-      CF_API_KEY: "{{ cloudflare_api_global }}"
+      CF_API_EMAIL: "{{ vault_cloudflare_email }}"
+      CF_API_KEY: "{{ vault_cloudflare_api_key }}"
     labels:
       traefik.enable: "true"
       traefik.http.routers.traefik-rtr.entrypoints: "websecure"
-      traefik.http.routers.traefik-rtr.rule: "Host(`traefik.{{ network_domain.tld }}`)"
+      traefik.http.routers.traefik-rtr.rule: "Host(`traefik.{{ net_domain.tld }}`)"
       traefik.http.routers.traefik-rtr.tls.certresolver: "dns-cloudflare"
-      traefik.http.routers.traefik-rtr.tls.domains[0].main: "{{ network_domain.tld }}"
-      traefik.http.routers.traefik-rtr.tls.domains[0].sans: "*.{{ network_domain.tld }}"
+      traefik.http.routers.traefik-rtr.tls.domains[0].main: "{{ net_domain.tld }}"
+      traefik.http.routers.traefik-rtr.tls.domains[0].sans: "*.{{ net_domain.tld }}"
       traefik.http.routers.traefik-rtr.service: "api@internal"
       traefik.http.routers.traefik-rtr.middlewares: "chain-internal@file"
 
-  dependents:
-    - redis_traefik_cs
-    - whoami
+  files:
+    - dest: "{{ common_apps_dir }}/traefik/configs"
+    - dest: "{{ common_apps_dir }}/logs/traefik"
+    - dest: "{{ common_apps_dir }}/traefik/acme.json"
+      state: touch
+      mode: 0600
+      modification_time: preserve
+      access_time: preserve
+    - src: traefik.yaml.j2
+      dest: "{{ common_apps_dir }}/traefik/traefik.yaml"
+    - src: configs/tls-opts.yml
+      dest: "{{ common_apps_dir }}/traefik/configs/tls-opts.yml"
+    - src: configs/middlewares.yml.j2
+      dest: "{{ common_apps_dir }}/traefik/configs/middlewares.yml"
+    - src: configs/middleware-chains.yml
+      dest: "{{ common_apps_dir }}/traefik/configs/middleware-chains.yml"
+    - src: configs/middleware-crowdsec.yml.j2
+      dest: "{{ common_apps_dir }}/traefik/configs/middleware-crowdsec.yml"
+    - src: configs/middleware-authentik.yml.j2
+      dest: "{{ common_apps_dir }}/traefik/configs/middleware-authentik.yml"
+    - src: configs/middleware-cloudflare.yml.j2
+      dest: "{{ common_apps_dir }}/traefik/configs/middleware-cloudflare.yml"
+    - src: logrotate.j2
+      dest: /etc/logrotate.d/traefik
+
+  pre_tasks:
+    - file: crowdsec/bouncer.yml
+      vars:
+        bouncer: traefik
+
+  tasks:
+    - file: traefik/restart_logging.yml
 
   uptime:
     group: system
     type: port
     port: "443"
 
-redis_traefik_cs:
-  name: redis-traefik-cs
-  container:
-    image: redis:7-alpine
-    volumes:
-      - "{{ common_dir }}/traefik/db:/data"
-    command: "redis-server --requirepass {{ vault_redis_cs_pass }}"
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 3s
+  dependents:
+    - redis_bastion
+    - whoami
 
 whoami:
   container:
     image: traefik/whoami
     labels:
       traefik.enable: "true"
-      traefik.http.routers.whoami-rtr.rule: "Host(`whoami.{{ network_domain.tld }}`)"
+      traefik.http.routers.whoami-rtr.rule: "Host(`whoami.{{ net_domain.tld }}`)"
       traefik.http.routers.whoami-rtr.entrypoints: "websecure"
-      traefik.http.routers.whoami-rtr.middlewares: "chain-external-no-auth@file"
-
-traefik_test:
-  traefik:
-    name: test
-    url: "http://whoami"
-    rtr-middlewares:
-      - crowdsec
-      - cloudflarewarp
+      traefik.http.routers.whoami-rtr.middlewares: "chain-external@file"

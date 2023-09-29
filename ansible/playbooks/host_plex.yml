@@ -1,0 +1,172 @@
+---
+- hosts: [localhost, plex]
+  gather_facts: false
+  become: false
+
+  vars:
+    # PVE vars
+    pve_host: plex
+    pve_container:
+      ostemplate: "zfs-hdd:vztmpl/debian-11-standard_11.7-1_amd64.tar.zst"
+      size: 10
+      cores: 4
+      memory: 4096
+      swap: 4096
+      unprivileged: false
+      features:
+        - nesting=1
+        - fuse=1
+        - mount=nfs
+      config:
+        - "lxc.cgroup2.devices.allow: c 226:0 rwm"
+        - "lxc.cgroup2.devices.allow: c 226:128 rwm"
+        - "lxc.cgroup2.devices.allow: c 29:0 rwm"
+        - "lxc.mount.entry: /dev/fb0 dev/fb0 none bind,optional,create=file"
+        - "lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir"
+        - "lxc.mount.entry: /dev/dri/renderD128 dev/renderD128 none bind,optional,create=file"
+
+    # bootstrap vars
+    bootstrap:
+      # packages: true
+      # system: true
+      # user: true
+      # network: true
+      # filesystem: true
+      # profile: true
+      # locale: true
+      # ssh: true
+      # docker: true
+      borg: true
+    bootstrap_pkg_extra:
+      - name: plexmediaserver
+    bootstrap_pkg_repo:
+      - repo: deb [signed-by=/usr/share/keyrings/plex.asc] https://downloads.plex.tv/repo/deb public main
+        key: https://downloads.plex.tv/plex-keys/PlexSign.key
+        key_dest: /usr/share/keyrings/plex.asc
+    bootstrap_pkg_microcode: true
+    bootstrap_pkg_unattended_upgrades: true
+    bootstrap_net_hostname: "{{ hostvars[pve_host].inventory_hostname_short }}.{{ net_domain.tld_local }}"
+    bootstrap_fs_directories:
+      - "{{ common_apps_dir }}"
+      - "{{ common_data_dir }}"
+    bootstrap_fs_mounts:
+      - src: "{{ net_hosts.nas.ip }}:/data/hdd/media"
+        dest: "/data/media"
+    bootstrap_profile_config:
+      - file: bashrc
+        dest: ".bashrc"
+        user:
+          - root
+          - "{{ common_user }}"
+      - file: vimrc
+        dest: ".vimrc"
+        user:
+          - root
+          - "{{ common_user }}"
+
+    # borg backup vars
+    borg_repository:
+      - path: "{{ borg_server }}/plex"
+        label: local
+      - path: "{{ vault_borgbase.plex }}"
+        label: borgbase
+    borg_source_directories:
+      - "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server"
+      - "/data/apps"
+    borg_exclude_patterns:
+      - "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache"
+      - "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Crash Reports"
+      - "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Diagnostics"
+      - "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Logs"
+      - "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Updates"
+    borg_hc_ping_url: "{{ vault_borg_hc.plex }}"
+    borgmatic_timer_hour: 02
+    borgmatic_timer_minute: 20
+
+  tasks:
+    - block:
+        - name: Destory LXC container
+          tags: [never, destroy]
+          block:
+            - ansible.builtin.import_role:
+                name: pve
+                tasks_from: destroy
+            - ansible.builtin.meta: end_play
+
+        - name: Create LXC container
+          tags: container
+          ansible.builtin.import_role:
+            name: pve
+            tasks_from: create_container
+      vars:
+        ansible_python_interpreter: "{{ common_python_interpreter }}"
+      when: inventory_hostname == "localhost"
+
+    - name: Run bootstrap steps
+      tags: bootstrap
+      block:
+        - name: Check if sudo user has already been installed
+          block:
+            - ansible.builtin.wait_for_connection:
+                timeout: 5
+              register: _status
+          rescue:
+            - ansible.builtin.meta: clear_host_errors
+            - ansible.builtin.set_fact:
+                _user: root
+
+        - name: Run bootstrap steps
+          block:
+            - name: Get host facts
+              ansible.builtin.setup:
+
+            - name: Include bootstrap role
+              ansible.builtin.include_role:
+                name: bootstrap
+          any_errors_fatal: true
+          become: true
+          vars:
+            ansible_user: "{{ _user | default(bootstrap_user.name) }}"
+      when: inventory_hostname != "localhost"
+
+    - block:
+        - name: Confirm restoring Plex data from latest backup
+          ansible.builtin.pause:
+            prompt: "Do you want to restore Plex from the latest backup?"
+          register: _confirm_restore
+
+        - ansible.builtin.set_fact:
+            _restore: "{{ _confirm_restore.user_input | bool }}"
+          when: inventory_hostname == "localhost"
+
+        - name: Restore backup using Borg
+          become: true
+          block:
+            - name: Stop plexmediaserver service
+              ansible.builtin.service:
+                name: plexmediaserver
+                state: stopped
+
+            - name: Extract Borg backup
+              ansible.builtin.command: |
+                borgmatic extract --repository local --archive latest --destination /
+
+            - name: Start plexmediaserver service
+              ansible.builtin.service:
+                name: plexmediaserver
+                state: started
+          when:
+            - inventory_hostname != "localhost"
+            - hostvars.localhost._restore
+      tags: restore
+
+    - name: Run plex app configurations
+      tags: plex
+      block:
+        - name: Include app role for Plex
+          tags: plex
+          ansible.builtin.include_role:
+            name: apps
+          vars:
+            _app: plex
+      when: inventory_hostname == "localhost"
