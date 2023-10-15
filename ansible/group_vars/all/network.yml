@@ -85,6 +85,8 @@ net_hosts:
   pve:
     pve_nas: "{{ net_cidr.servers | ansible.utils.nthhost(10) }}"
     pve_nuc: "{{ net_cidr.servers | ansible.utils.nthhost(11) }}"
+    pve_opti_01: "{{ net_cidr.servers | ansible.utils.nthhost(12) }}"
+    pve_opti_02: "{{ net_cidr.servers | ansible.utils.nthhost(13) }}"
   k8s:
     master_1: "{{ net_cidr.k8s | ansible.utils.nthhost(11) }}"
     master_2: "{{ net_cidr.k8s | ansible.utils.nthhost(12) }}"
@@ -150,6 +152,9 @@ net_svc:
     host: media
     ip: "192.168.100.100"
     port: "9005"
+  jellyfin:
+    host: plex
+    port: "8096"
   linkace:
     host: services
     port: "9036"
@@ -227,6 +232,10 @@ net_svc:
   tautulli:
     host: plex
     port: "9070"
+  threadfin:
+    host: plex
+    port: "9092"
+    port_dvr: "1901"
   traefik:
     host: bastion
   unpackerr:
@@ -237,5 +246,5 @@ net_svc:
   whoami:
     host: bastion
   wizarr:
-    host: services
+    host: plex
     port: "9072"
