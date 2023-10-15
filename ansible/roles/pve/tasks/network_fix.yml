@@ -1,0 +1,11 @@
+---
+- name: Install r8169 driver
+  ansible.builtin.apt:
+    name: r8168-dkms
+    state: present
+
+- name: Blacklist r8169 network driver
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/blacklist-r8169.conf
+    line: blacklist r8169
+    create: yes
