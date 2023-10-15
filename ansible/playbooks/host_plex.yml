@@ -8,7 +8,7 @@
     pve_host: plex
     pve_container:
       ostemplate: "zfs-hdd:vztmpl/debian-11-standard_11.7-1_amd64.tar.zst"
-      size: 10
+      size: 20
       cores: 4
       memory: 4096
       swap: 4096
@@ -27,7 +27,7 @@
 
     # bootstrap vars
     bootstrap:
-      # packages: true
+      packages: true
       # system: true
       # user: true
       # network: true
@@ -36,13 +36,29 @@
       # locale: true
       # ssh: true
       # docker: true
-      borg: true
+      # borg: true
     bootstrap_pkg_extra:
       - name: plexmediaserver
+      - name: jellyfin
+      # - name: vainfo
+      # - name: ocl-icd-libopencl1
+      # - name: beignet-opencl-icd
+      # - deb: https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.14828.8/intel-igc-core_1.0.14828.8_amd64.deb
+      # - deb: https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.14828.8/intel-igc-opencl_1.0.14828.8_amd64.deb
+      # - deb: https://github.com/intel/compute-runtime/releases/download/23.30.26918.9/intel-level-zero-gpu-dbgsym_1.3.26918.9_amd64.ddeb
+      # - deb: https://github.com/intel/compute-runtime/releases/download/23.30.26918.9/intel-level-zero-gpu_1.3.26918.9_amd64.deb
+      # - deb: https://github.com/intel/compute-runtime/releases/download/23.30.26918.9/intel-opencl-icd-dbgsym_23.30.26918.9_amd64.ddeb
+      # - deb: https://github.com/intel/compute-runtime/releases/download/23.30.26918.9/intel-opencl-icd_23.30.26918.9_amd64.deb
+      # - deb: https://github.com/intel/compute-runtime/releases/download/23.30.26918.9/libigdgmm12_22.3.0_amd64.deb
     bootstrap_pkg_repo:
       - repo: deb [signed-by=/usr/share/keyrings/plex.asc] https://downloads.plex.tv/repo/deb public main
         key: https://downloads.plex.tv/plex-keys/PlexSign.key
         key_dest: /usr/share/keyrings/plex.asc
+      - repo: deb [arch=amd64 signed-by=/usr/share/keyrings/jellyfin.gpg] https://repo.jellyfin.org/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main
+        key: https://repo.jellyfin.org/jellyfin_team.gpg.key
+        key_dest: /tmp/jellyfin.gpg.key
+        key_cmd: gpg --dearmor --yes -o /usr/share/keyrings/jellyfin.gpg /tmp/jellyfin_team.gpg.key
+        validate_certs: false
     bootstrap_pkg_microcode: true
     bootstrap_pkg_unattended_upgrades: true
     bootstrap_net_hostname: "{{ hostvars[pve_host].inventory_hostname_short }}.{{ net_domain.tld_local }}"
@@ -123,6 +139,12 @@
             - name: Include bootstrap role
               ansible.builtin.include_role:
                 name: bootstrap
+
+            # - name: Configure video driver
+            #   ansible.builtin.lineinfile:
+            #     path: /etc/modprobe.d/i915.conf
+            #     line: options i915 enable_guc=2
+            #     create: yes
           any_errors_fatal: true
           become: true
           vars:
