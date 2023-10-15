@@ -11,7 +11,7 @@ pip_install_packages:
 
 # (string) Use a specific version of k3s
 # renovate: datasource=github-releases depName=k3s-io/k3s
-k3s_release_version: "v1.26.5+k3s1"
+k3s_release_version: stable
 
 # (bool) Install using hard links rather than symbolic links.
 k3s_install_hard_links: true
