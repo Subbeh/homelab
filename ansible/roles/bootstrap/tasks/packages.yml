@@ -17,11 +17,17 @@
     autoremove: true
 
 - name: Add signing keys (get_url)
-  ansible.builtin.get_url:
-    url: "{{ item.key }}"
-    dest: "{{ item.key_dest | default(omit) }}"
-    validate_certs: "{{ item.validate_certs | default(true) }}"
-  with_items: "{{ bootstrap_pkg_repo }}"
+  block:
+    - name: Download key
+      ansible.builtin.get_url:
+        url: "{{ item.key }}"
+        dest: "{{ item.key_dest | default(omit) }}"
+        validate_certs: "{{ item.validate_certs | default(true) }}"
+      with_items: "{{ bootstrap_pkg_repo }}"
+
+    - name: Run key command
+      ansible.builtin.command: "{{ item.key_cmd }}"
+      when: item.key_cmd is defined
   when: item.key is defined
 
 - name: Add signing keys (apt_key)
