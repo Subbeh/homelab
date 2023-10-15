@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker run --rm -it --network host -v "{{ common_apps_dir }}/plex-meta-manager/config:/config:rw" meisnate12/plex-meta-manager --config config/config_manual.yml --run $@

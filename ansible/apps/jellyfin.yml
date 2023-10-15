@@ -1,0 +1,6 @@
+---
+jellyfin:
+  traefik:
+    name: tv
+    rtr_middlewares:
+      - chain-external-no-auth

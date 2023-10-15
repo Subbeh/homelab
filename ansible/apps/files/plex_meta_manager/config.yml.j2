@@ -1,0 +1,224 @@
+# vi: ft=yaml
+
+libraries:
+  Movies:
+    template_variables:
+      sep_style: gray
+      collection_mode: hide
+      placeholder_imdb_id: tt8579674
+    metadata_path:
+      - file: config/refresh_movies.yml
+      - pmm: imdb
+      - pmm: tmdb                                     # TMDb Charts (Popular, Trending, etc.)
+      - pmm: basic                                    # Some basic chart collections based on recently released media in your library
+      - pmm: separator_award                          # An "index card"
+      - pmm: bafta                                    # BAFTA Awards
+        template_variables:                           # based on when the award show started
+          data:
+            starting: 2014
+            ending: current_year
+      - pmm: cannes                                   # Cannes Film Festival Awards
+        template_variables:                           # based on when the award show started
+          data:
+            starting: 2016
+            ending: current_year
+      - pmm: choice                                   # Critic's Choice Awards
+        template_variables:                           # based on when the award show started
+          data:
+            starting: 2014
+            ending: current_year
+      - pmm: golden                                   # Golden Globes Awards
+        template_variables:                           # based on when the award show started
+          data:
+            starting: 1944
+            ending: current_year
+      - pmm: oscars                                   # The Oscars
+        template_variables:                           # based on when the award show started
+          data:
+            starting: 1928
+            ending: current_year
+      - pmm: other_award                              # Other award collections
+      - pmm: spirit                                   # Independent Spirit Awards
+        template_variables:                           # based on when the award show started
+          data:
+            starting: 2014
+            ending: current_year
+      - pmm: sundance                                 # Sundance Film Festival Awards
+        template_variables:                           # based on when the award show started
+          data:
+            starting: 2010
+            ending: current_year
+      - pmm: separator_chart                          # An "index card"
+    overlay_path:
+      - remove_overlays: false                        # Set to true if you want to remove overlays
+      - reapply_overlays: true                        # If you are doing a lot of testing and changes like me, keep this to true to always reapply overlays
+      - pmm: ribbon
+        template_variables:
+          use_common: false
+          use_rotten: false
+      - pmm: resolution
+        template_variables:
+          horizontal_align: left
+          vertical_align: bottom
+      - pmm: ratings
+        template_variables:
+          rating1: user
+          rating1_image: imdb
+          rating2: audience
+          rating2_image: rt_popcorn
+          rating3: critic
+          rating3_image: rt_tomato
+          horizontal_align: left
+          vertical_position: top
+          vertical_offset: 0
+          rating_alignment: horizontal
+          font_size: 55
+    operations:
+      delete_unmanaged_collections: true            # Any manually added collection outside of PMM will be deleted
+      mass_user_rating_update: imdb                 # Update user ratings from imdb
+      mass_genre_update: tmdb                       # Update all genres from tmdb
+  ############################################
+  TV Shows:
+    template_variables:
+      sep_style: gray                               # use the gray separators globally for this library
+      collection_mode: hide                         # hide the collections
+      placeholder_imdb_id: tt1190634                # The Boys (2019) placeholder id for the separators
+    metadata_path:
+      - file: config/refresh_tv.yml
+      - pmm: imdb
+      - pmm: separator_award                        # An "index card"
+      - pmm: choice                                 # Critic's Choice Awards
+        template_variables:                         # based on when the award show started
+          data:
+            starting: 2014
+            ending: current_year
+      - pmm: golden                                 # Golden Globes Awards
+        template_variables:                         # based on when the award show started
+          data:
+            starting: 1944
+            ending: current_year
+      - pmm: emmy                                   # Emmy Awards
+        template_variables:                         # based on when the award show started
+          data:
+            starting: 1948
+            ending: current_year
+      - pmm: separator_chart                        # An "index card"
+      - pmm: imdb                                   # IMDb Charts (Popular, Trending, etc.)
+      - pmm: tmdb                                   # TMDb Charts (Popular, Trending, etc.)
+      - pmm: basic                                  # Some basic chart collections based on recently released media in your library
+    overlay_path:
+      - remove_overlays: false                      # Set to true if you want to remove overlays
+      - reapply_overlays: true                      # If you are doing a lot of testing and changes like me, keep this to true to always reapply overlays
+      - pmm: ribbon
+        template_variables:
+          use_common: false
+          use_rotten: false
+      - pmm: resolution
+        template_variables:
+          overlay_level: episode
+          horizontal_align: left
+          vertical_align: bottom
+      - pmm: ratings
+        template_variables:
+          rating1: user
+          rating1_image: imdb
+          horizontal_position: left
+          vertical_position: top
+          rating_alignment: horizontal
+          vertical_offset: 15
+          horizontal_offset: 0
+      - pmm: ratings
+        template_variables:
+          builder_level: episode
+          rating1: user
+          rating1_image: imdb
+          horizontal_position: left
+          vertical_position: top
+          rating_alignment: horizontal
+          vertical_offset: 15
+          horizontal_offset: 0
+    operations:
+      delete_unmanaged_collections: true            # Any manually added collection outside of PMM will be deleted
+      mass_user_rating_update: imdb                 # Update user ratings from imdb
+      mass_genre_update: tmdb                       # Update all genres from tmdb
+      mass_episode_user_rating_update: imdb         # Update user ratings with imdb for episodes
+############################################
+playlist_files:
+  - pmm: playlist
+    template_variables:
+      libraries: Movies, TV Shows
+############################################
+settings:
+  cache: true
+  cache_expiration: 60
+  asset_directory: config/assets
+  missing_path: config/missing
+  asset_folders: true
+  asset_depth: 0
+  create_asset_folders: false
+  prioritize_assets: false
+  dimensional_asset_rename: false
+  download_url_assets: false
+  show_missing_season_assets: false
+  show_missing_episode_assets: false
+  show_asset_not_needed: false
+  sync_mode: sync
+  default_collection_order:
+  minimum_items: 1
+  delete_below_minimum: true
+  delete_not_scheduled: false
+  run_again_delay: 1
+  missing_only_released: true
+  show_unconfigured: true
+  show_unmanaged: true
+  show_filtered: true
+  show_options: true
+  show_missing: false
+  only_filter_missing: false
+  show_missing_assets: false
+  save_report: false
+  tvdb_language: eng
+  ignore_ids:
+  ignore_imdb_ids:
+  item_refresh_delay: 0
+  playlist_sync_to_users: all
+  playlist_report: true
+  custom_repo:
+  verify_ssl: true
+  check_nightly: true
+  playlist_exclude_users:
+############################################
+webhooks:
+  error: https://discord.com/api/webhooks/{{ vault_pmm_discord_webhook }}
+  run_start: https://discord.com/api/webhooks/{{ vault_pmm_discord_webhook }}
+  run_end: https://discord.com/api/webhooks/{{ vault_pmm_discord_webhook }}
+  changes:
+  version:
+  delete:
+############################################
+plex:
+  url: http://{{ net_hosts.plex.ip }}:32400
+  token: {{ vault_plex_token }}
+############################################
+tmdb:
+  apikey: {{ vault_tmdb_api }}
+  language: en
+############################################
+mdblist:
+  apikey: {{ vault_mdblist_api }}
+############################################
+# https://replit.com/@chazlarson/TraktAuth
+trakt:
+  client_id: {{ vault_trakt_client_id }}
+  client_secret: {{ vault_trakt_client_secret }}
+  authorization:
+    access_token: {{ vault_trakt_access_token }}
+    token_type: Bearer
+    expires_in: 7889237
+    refresh_token: {{ vault_trakt_refresh_token }}
+    scope: public
+    created_at: 1696027160
+  pin:
+############################################
+omdb:
+  apikey: {{ vault_omdb_api }}
