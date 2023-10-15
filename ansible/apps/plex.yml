@@ -15,9 +15,7 @@ plex:
 plex_meta_manager:
   name: plex-meta-manager
   container:
-    image: meisnate12/plex-meta-manager:v1.19.0
-    network_mode: host
-    networks:
+    image: meisnate12/plex-meta-manager:v1.19.1
     volumes:
       - "{{ common_apps_dir }}/plex-meta-manager/config:/config"
 
@@ -29,6 +27,10 @@ plex_meta_manager:
     - src: config.yml.j2
       dest: "{{ common_apps_dir }}/plex-meta-manager/config/config_manual.yml"
       mode: "0660"
+    - src: refresh_movies.yml
+      dest: "{{ common_apps_dir }}/plex-meta-manager/config/refresh_movies.yml"
+    - src: refresh_tv.yml
+      dest: "{{ common_apps_dir }}/plex-meta-manager/config/refresh_tv.yml"
     - src: run.sh.j2
       dest: "{{ common_apps_dir }}/plex-meta-manager/run.sh"
       mode: "0700"
