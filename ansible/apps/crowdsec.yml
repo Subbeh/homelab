@@ -13,9 +13,9 @@ crowdsec:
     - src: crowdsec-cloudflare-bouncer.yaml.j2
       dest: /etc/crowdsec/bouncers/crowdsec-cloudflare-bouncer.yaml
       mode: "0600"
-    - dest: /etc/crowdsec/config/parsers/s02-enrich
+    - dest: /etc/crowdsec/parsers/s02-enrich
     - src: custom-whitelists.yaml.j2
-      dest: /etc/crowdsec/config/parsers/s02-enrich/custom-whitelists.yaml
+      dest: /etc/crowdsec/parsers/s02-enrich/custom-whitelists.yaml
       mode: "0600"
     - dest: /etc/crowdsec/notifications
     - src: discord.yaml.j2
