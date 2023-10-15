@@ -3,16 +3,5 @@
   become: true
   gather_facts: false
 
-  pre_tasks:
-    - name: Gathering facts
-      tags: always
-      ansible.builtin.setup:
-      when:
-        - inventory_hostname != 'localhost'
-        - inventory_hostname != 'ansible_controller_fqdn'
-
-  vars:
-    reboot_servers: {}
-
   tasks:
     - ansible.builtin.import_tasks: ../tasks/update.yml

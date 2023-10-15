@@ -1,7 +1,11 @@
 ---
-
 - block:
+    - name: Gather facts
+      tags: always
+      ansible.builtin.setup:
+
     - name: Sync time
+      tags: always
       ansible.builtin.command: hwclock --hctosys
       failed_when: false
       changed_when: false
@@ -13,12 +17,8 @@
     - name: Update packages
       ansible.builtin.apt: upgrade=dist force_apt_get=yes
 
-    - name: Import reboot task
-      ansible.builtin.import_tasks:
-        file: ../tasks/check_reboot.yml
-
     - name: Clean up system
-      tags: [ never, clean ]
+      tags: [never, clean]
       block:
         - name: Remove useless packages from the cache
           ansible.builtin.apt:
@@ -31,6 +31,42 @@
         - name: Run the equivalent of "apt-get clean" as a separate step
           ansible.builtin.apt:
             clean: true
+
+    - name: Update Crowdsec hub
+      tags: crowdsec
+      block:
+        - name: Update crowdsec hub
+          ansible.builtin.shell: |
+            cscli hub update
+            cscli hub upgrade
+            cscli collections upgrade --all
+            cscli parsers upgrade --all
+            cscli scenarios upgrade --all
+        - name: Reload crowdsec config
+          ansible.builtin.service:
+            name: crowdsec
+            state: reloaded
+      when: inventory_hostname == 'bastion'
+
+    - name: Check if the reboot-required file exists
+      tags: always
+      ansible.builtin.stat: path=/var/run/reboot-required get_md5=no
+      register: reboot_required_file
+
+    - name: Servers requiring reboot
+      tags: always
+      ansible.builtin.debug: var=reboot_required_file.stat.exists
+
+    - name: Reboot the Debian or Ubuntu server
+      tags: [never, reboot]
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible due to kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
 
   when:
     - (ansible_os_family is defined) and (ansible_os_family == "Debian")
