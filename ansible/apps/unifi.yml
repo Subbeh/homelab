@@ -1,0 +1,20 @@
+---
+unifi_network_app:
+  container:
+    name: unifi-network-app
+    image: lscr.io/linuxserver/unifi-network-application:7.5.187-ls13
+    ports:
+      - "{{ net_svc.unifi_network_app.port }}:8443"
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    volumes:
+      - "{{ common_apps_dir }}/wizarr/config:/data/database"
+    env:
+      APP_URL: "https://invites.{{ net_domain.tld }}"
+      DISABLE_BUILTIN_AUTH: "True"

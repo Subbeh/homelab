@@ -18,7 +18,8 @@
       mounts:
         mp0: "/data/ssd0/app_data/media,mp=/data/apps"
         mp1: "/data/ssd0/downloads,mp=/data/downloads"
-        mp2: "/data/hdd0/media,mp=/data/media"
+        mp2: "/data/ssd0/media,mp=/data/media-fast"
+        mp3: "/data/hdd0/media,mp=/data/media"
       config:
         - "lxc.cgroup2.devices.allow: c 10:200 rwm"
         - "lxc.mount.entry: /dev/net dev/net none bind,create=dir"

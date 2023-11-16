@@ -1,9 +1,9 @@
 ---
-- block:
-    - name: Gather facts
-      tags: always
-      ansible.builtin.setup:
+- name: Gather facts
+  tags: always
+  ansible.builtin.setup:
 
+- block:
     - name: Sync time
       tags: always
       ansible.builtin.command: hwclock --hctosys

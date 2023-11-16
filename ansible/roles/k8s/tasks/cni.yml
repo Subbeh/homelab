@@ -1,0 +1,6 @@
+---
+- name: Apply Calico manifests
+  ansible.builtin.shell: |
+    set -eo pipefail
+    kubectl create --kubeconfig=/etc/kubernetes/admin.conf -f {{ k8s.calico.tigera_operator_url }}
+    curl -Ls {{ k8s.calico.crd_url }} | yq --yaml-output 'if .spec.calicoNetwork? then .spec.calicoNetwork.ipPools[0].cidr = "{{ k8s.network.cluster_cidr }}" else . end' | kubectl create -f -

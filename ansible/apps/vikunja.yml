@@ -1,0 +1,63 @@
+vikunja_api:
+  name: vikunja-api
+  container:
+    image: vikunja/api:0.21.0
+    ports:
+      - "{{ net_svc.vikunja_api.port }}:3456"
+    volumes:
+      - "{{ common_apps_dir }}/vikunja/files:/app/vikunja/files"
+    env:
+      VIKUNJA_DATABASE_HOST: postgres
+      VIKUNJA_DATABASE_TYPE: postgres
+      VIKUNJA_DATABASE_PASSWORD: "{{ vault_postgres_pass }}"
+      VIKUNJA_DATABASE_USER: "{{ common_user }}"
+      VIKUNJA_DATABASE_DATABASE: vikunja
+      # VIKUNJA_SERVICE_JWTSECRET: "{{ vault_vikunja_jwtsecret }}"
+      VIKUNJA_SERVICE_FRONTENDURL: "https://vikunja.{{ net_domain.tld }}/"
+      # VIKUNJA_SERVICE_FRONTENDURL: "http://vikunja:80/"
+
+  dependents:
+    - vikunja
+
+  db:
+    - type: postgres
+      name: vikunja
+
+  traefik:
+    routers:
+      - name: "vikunja"
+        rule: "Host(`vikunja.{{ net_domain.tld }}`)"
+        middlewares:
+          - chain-internal
+        service: vikunja-svc
+      - name: "vikunja-api"
+        rule: "Host(`vikunja.{{ net_domain.tld }}`) && (PathPrefix(`/api/v1`) || PathPrefix(`/dav/`) || PathPrefix(`/.well-known/`))"
+        middlewares:
+          - chain-internal
+        service: vikunja-api-svc
+    services: |
+      vikunja-svc:
+        loadBalancer:
+          servers:
+            - url: "http://{{ net_svc.vikunja.host }}:{{ net_svc.vikunja.port }}"
+      vikunja-api-svc:
+        loadBalancer:
+          servers:
+            - url: "http://{{ net_svc.vikunja_api.host }}:{{ net_svc.vikunja_api.port }}"
+
+  # uptime:
+  #   - group: services
+  #   - group: databases
+  #     type: postgres
+  #     dbname: vikunja
+
+vikunja:
+  container:
+    image: vikunja/frontend:0.21.0
+    ports:
+      - "{{ net_svc.vikunja.port }}:80"
+    env:
+      VIKUNJA_API_URL: "https://vikunja.{{ net_domain.tld }}/api/v1"
+
+  # uptime:
+  #   - group: services

@@ -1,52 +1,20 @@
 ---
-- name: Set container facts
+- name: Set facts
   no_log: "{{ ci | default(false) }}"
   ansible.builtin.set_fact:
-    _bootstrap: "{{ bootstrap_defaults | ansible.builtin.combine(bootstrap, list_merge='append_rp', recursive=true) }}"
+    _bts: "{{ bootstrap_defaults | ansible.builtin.combine(bootstrap, list_merge='append_rp', recursive=true) }}"
 
-- name: Run pre-process task
-  ansible.builtin.include_tasks: preproc.yml
+- name: Set home path
+  ansible.builtin.set_fact:
+    _bts_home: "{{ '/home/' + bootstrap_user if bootstrap_user != 'root' else '/root' }}"
 
-- name: Run package task
-  ansible.builtin.include_tasks: packages.yml
-  when: bootstrap.packages is true
-
-- name: Run system task
-  ansible.builtin.include_tasks: system.yml
-  when: bootstrap.system is true
-
-- name: Run user task
-  ansible.builtin.include_tasks: user.yml
-  when: bootstrap.user is true
-
-- name: Run network task
-  ansible.builtin.include_tasks: network.yml
-  when: bootstrap.network is true
-
-- name: Run ntp task
-  ansible.builtin.include_tasks: ntp.yml
-  when: bootstrap.ntp is true
-
-- name: Run filesystem task
-  ansible.builtin.include_tasks: filesystem.yml
-  when: bootstrap.filesystem is true
-
-- name: Run profile task
-  ansible.builtin.include_tasks: profile.yml
-  when: bootstrap.profile is true
-
-- name: Run locales task
-  ansible.builtin.include_tasks: locale.yml
-  when: bootstrap.locale is true
-
-- name: Run ssh task
-  ansible.builtin.include_tasks: ssh.yml
-  when: bootstrap.ssh is true
-
-- name: Run docker task
-  ansible.builtin.include_tasks: docker.yml
-  when: bootstrap.docker is true
-
-- name: Run borg task
-  ansible.builtin.include_tasks: borg.yml
-  when: bootstrap.borg is true
+- ansible.builtin.include_tasks: prereq.yml
+- ansible.builtin.include_tasks: packages.yml
+- ansible.builtin.include_tasks: system.yml
+- ansible.builtin.include_tasks: user.yml
+- ansible.builtin.include_tasks: mounts.yml
+- ansible.builtin.include_tasks: profile.yml
+- ansible.builtin.include_tasks: ntp.yml
+- ansible.builtin.include_tasks: ssh.yml
+- ansible.builtin.include_tasks: docker.yml
+- ansible.builtin.include_tasks: borg.yml

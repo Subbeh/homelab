@@ -31,16 +31,16 @@ if [ -f /usr/bin/most ]; then
 	export PAGER=most
 fi
 
-#############
-##  Alias  ##
-#############
+###############
+##  Aliases  ##
+###############
 
 # Commands
 alias ls='ls --color'
-alias grep='grep --color'
-alias egrep='egrep --color'
 alias ll='ls -lah'
 alias lt='ls -ltr'
+alias grep='grep --color'
+alias egrep='egrep --color'
 
 [ -f ~/.bash_functions ] && . ~/.bash_functions
-[ -f ~/.bashrc_local ] && . ~/.bashrc_local
+[ -f ~/.profile.custom ] && . ~/.profile.custom

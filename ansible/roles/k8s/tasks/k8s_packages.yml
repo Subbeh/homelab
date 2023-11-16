@@ -1,0 +1,35 @@
+---
+- name: Add Kubernetes repository apt key
+  ansible.builtin.apt_key:
+    url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key
+    keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    state: present
+
+- name: Add Kubernetes deb repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /"
+    state: present
+    filename: kubernetes
+
+- name: Update repo and cache
+  ansible.builtin.apt:
+    update_cache: yes
+    force_apt_get: yes
+  changed_when: false
+
+- name: Install Kubernetes packages
+  ansible.builtin.apt:
+    pkg:
+      - "kubeadm={{ k8s.apt_version }}"
+      - "kubectl={{ k8s.apt_version }}"
+      - "kubelet={{ k8s.apt_version }}"
+    update_cache: yes
+
+- name: Hold kubeadm, kubectl, kubelet
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items:
+    - kubeadm
+    - kubectl
+    - kubelet

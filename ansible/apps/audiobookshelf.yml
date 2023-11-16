@@ -1,13 +1,13 @@
 ---
 audiobookshelf:
   container:
-    image: ghcr.io/advplyr/audiobookshelf:2.3.3
+    image: ghcr.io/advplyr/audiobookshelf:2.4.4
     ports:
       - "{{ net_svc.audiobookshelf.port }}:80"
     volumes:
       - "{{ common_apps_dir }}/audiobookshelf/config:/config"
       - "{{ common_apps_dir }}/audiobookshelf/metadata:/metadata"
-      - "/data/media/books/audiobooks:/data"
+      - "/data/media-fast/books/audiobooks:/data"
 
   traefik:
     name: audiobooks

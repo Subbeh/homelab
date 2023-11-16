@@ -1,24 +1,35 @@
 ---
 - name: Ensure user is created
   ansible.builtin.user:
-    name: "{{ bootstrap_user.name }}"
-    createhome: true
-    password: "{{ bootstrap_user.password | string | password_hash('sha512', 'mysecretsalt') }}"
-    uid: "{{ bootstrap_user.uid }}"
-    shell: /bin/bash
+    name: "{{ item.name }}"
+    createhome: "{{ item.home | default(false) }}"
+    password: "{{ (item.password | string | password_hash('sha512', 'mysecretsalt')) | default(omit) }}"
+    uid: "{{ item.uid | default(omit) }}"
+    shell: "{{ item.shell | default('/bin/bash')}}"
     state: present
+  loop: "{{ bootstrap_users }}"
+  no_log: true
+  when: _bts.user_add
 
 - name: Add user to sudoers
   ansible.builtin.copy:
-    content: "{{ bootstrap_user.name }} ALL=(ALL:ALL) NOPASSWD:ALL"
-    dest: "/etc/sudoers.d/{{ bootstrap_user.name }}_nopasswd"
+    content: "{{ item.name }} ALL=(ALL:ALL) NOPASSWD:ALL"
+    dest: "/etc/sudoers.d/{{ item.name }}_nopasswd"
     mode: 0440
+  loop: "{{ bootstrap_users }}"
+  when:
+    - _bts.user_add
+    - item.sudoers is defined and item.sudoers
 
 - name: Silence the login prompt
   ansible.builtin.file:
-    dest: "/home/{{ bootstrap_user.name }}/.hushlogin"
+    dest: "/home/{{ item.name }}/.hushlogin"
     state: touch
-    owner: "{{ bootstrap_user.name }}"
+    owner: "{{ item.name }}"
     mode: 0775
     modification_time: preserve
     access_time: preserve
+  loop: "{{ bootstrap_users }}"
+  when:
+    - _bts.user_add
+    - item.home is defined and item.home

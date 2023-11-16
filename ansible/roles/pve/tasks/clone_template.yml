@@ -1,0 +1,49 @@
+---
+- name: Set facts
+  ansible.builtin.set_fact:
+    _vars: "{{ pve_vm_defaults | ansible.builtin.combine((pve_vm | default([])), list_merge='append_rp', recursive=true) }}"
+
+- name: Clone template to node
+  ansible.builtin.command: qm clone {{ _vars.template }} {{ _vars.vmid }} --target {{ _vars.node }} --name {{ _vars.name }}
+  register: _result
+  failed_when: _result.stderr != ''
+  delegate_to: "{{ groups['pve'][0] }}"
+
+- block:
+    - name: Move VM to node
+      ansible.builtin.command: qm disk move {{ _vars.vmid }} scsi0 {{ _vars.storage | default("local-lvm") }} --delete 1
+      register: _result
+      failed_when: _result.stderr != ''
+
+    - name: Configure VM hardware specs
+      ansible.builtin.command: qm set {{ _vars.vmid }} --cores {{ _vars.cores }} --memory {{ _vars.memory }}
+      register: _result
+      failed_when: _result.stderr != ''
+
+    - name: Configure VM network settings
+      ansible.builtin.shell: |
+        qm set {{ _vars.vmid }} --ipconfig0 ip={{ _vars.ip }},gw={{ _vars.ip | ansible.utils.nthhost(1) }}
+        qm set {{ _vars.vmid }} --net0 model=virtio,bridge=vmbr0,tag={{ _vars.tag }}
+      register: _result
+      failed_when: _result.stderr != ''
+
+    - name: Resize VM disk
+      ansible.builtin.command: qm disk resize {{ _vars.vmid }} "scsi0" {{ _vars.size | default("50G") }}
+      register: _result
+      failed_when: _result.stderr != ''
+
+    - block:
+        - name: Start VM
+          ansible.builtin.command: qm start {{ _vars.vmid }}
+          register: _result
+          failed_when: _result.stderr != ''
+
+        - name: Wait for host to come online
+          wait_for:
+            host: "{{ _vars.ip | ansible.utils.ipaddr('address') }}"
+            port: 22
+            delay: 10
+            connect_timeout: 5
+          delegate_to: localhost
+      when: _vars.start
+  delegate_to: "{{ _vars.node }}"

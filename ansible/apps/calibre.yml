@@ -1,13 +1,13 @@
 ---
 calibre:
   container:
-    image: lscr.io/linuxserver/calibre:6.25.0
+    image: lscr.io/linuxserver/calibre:6.29.0
     ports:
       - "{{ net_svc.calibre.port }}:8080"
       - "{{ net_svc.calibre.port_server }}:8081"
     volumes:
       - "{{ common_apps_dir }}/calibre:/config"
-      - "/data/media/books/ebooks:/books"
+      - "/data/media-fast/books/ebooks:/books"
       - "/data/downloads:/downloads"
 
   traefik:
@@ -34,14 +34,14 @@ calibre:
 calibre_web:
   name: calibre-web
   container:
-    image: lscr.io/linuxserver/calibre-web:0.6.20
+    image: lscr.io/linuxserver/calibre-web:0.6.21
     env:
       DOCKER_MODS: linuxserver/mods:universal-calibre
     ports:
       - "{{ net_svc.calibre_web.port }}:8083"
     volumes:
       - "{{ common_apps_dir }}/calibre-web:/config"
-      - "/data/media/books/ebooks:/books"
+      - "/data/media-fast/books/ebooks:/books"
 
   traefik:
     name: books

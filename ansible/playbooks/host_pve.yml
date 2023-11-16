@@ -1,0 +1,106 @@
+---
+- hosts: "{{ ansible_limit | default(omit) }}"
+  gather_facts: true
+
+  vars:
+    pve:
+      repos: true
+      acme: true
+
+    bootstrap:
+      # packages: true
+      # profile: true
+      # system: true
+      ssh: true
+    bootstrap_sshd_config:
+      ChallengeResponseAuthentication: "no"
+      PermitEmptyPasswords: "no"
+      AuthenticationMethods: publickey
+      PubkeyAuthentication: "yes"
+      PasswordAuthentication: "no"
+      MaxAuthTries: 3
+      Protocol: 2
+      UseDNS: "no"
+    bootstrap_pkg_extra:
+      - name: pve-headers
+      - name: lm-sensors
+      - name: acpi-support
+      - name: acpid
+      - name: acpi
+      - name: libguestfs-tools
+      - deb: https://github.com/Jamesits/pve-fake-subscription/releases/download/v0.0.9/pve-fake-subscription_0.0.9+git-1_all.deb
+    bootstrap_pkg_pip_extra:
+      - pexpect
+      - proxmoxer
+      - requests
+    bootstrap_pkg_microcode: true
+    bootstrap_pkg_repo:
+      - repo: deb http://download.proxmox.com/debian/pve {{ ansible_distribution_release }} pve-no-subscription
+      - repo: deb http://download.proxmox.com/debian/ceph-quincy {{ ansible_distribution_release }} no-subscription
+      - repo: deb http://ftp.au.debian.org/debian {{ ansible_distribution_release }} main contrib non-free non-free-firmware
+      - repo: deb http://ftp.au.debian.org/debian {{ ansible_distribution_release }}-updates main contrib non-free non-free-firmware
+    bootstrap_profile_config:
+      - file: bashrc
+        dest: ".bashrc"
+        user:
+          - root
+      - file: vimrc
+        dest: ".vimrc"
+        user:
+          - root
+    bootstrap_sys_grub_config:
+      intel_iommu: "on"
+      intel_pstate: "disable"
+    bootstrap_sys_kernel_modules:
+      - vfio
+      - vfio_iommu_type1
+      - vfio_pci
+      - vfio_virqfd
+
+    pve_acme:
+      # account: acme-sbbh-cloud-stg
+      # url: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      account: acme-sbbh-cloud-prd
+      url: "https://acme-v02.api.letsencrypt.org/directory"
+      email: "{{ vault_cloudflare_email }}"
+      plugin: cf-sbbh-cloud
+      cf_account_id: "{{ vault_cloudflare_account }}"
+      cf_email: "{{ vault_cloudflare_email }}"
+      cf_key: "{{ vault_cloudflare_api_key }}"
+      cf_token: "{{ vault_cloudflare_api_token }}"
+      cf_zone_id: "{{ vault_cloudflare_zone_id }}"
+
+    borg_repository:
+      - path: "{{ borg_server }}/pve"
+        label: local
+      - path: "{{ vault_pve_borg_repo }}"
+        label: borgbase
+    borg_source_directories:
+      - /etc
+      - /var/lib/pve-cluster
+      - /root
+      - /var/spool/cron
+      - /usr/local/bin
+    borg_exclude_patterns:
+      - /root/templates
+    borg_hc_ping_url: "{{ vault_pve_borg_hc_ping_url }}"
+    borgmatic_timer_hour: 02
+    borgmatic_timer_minute: 50
+
+  tasks:
+    - name: Import system bootstrap role
+      tags: bootstrap
+      ansible.builtin.import_role:
+        name: bootstrap
+
+    - name: Import PVE bootstrap role
+      tags: pve
+      ansible.builtin.import_role:
+        name: pve
+
+    - name: Import Borg backups task
+      tags: borg
+      ansible.builtin.include_role:
+        name: borg
+        tasks_from: bootstrap
+      when: inventory_hostname == groups['pve'][0]

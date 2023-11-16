@@ -1,0 +1,13 @@
+---
+# - name: Run kubeadm init
+#   become: yes
+#   ansible.builtin.command: kubeadm init --control-plane-endpoint "{{ k8s.vip.ip }}:6443" --upload-certs --kubernetes-version={{ k8s.version }} --pod-network-cidr={{ k8s.network.cluster_cidr }} --service-cidr={{ k8s.network.service_cidr }}
+- name: Copy kubeadm init config
+  become: yes
+  ansible.builtin.template:
+    src: kubeadm.yaml.j2
+    dest: /etc/kubeadm.yaml
+
+- name: Run kubeadm init
+  become: yes
+  ansible.builtin.command: kubeadm init --config /etc/kubeadm.yaml

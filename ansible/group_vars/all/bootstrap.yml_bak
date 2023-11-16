@@ -1,0 +1,109 @@
+---
+bootstrap_user:
+  name: "{{ common_user }}"
+  password: "{{ common_pass }}"
+  uid: "{{ common_user_id }}"
+
+bootstrap_pkg_prereq:
+  - ca-certificates
+  - gnupg
+bootstrap_pkg:
+  - acl
+  - apt-transport-https
+  - bash-completion
+  - cron
+  - curl
+  - debian-archive-keyring
+  - dnsutils
+  - gawk
+  - git
+  - hping3
+  - htop
+  - iftop
+  - iotop
+  - iperf3
+  - iptraf-ng
+  - iputils-ping
+  - jq
+  - locales
+  - lsb-release
+  - lsof
+  - lynx
+  - make
+  - ncdu
+  - netcat-openbsd
+  - nethogs
+  - net-tools
+  - nfs-common
+  - nmap
+  - nmon
+  - python3-pip
+  - python3-setuptools
+  - rsync
+  - socat
+  - software-properties-common
+  - strace
+  - sudo
+  - tcpdump
+  - telnet
+  - tmux
+  - traceroute
+  - tree
+  - unzip
+  - vim
+  - zip
+
+bootstrap_net_set_hosts_file: true
+bootstrap_net_set_dns: true
+bootstrap_net_dns_server: "{{ net_cidr.vms | ansible.utils.nthhost(1) }}"
+bootstrap_net_dns_domain: "{{ net_domain.tld_local }}"
+
+bootstrap_ssh_authorizedkeys:
+  - "{{ vault_ssh_keys.pub.master }}"
+  - "{{ vault_ssh_keys.pub.drone }}"
+bootstrap_sshd_config:
+  PermitRootLogin: "no"
+  ChallengeResponseAuthentication: "no"
+  PermitEmptyPasswords: "no"
+  UsePAM: "no"
+  AuthenticationMethods: publickey
+  PubkeyAuthentication: "yes"
+  PasswordAuthentication: "no"
+  MaxAuthTries: 3
+  Protocol: 2
+  UseDNS: "no"
+
+bootstrap_ntp_timezone: "{{ common_timezone }}"
+bootstrap_ntp_server: "{{ net_cidr.vms | ansible.utils.nthhost(1) }}"
+
+bootstrap_profile_defaults:
+  - editor: /usr/bin/vim
+bootstrap_locales:
+  - "{{ common_locale }}"
+
+bootstrap_docker_gid: "{{ common_group_id_docker }}"
+bootstrap_docker_app_data: "{{ common_dir }}"
+
+## borg backup
+borg_ssh_key: "{{ vault_ssh_keys.priv.borg }}"
+borg_encryption_passphrase: "{{ vault_borg_passphrase }}"
+borg_user: root
+borg_group: root
+borg_server: "ssh://borg@nas/."
+borg_ssh_key_file_path: ~/.ssh/borg
+borg_ssh_command: "ssh -i ~/.ssh/borg -o StrictHostKeyChecking=no"
+borg_remote_path: /usr/local/bin/borg
+borg_retention_policy:
+  keep_daily: 7
+  keep_weekly: 4
+  keep_monthly: 12
+borg_db_postgres: false
+borgmatic_hooks:
+  before_backup:
+    - echo "$(date) - Starting backup."
+  after_backup:
+    - echo "$(date) - Backup created."
+  on_error:
+    - echo "$(date) - Error while creating a backup."
+  healthchecks:
+    ping_url: "{{ borg_hc_ping_url | default(omit) }}"

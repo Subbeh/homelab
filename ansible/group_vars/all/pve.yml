@@ -3,3 +3,28 @@ pve_img_dir: /data/ssd0/pve/cloudimg
 pve_template_dir: /data/ssd0/pve/cloudimg/templates
 pve_default_img: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2
 pve_authorized_keys: "{{ common_authorized_keys }}"
+
+pve_template_defaults:
+  node: pve-nas
+  storage: nfs-ssd
+  node_storage: local-lvm
+  size: 2
+  cores: 1
+  memory: 1024
+  img_dir: /data/ssd0/pve/cloudimg
+  template_dir: /data/ssd0/pve/cloudimg/templates
+  image: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2
+  authorized_keys: "{{ common_authorized_keys }}"
+  user: "{{ common_user }}"
+  group: "{{ common_group }}"
+  user_id: "{{ common_user_id }}"
+  group_id: "{{ common_group_id }}"
+  password: "{{ common_pass }}"
+
+pve_vm_defaults:
+  storage: local-lvm
+  size: 50G
+  cores: 1
+  memory: 1024
+  tag: 20
+  start: false

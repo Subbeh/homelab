@@ -1,0 +1,63 @@
+---
+- block:
+    - name: Set facts
+      ansible.builtin.set_fact:
+        _vars: "{{ pve_template_defaults | ansible.builtin.combine((pve_template | default([])), list_merge='append_rp', recursive=true) }}"
+
+    - name: Set template fact
+      ansible.builtin.set_fact:
+        _template: "{{ _vars.template_dir }}/{{ _vars.name }}"
+
+    - name: Ensure image and template directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - "{{ _vars.img_dir }}"
+        - "{{ _vars.template_dir }}"
+
+    - name: Download cloud-init image
+      ansible.builtin.get_url:
+        url: "{{ _vars.image }}"
+        dest: "{{ _vars.img_dir }}/{{ _vars.image | basename }}"
+
+    - name: Create template image
+      ansible.builtin.copy:
+        src: "{{ _vars.img_dir }}/{{ _vars.image | basename }}"
+        dest: "{{ _template }}"
+        remote_src: yes
+
+    - name: Bootstrap template
+      ansible.builtin.command: "{{ item }}"
+      loop:
+        - virt-customize -a {{ _template }} --update
+        - virt-customize -a {{ _template }} --install qemu-guest-agent
+        - virt-customize -a {{ _template }} --run-command "useradd -m --shell /bin/bash {{ _vars.user }} --uid {{ _vars.user_id }}"
+        - virt-customize -a {{ _template }} --password {{ _vars.user }}:password:{{ _vars.password }}
+        - virt-customize -a {{ _template }} --run-command 'mkdir -m 0700 -p /home/{{ _vars.user }}/.ssh'
+        - virt-customize -a {{ _template }} --run-command 'curl {{ _vars.authorized_keys }} -o /home/{{ _vars.user }}/.ssh/authorized_keys'
+        - virt-customize -a {{ _template }} --run-command 'chown -R {{ _vars.user }}:{{ _vars.group }} /home/{{ _vars.user }}'
+        - virt-customize -a {{ _template }} --run-command 'echo "{{ _vars.user }} ALL=(ALL) NOPASSWD{{ ":" }} ALL" > /etc/sudoers.d/{{ _vars.user }}'
+        - virt-customize -a {{ _template }} --run-command 'chmod 0440 /etc/sudoers.d/{{ _vars.user }}'
+        - virt-customize -a {{ _template }} --run-command 'chown root:root /etc/sudoers.d/{{ _vars.user }}'
+        - virt-customize -a {{ _template }} --run-command '>/etc/machine-id'
+      register: _result
+      failed_when: _result.stderr != '' and 'already exists' not in _result.stderr
+
+    - name: Provision PVE template
+      ansible.builtin.command: "{{ item }}"
+      loop:
+        - qm create {{ _vars.vmid }} --name {{ _vars.name }}
+        - qm importdisk {{ _vars.vmid }} {{ _template }} {{ _vars.storage }}
+        - qm set {{ _vars.vmid }} --memory {{ _vars.memory }} --cores {{ _vars.cores }}
+        - qm set {{ _vars.vmid }} --net0 virtio,bridge=vmbr0 --ipconfig0 ip=dhcp
+        - qm set {{ _vars.vmid }} --scsihw virtio-scsi-pci --scsi0 {{ _vars.storage }}:{{ _vars.vmid }}/vm-{{ _vars.vmid }}-disk-0.raw
+        - qm set {{ _vars.vmid }} --boot c --bootdisk scsi0
+        - qm set {{ _vars.vmid }} --ide2 {{ _vars.storage }}:cloudinit
+        - qm set {{ _vars.vmid }} --serial0 socket --vga serial0
+        - qm set {{ _vars.vmid }} --agent enabled=1
+      register: _result
+      failed_when:
+        - _result.stderr != ''
+        - "'failed: exit code' in _result.stdout"
+  delegate_to: "{{ pve_node | default(groups['pve'][0]) }}"

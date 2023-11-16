@@ -9,7 +9,7 @@ changedetection:
     ports:
       - "{{ net_svc.changedetection.port }}:5000"
     volumes:
-      - "{{ common_dir }}/changedetection/datastore:/datastore"
+      - "{{ common_apps_dir }}/changedetection/datastore:/datastore"
     env:
       BASE_URL: "https://changedetection.{{ net_domain.tld }}"
       PLAYWRIGHT_DRIVER_URL: "ws://changedetection-chrome:3000/?stealth=1&--disable-web-security=true"

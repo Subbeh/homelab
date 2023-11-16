@@ -1,0 +1,112 @@
+---
+- hosts: k8s
+  tags: [never, vm]
+  gather_facts: false
+  become: false
+  serial: 1
+
+  tasks:
+    - name: ALL | Create VMs from template
+      ansible.builtin.import_role:
+        name: pve
+        tasks_from: clone_template
+
+- hosts: k8s
+  gather_facts: true
+  become: true
+  any_errors_fatal: true
+  serial: 3
+
+  tasks:
+    - name: ALL | Bootstrap nodes
+      tags: [never, bootstrap]
+      ansible.builtin.import_role:
+        name: bootstrap
+
+    - name: MASTERS | Bootstrap nodes
+      tags: [never, bootstrap, bootstrap_custom]
+      ansible.builtin.import_role:
+        name: bootstrap
+      vars:
+        bootstrap:
+          profile_files_custom: true
+        bootstrap_profile_custom_root: |
+          alias k=kubectl
+          export KUBECONFIG=/etc/kubernetes/admin.conf
+      when: inventory_hostname in groups['k8s-masters']
+
+    - name: ALL | Install container runtime
+      tags: [never, cluster, runtime]
+      ansible.builtin.import_role:
+        name: k8s
+        tasks_from: container_runtime
+
+    - name: ALL | Install kubernetes packages
+      tags: [never, cluster, k8s_packages]
+      ansible.builtin.import_role:
+        name: k8s
+        tasks_from: k8s_packages
+
+    - name: MASTERS | Install kube-vip
+      tags: [never, cluster, vip]
+      ansible.builtin.import_role:
+        name: k8s
+        tasks_from: kube_vip
+      when: inventory_hostname in groups['k8s-masters']
+
+    - block:
+        - name: MASTER[0] | Initialize cluster
+          tags: [never, cluster, cluster_init]
+          ansible.builtin.import_role:
+            name: k8s
+            tasks_from: cluster_init
+
+        - name: MASTER[0] | Install Calico CNI
+          tags: [never, cluster, cni]
+          ansible.builtin.import_role:
+            name: k8s
+            tasks_from: cni
+
+        - name: MASTER[0] | Fetch kubeconfig
+          tags: [never, cluster, kubeconfig]
+          ansible.builtin.import_role:
+            name: k8s
+            tasks_from: kubeconfig
+      when: inventory_hostname == groups['k8s-masters'][0]
+
+    - name: MASTERS[1+] | Join cluster
+      tags: [never, cluster, cluster_join]
+      ansible.builtin.import_role:
+        name: k8s
+        tasks_from: cluster_join
+      vars:
+        k8s_node: master
+      when: inventory_hostname in groups['k8s-masters'][1:]
+
+    - name: WORKERS | Join cluster
+      tags: [never, cluster, cluster_join]
+      ansible.builtin.import_role:
+        name: k8s
+        tasks_from: cluster_join
+      vars:
+        k8s_node: worker
+      when: inventory_hostname in groups['k8s-workers']
+
+- hosts: k8s
+  tags: [never, destroy]
+  gather_facts: false
+  become: false
+  serial: 1
+
+  tasks:
+    - block:
+        - ansible.builtin.debug: msg="DESTROYING CLUSTER ..."
+        - name: Pausing for 5 seconds...
+          ansible.builtin.pause:
+            seconds: 5
+      run_once: true
+
+    - name: ALL | Destroy VMs
+      ansible.builtin.import_role:
+        name: pve
+        tasks_from: destroy_vm

@@ -8,7 +8,7 @@
     pve_host: plex
     pve_container:
       ostemplate: "zfs-hdd:vztmpl/debian-11-standard_11.7-1_amd64.tar.zst"
-      size: 20
+      size: 50
       cores: 4
       memory: 4096
       swap: 4096

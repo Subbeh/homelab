@@ -1,0 +1,25 @@
+- name: Destroy VM
+  block:
+    - name: Get VM status
+      ansible.builtin.shell: pvesh get /cluster/resources --output-format json | jq -r '.[] | .id + " " + .node' | grep qemu/{{ pve_vmid }}
+      register: _status
+      failed_when: false
+
+    - block:
+        - name: Set node fact
+          ansible.builtin.set_fact:
+            _node: "{{ _status.stdout.split()[1] }}"
+
+        - name: Stop VM
+          ansible.builtin.command: pvesh create /nodes/{{ _node }}/qemu/{{ pve_vmid }}/status/stop
+          register: _result
+          failed_when: _result.stderr != ''
+
+        - name: Destroy VM
+          ansible.builtin.command: pvesh delete /nodes/{{ _node }}/qemu/{{ pve_vmid }}
+          register: _result
+          failed_when: _result.stderr != ''
+      when: _status.rc == 0
+
+  delegate_to: "{{ groups['pve'][0] }}"
+  when: pve_vmid is defined

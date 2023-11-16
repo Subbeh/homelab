@@ -1,8 +1,13 @@
 ---
+- name: Check host OS
+  ansible.builtin.fail:
+  when:
+    - (ansible_os_family is not defined) or (ansible_os_family != "Debian")
+
 - name: Set hostname
   ansible.builtin.hostname:
     name: "{{ bootstrap_net_hostname }}"
-  when: bootstrap_net_hostname is defined
+  when: _bts.net_hostname
 
 - name: Clean up hosts file
   ansible.builtin.template:
@@ -11,9 +16,9 @@
     mode: 0644
     owner: root
     group: root
-  when: bootstrap_net_set_hosts_file is true
+  when: _bts.net_hosts
 
-- name: Set up nameserver
+- name: Set DNS config
   block:
     - name: Stop and disable service
       ansible.builtin.service:
@@ -36,4 +41,33 @@
         content: |
           nameserver {{ bootstrap_net_dns_server }}
           search {{ bootstrap_net_dns_domain }}
-  when: bootstrap_net_set_dns is true
+  when: _bts.net_dns
+
+- name: Sync time
+  ansible.builtin.command: hwclock --hctosys
+  failed_when: false
+  changed_when: false
+  when: _bts.sys_sync_time
+
+- name: Enable contrib and non-free repositories
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list.d/debian.sources
+    regexp: "^(Components: main)$"
+    replace: '\1 contrib non-free'
+  when:
+    - _bts.pkg_enable_nonfree_repo
+    - ansible_distribution == "Debian"
+
+- name: Update repo and cache
+  ansible.builtin.apt:
+    update_cache: yes
+    force_apt_get: yes
+  changed_when: false
+  when: _bts.pkg_update
+
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name: "{{ bootstrap_pkg_prereq }}"
+    state: present
+    install_recommends: false
+  when: _bts.pkg_prereq

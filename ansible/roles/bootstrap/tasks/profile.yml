@@ -1,17 +1,43 @@
 ---
-- name: Copy profile config files over
+- name: Copy .bashrc file over
   ansible.builtin.copy:
-    src: "{{ item.0.file }}"
-    dest: "{{ '/root' if item.1 == 'root' else '/home/' + item.1 }}/{{ item.0.dest }}"
+    src: bashrc
+    dest: "{{ '/root' if item == 'root' else '/home/' + item }}/.bashrc"
     mode: 0640
-    owner: "{{ item.1 }}"
-    group: "{{ item.1 }}"
-  with_subelements:
-    - "{{ bootstrap_profile_config }}"
-    - user
+    owner: "{{ item }}"
+    group: "{{ item }}"
+  loop: "{{ bootstrap_profile_users }}"
+  when: _bts.profile_files
+
+- name: Copy .vimrc file over
+  ansible.builtin.copy:
+    src: vimrc
+    dest: "{{ '/root' if item == 'root' else '/home/' + item }}/.vimrc"
+    mode: 0640
+    owner: "{{ item }}"
+    group: "{{ item }}"
+  loop: "{{ bootstrap_profile_users }}"
+  when: _bts.profile_files
+
+- name: Create custom bash user profile
+  ansible.builtin.copy:
+    content: "{{ bootstrap_profile_custom_user }}"
+    dest: "/home/{{ bootstrap_user }}/.profile.custom"
+  when:
+    - _bts.profile_files_custom
+    - bootstrap_profile_custom_user
+
+- name: Create custom bash root profile
+  ansible.builtin.copy:
+    content: "{{ bootstrap_profile_custom_root }}"
+    dest: "/root/.profile.custom"
+  when:
+    - _bts.profile_files_custom
+    - bootstrap_profile_custom_root
 
 - name: Set app defaults
   community.general.alternatives:
     name: "{{ item.key }}"
     path: "{{ item.value }}"
   with_dict: "{{ bootstrap_profile_defaults }}"
+  when: _bts.profile_defaults

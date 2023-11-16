@@ -1,9 +1,9 @@
 ---
 net_domain:
-  tld: sbbh.cloud
-  tld_local: int.sbbh.cloud
-  tld_test: test.sbbh.cloud
-  tld_k8s: k8s.sbbh.cloud
+  tld: "{{ vault_network_domain }}"
+  tld_local: "int.{{ vault_network_domain }}"
+  tld_test: "test.{{ vault_network_domain }}"
+  tld_k8s: "k8s.{{ vault_network_domain }}"
 
 net_cidr:
   lan: "10.11.0.0/16"
@@ -161,6 +161,9 @@ net_svc:
   linx:
     host: services
     port: "9024"
+  mealie:
+    host: services
+    port: "9037"
   minio:
     host: services
     port: "9006"
@@ -215,10 +218,7 @@ net_svc:
   radarr:
     host: media
     port: "9050"
-  readarr_ebooks:
-    host: media
-    port: "9055"
-  readarr_audiobooks:
+  readarr:
     host: media
     port: "9056"
   redis_bastion:
@@ -238,11 +238,23 @@ net_svc:
     port_dvr: "1901"
   traefik:
     host: bastion
+  trilium:
+    host: services
+    port: "9034"
+  unifi_network_app:
+    host: services
+    port: "9004"
   unpackerr:
     host: media
   uptimekuma:
     host: bastion
     port: "9032"
+  vikunja:
+    host: services
+    port: "9038"
+  vikunja_api:
+    host: services
+    port: "9039"
   whoami:
     host: bastion
   wizarr:

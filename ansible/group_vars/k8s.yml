@@ -1,0 +1,72 @@
+---
+pve_template: 1000
+pve_vm:
+  name: "{{ inventory_hostname }}"
+  template: "{{ pve_template }}"
+  vmid: "{{ pve_vmid }}"
+  node: "{{ pve_node }}"
+  cores: "{{ pve_cores }}"
+  memory: "{{ pve_memory }}"
+  ip: "{{ ansible_host }}/24"
+  tag: 80
+  start: true
+
+bootstrap:
+  reboot: true
+  net_hostname: true
+  net_hosts: true
+  net_dns: true
+  pkg_update: true
+  sys_sync_time: true
+  sys_disable_swap: true
+  sys_kernel_modules: true
+  sys_sysctl: true
+  sys_locales: true
+  pkg_prereq: true
+  pkg_enable_nonfree_repo: true
+  pkg_install: true
+  pkg_unattended: true
+  pkg_cleanup: true
+  user_add: true
+  net_ntp: true
+  profile_files: true
+  profile_defaults: true
+  ssh_authorizedkeys: true
+  ssh_keypair: true
+  ssh_server_config: true
+
+bootstrap_sys_kernel_modules:
+  - name: br_netfilter
+  - name: overlay
+bootstrap_sysctl_config:
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.bridge.bridge-nf-call-iptables: 1
+  net.ipv4.ip_forward: 1
+
+k8s:
+  cluster_name: k8s-homelab
+  version: v1.28.3
+  apt_version: 1.28.3-1.1
+  kubeconfig: "{{ common_k8s_root }}/kubeconfig"
+
+  network:
+    domain: cluster.local
+    cluster_cidr: 10.42.0.0/16
+    service_cidr: 10.43.0.0/16
+    dns: "{{ net_cidr.k8s | ansible.utils.nthhost(1) }}"
+    metallb_address_range: "{{ net_cidr.k8s | ansible.utils.nthhost(100) }}-{{ net_cidr.k8s | ansible.utils.nthhost(150) }}"
+
+  packages:
+    containerd_download_url: https://github.com/containerd/containerd/releases/download/v1.7.8/containerd-1.7.8-linux-amd64.tar.gz
+    crictl_download_url: https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.28.0/crictl-v1.28.0-linux-amd64.tar.gz
+    runc_download_url: https://github.com/opencontainers/runc/releases/download/v1.1.10/runc.amd64
+
+  vip:
+    version: "{{ (lookup('ansible.builtin.url', 'https://api.github.com/repos/kube-vip/kube-vip/releases') | from_json)[0].name }}"
+    iface: eth0
+    ip: "{{ net_cidr.k8s | ansible.utils.nthhost(80) }}"
+
+  calico:
+    tigera_operator_url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/tigera-operator.yaml
+    crd_url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/custom-resources.yaml
+    manifest_url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/calico.yaml

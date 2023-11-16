@@ -14,7 +14,7 @@
 
 - name: change ansible_user
   ansible.builtin.set_fact:
-    ansible_user: "{{ bootstrap_user.name }}"
+    ansible_user: "{{ bootstrap_user }}"
 
 - name: reboot
   ansible.builtin.reboot:
@@ -23,3 +23,4 @@
     pre_reboot_delay: 0
     post_reboot_delay: 10
     test_command: uptime
+  when: _bts.reboot

@@ -27,6 +27,7 @@ while true; do
 	else
 		echo ERROR: port $PORT not valid. Restarting gluetun container..
 		curl -s --unix-socket /var/run/docker.sock -X POST http://dummy/containers/gluetun/restart
+		sleep 60
 		curl -s --unix-socket /var/run/docker.sock -X POST http://dummy/containers/qbittorrent/restart
 	fi
 

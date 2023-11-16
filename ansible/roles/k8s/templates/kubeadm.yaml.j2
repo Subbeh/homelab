@@ -1,0 +1,33 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: {{ k8s.version }}
+clusterName: {{ k8s.cluster_name }}
+apiServer:
+  extraArgs:
+    authorization-mode: Node,RBAC
+  timeoutForControlPlane: 4m0s
+certificatesDir: /etc/kubernetes/pki
+controlPlaneEndpoint: "{{ k8s.vip.ip }}:6443"
+dns: {}
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+imageRepository: registry.k8s.io
+networking:
+  dnsDomain: {{ k8s.network.domain }}
+  podSubnet: {{ k8s.network.cluster_cidr }}
+  serviceSubnet: {{ k8s.network.service_cidr }}
+controllerManager: {}
+scheduler: {}
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+nodeRegistration:
+  criSocket: "unix:///run/containerd/containerd.sock"
+  name: {{ inventory_hostname }}
+  taints:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+localAPIEndpoint:
+  advertiseAddress: {{ ansible_default_ipv4.address }}
+  bindPort: 6443

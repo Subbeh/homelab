@@ -1,38 +1,27 @@
 ---
 - name: Set authorized keys
   ansible.posix.authorized_key:
-    user: "{{ _def_user }}"
+    user: "{{ bootstrap_user }}"
     key: "{{ item }}"
     state: present
   loop: "{{ bootstrap_ssh_authorizedkeys }}"
+  when: _bts.ssh_authorizedkeys
 
 - name: Generate root OpenSSH keypair
   community.crypto.openssh_keypair:
-    path: /root/.ssh/id_ed25519
+    path: "{{ _bts_home }}/.ssh/id_ed25519"
     type: ed25519
-  register: _setup_root_ssh_key
-
-- name: Allow root self-SSH
-  ansible.posix.authorized_key:
-    user: "root"
-    state: present
-    key: "{{ _setup_root_ssh_key.public_key }}"
-
-- name: Generate user OpenSSH keypair
-  community.crypto.openssh_keypair:
-    path: "{{ _def_user_home }}/.ssh/id_ed25519"
-    type: ed25519
-    owner: "{{ _def_user }}"
-    group: "{{ _def_user }}"
-  register: _setup_user_ssh_key
+  register: _ssh_key
+  when: _bts.ssh_keypair
 
 - name: Allow user self-SSH
   ansible.posix.authorized_key:
-    user: "{{ _def_user }}"
+    user: "{{ bootstrap_user }}"
     state: present
-    key: "{{ _setup_user_ssh_key.public_key }}"
+    key: "{{ _ssh_key.public_key }}"
+  when: _bts.ssh_keypair
 
-- name: Configure sshd
+- name: Configure SSH server
   ansible.builtin.lineinfile:
     path: "/etc/ssh/sshd_config"
     regex: "^(#)?{{ item.key }}"
@@ -42,6 +31,7 @@
   notify:
     - change ansible_user
     - restart sshd
+  when: _bts.ssh_server_config
 
 # https://bugs.launchpad.net/ubuntu/+source/openssh/+bug/45234
 - name: Fix - create cron job to create /run/sshd on reboot
@@ -51,3 +41,4 @@
     job: "mkdir -p -m0755 /run/sshd && systemctl restart ssh.service"
     user: root
     cron_file: sshd_fix
+  when: _bts.ssh_server_fix

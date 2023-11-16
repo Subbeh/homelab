@@ -12,7 +12,7 @@
         state: absent
       loop: ["none", "swap"]
   notify: reboot
-  when: bootstrap_sys_disable_swap is true
+  when: _bts.sys_disable_swap
 
 - block:
     - name: Set Grub config parameters
@@ -27,13 +27,16 @@
       when: _grub_status.changed
       ansible.builtin.command: update-grub
   notify: reboot
+  when: _bts.sys_grub
 
 - name: Add kernel modules
-  ansible.builtin.lineinfile:
-    path: /etc/modules
-    line: "{{ item }}"
+  ansible.builtin.modprobe:
+    name: "{{ item.name }}"
+    params: "{{ item.params | default(omit) }}"
+    persistent: present
   loop: "{{ bootstrap_sys_kernel_modules }}"
   notify: reboot
+  when: _bts.sys_kernel_modules
 
 - name: Set sysctls config parameters
   ansible.posix.sysctl:
@@ -41,8 +44,9 @@
     value: "{{ item.value }}"
     sysctl_file: /etc/sysctl.d/99-ansible.conf
     reload: true
-  with_dict: "{{ bootstrap_sys_ctl_config }}"
+  with_dict: "{{ bootstrap_sysctl_config }}"
   notify: reboot
+  when: _bts.sys_sysctl
 
 - name: Stop and disable systemd service
   ansible.builtin.service:
@@ -52,29 +56,16 @@
     masked: true
   register: _systemd_result
   failed_when: "_systemd_result is failed and 'Could not find the requested service' not in _systemd_result.msg"
-  loop: "{{ bootstrap_disable_svc }}"
-
-- name: Check if cloud-init config exists
-  ansible.builtin.stat:
-    path: /etc/cloud/cloud.cfg
-  register: _stat_result
+  loop: "{{ bootstrap_sys_systemd_disable }}"
+  when: _bts.sys_systemd
 
 - block:
-    - name: Disable cloud-init
-      ansible.builtin.file:
-        dest: /etc/cloud/cloud-init.disabled
-        state: touch
-        owner: root
-        mode: "0775"
-        modification_time: preserve
-        access_time: preserve
-      when: bootstrap_sys_disable_cloudinit is true
+    - name: Generate locales
+      community.general.locale_gen:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ bootstrap_sys_locales }}"
 
-    - name: Set cloud-init options
-      ansible.builtin.lineinfile:
-        path: /etc/cloud/cloud.cfg
-        regexp: "^{{ item.key }}:"
-        line: "{{ item.key }}: {{ item.value }}"
-      with_dict: "{{ bootstrap_sys_cloudinit_config }}"
-  notify: reboot
-  when: _stat_result.stat.exists
+    - name: Run locale-gen command
+      ansible.builtin.command: locale-gen
+  when: _bts.sys_locales
