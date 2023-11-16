@@ -22,7 +22,7 @@ bootstrap_defaults:
   net_hosts: false
   net_dns: false
   net_ntp: false
-  nfs_mounts: false
+  mounts: false
   profile_files: false
   profile_files_custom: false
   profile_defaults: false
@@ -63,7 +63,7 @@ bootstrap_net_dns_domain:
 bootstrap_net_ntp_server:
 bootstrap_net_ntp_timezone:
 
-bootstrap_nfs_mounts: []
+bootstrap_mounts: []
 
 bootstrap_profile_users: []
 bootstrap_profile_custom_user: ""

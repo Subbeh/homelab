@@ -1,27 +1,28 @@
 ---
 - name: Check directories exist
   ansible.builtin.stat:
-    path: "{{ item.src }}"
-  loop: "{{ bootstrap_nfs_mounts }}"
+    path: "{{ item.path }}"
+  loop: "{{ bootstrap_mounts }}"
   register: _fs_dirs
-  when: _bts.nfs_mounts
+  when: _bts.mounts
 
 - name: Create directories
   ansible.builtin.file:
-    path: "{{ item.item }}"
+    path: "{{ item.item.path }}"
     state: directory
     mode: "0771"
   loop: "{{ _fs_dirs.results }}"
   when:
-    - _bts.nfs_mounts
+    - _bts.mounts
     - item.stat.exists is false
 
-- name: Mount NFS shares
+- name: Mount shares / devices
   ansible.posix.mount:
     src: "{{ item.src }}"
     path: "{{ item.dest }}"
-    opts: rw,sync,hard
+    opts: "{{ item.opts | default('rw,sync,hard' if item.type == 'nfs' else omit) }}"
     state: mounted
-    fstype: nfs
-  loop: "{{ bootstrap_fs_mounts }}"
-  when: _bts.nfs_mounts
+    fstype: "{{ item.type }}"
+  loop: "{{ bootstrap_mounts }}"
+  when:
+    - _bts.mounts

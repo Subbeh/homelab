@@ -32,6 +32,12 @@
       register: _result
       failed_when: _result.stderr != ''
 
+    - name: Mount disk to VM
+      ansible.builtin.command: qm set {{ _vars.vmid }} -scsi1 {{ _vars.mount }}
+      register: _result
+      failed_when: _result.stderr != ''
+      when: _vars.mount is defined
+
     - block:
         - name: Start VM
           ansible.builtin.command: qm start {{ _vars.vmid }}

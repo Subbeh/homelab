@@ -9,6 +9,7 @@ pve_vm:
   memory: "{{ pve_memory }}"
   ip: "{{ ansible_host }}/24"
   tag: 80
+  mount: /dev/disk/by-label/k8s
   start: true
 
 bootstrap:
@@ -47,7 +48,8 @@ k8s:
   cluster_name: k8s-homelab
   version: v1.28.3
   apt_version: 1.28.3-1.1
-  kubeconfig: "{{ common_k8s_root }}/kubeconfig"
+  kubeconfig: /etc/kubernetes/admin.conf
+  kubeconfig_loc: "{{ common_k8s_root }}/kubeconfig"
 
   network:
     domain: cluster.local
@@ -70,3 +72,7 @@ k8s:
     tigera_operator_url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/tigera-operator.yaml
     crd_url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/custom-resources.yaml
     manifest_url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/calico.yaml
+
+  argocd:
+    repo: "https://{{ common_git_user }}:{{ common_git_pass }}@git.sbbh.cloud/infra/homelab.git"
+    agekey: "{{ vault_agekey }}"

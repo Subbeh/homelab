@@ -1,0 +1,34 @@
+---
+- name: Check if ArgoCD is installed
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ k8s.kubeconfig }}"
+    kind: "Deployment"
+    name: "argocd-server"
+    namespace: "argocd"
+  register: _argocd_server
+
+- block:
+    - name: Clone git repository
+      ansible.builtin.git:
+        repo: "https://{{ common_git_user }}:{{ common_git_pass }}@git.sbbh.cloud/infra/homelab.git"
+        dest: /tmp/repo
+        version: main
+
+    - name: Create SOPS AGE key file
+      ansible.builtin.copy:
+        content: "{{ k8s.argocd.agekey }}"
+        dest: /root/.agekey
+        owner: root
+        group: root
+        mode: "0400"
+
+    - name: Deploy app to cluster
+      ansible.builtin.shell: |
+        kubectl kustomize --enable-alpha-plugins /tmp/repo/k8s/{{ item }} | kubectl apply --kubeconfig {{ k8s.kubeconfig }} -f -
+      environment:
+        SOPS_AGE_KEY_FILE: /root/.agekey
+      loop:
+        - apps/external-secrets
+        - argocd
+  when:
+    - argocd_server.api_found is false

@@ -29,11 +29,27 @@
         name: bootstrap
       vars:
         bootstrap:
+          pkg_install: true
           profile_files_custom: true
+        bootstrap_pkg_pip_extra:
+          - kubernetes
         bootstrap_profile_custom_root: |
           alias k=kubectl
           export KUBECONFIG=/etc/kubernetes/admin.conf
       when: inventory_hostname in groups['k8s-masters']
+
+    - name: WORKERS | Bootstrap nodes
+      tags: [never, bootstrap, bootstrap_custom]
+      ansible.builtin.import_role:
+        name: bootstrap
+      vars:
+        bootstrap:
+          mounts: true
+        bootstrap_mounts:
+          - src: LABEL=k8s
+            path: /srv/k8s_volume
+            type: ext4
+      when: inventory_hostname in groups['k8s-workers']
 
     - name: ALL | Install container runtime
       tags: [never, cluster, runtime]
@@ -61,17 +77,29 @@
             name: k8s
             tasks_from: cluster_init
 
+        - name: MASTER[0] | Fetch kubeconfig
+          tags: [never, cluster, kubeconfig]
+          ansible.builtin.import_role:
+            name: k8s
+            tasks_from: kubeconfig
+
+        - name: MASTER[0] | Install additional tools
+          tags: [never, cluster, tools]
+          ansible.builtin.import_role:
+            name: k8s
+            tasks_from: tools
+
         - name: MASTER[0] | Install Calico CNI
           tags: [never, cluster, cni]
           ansible.builtin.import_role:
             name: k8s
             tasks_from: cni
 
-        - name: MASTER[0] | Fetch kubeconfig
-          tags: [never, cluster, kubeconfig]
+        - name: MASTER[0] | Install Argo CD
+          tags: [never, cluster, argocd]
           ansible.builtin.import_role:
             name: k8s
-            tasks_from: kubeconfig
+            tasks_from: argocd
       when: inventory_hostname == groups['k8s-masters'][0]
 
     - name: MASTERS[1+] | Join cluster
