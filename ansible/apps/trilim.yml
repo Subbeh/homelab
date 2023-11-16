@@ -1,0 +1,18 @@
+#jinja2:variable_start_string:'[[', variable_end_string:']]', trim_blocks: False
+---
+trilium:
+  container:
+    image: zadam/trilium:0.61.13
+    ports:
+      - "{{ net_svc.trilium.port }}:8080"
+    volumes:
+      - "{{ common_apps_dir }}/trilium/data:/home/node/trilium-data"
+    env:
+      USER_UID: "{{ common_user_id | string }}"
+      USER_GID: "{{ common_group_id | string }}"
+
+  traefik:
+    name: notes
+
+  uptime:
+    group: services
