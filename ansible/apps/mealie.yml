@@ -1,0 +1,31 @@
+mealie:
+  container:
+    image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1
+    ports:
+      - "{{ net_svc.mealie.port }}:9000"
+    volumes:
+      - "{{ common_apps_dir }}/mealie/data:/app/data"
+    env:
+      ALLOW_SIGNUP: "false"
+      MAX_WORKERS: "1"
+      WEB_CONCURRENCY: "1"
+      BASE_URL: "https://mealie.{{ net_domain.tld }}"
+      DEFAULT_EMAIL: "mealie@{{ net_domain.tld }}"
+      DB_ENGINE: "postgres"
+      POSTGRES_USER: "{{ common_user }}"
+      POSTGRES_PASSWORD: "{{ vault_postgres_pass }}"
+      POSTGRES_SERVER: "postgres"
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "mealie"
+
+  db:
+    - type: postgres
+      name: mealie
+
+  traefik:
+
+  uptime:
+    - group: services
+    - group: databases
+      type: postgres
+      dbname: mealie
