@@ -1,4 +1,0 @@
-#!/bin/bash
-
-kubectl delete job renovate-man -n gitops 2> /dev/null
-kubectl create job --from=cronjob/renovate renovate-man -n gitops
