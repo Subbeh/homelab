@@ -1,5 +1,0 @@
----
-
-- ansible.builtin.include_tasks: prereq.yml
-- ansible.builtin.include_tasks: deploy.yml
-- ansible.builtin.include_tasks: post.yml
