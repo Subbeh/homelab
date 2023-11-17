@@ -89,13 +89,19 @@
             name: k8s
             tasks_from: tools
 
+        - name: MASTER[0] | Apply prerequisite CRDs
+          tags: [never, cluster, crds]
+          ansible.builtin.import_role:
+            name: k8s
+            tasks_from: crds
+
         - name: MASTER[0] | Install Calico CNI
           tags: [never, cluster, cni]
           ansible.builtin.import_role:
             name: k8s
             tasks_from: cni
 
-        - name: MASTER[0] | Install Argo CD
+        - name: MASTER[0] | Install ArgoCD
           tags: [never, cluster, argocd]
           ansible.builtin.import_role:
             name: k8s

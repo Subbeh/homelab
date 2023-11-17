@@ -65,6 +65,7 @@ k8s:
 
   vip:
     version: "{{ (lookup('ansible.builtin.url', 'https://api.github.com/repos/kube-vip/kube-vip/releases') | from_json)[0].name }}"
+    rbac_url: https://raw.githubusercontent.com/kube-vip/kube-vip/main/docs/manifests/rbac.yaml
     iface: eth0
     ip: "{{ net_cidr.k8s | ansible.utils.nthhost(80) }}"
 
@@ -74,5 +75,26 @@ k8s:
     manifest_url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/calico.yaml
 
   argocd:
-    repo: "https://{{ common_git_user }}:{{ common_git_pass }}@git.sbbh.cloud/infra/homelab.git"
+    repo: "https://{{ vault_git_user }}:{{ vault_git_pass }}@git.sbbh.cloud/infra/homelab.git"
     agekey: "{{ vault_agekey }}"
+
+  crds:
+    # argocd
+    - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/application-crd.yaml
+    - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/crds/applicationset-crd.yaml
+    # external-secrets
+    - https://raw.githubusercontent.com/external-secrets/external-secrets/main/config/crds/bases/external-secrets.io_clustersecretstores.yaml
+    # traefik
+    - https://raw.githubusercontent.com/traefik/traefik/master/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
+    - https://raw.githubusercontent.com/traefik/traefik/master/docs/content/reference/dynamic-configuration/kubernetes-crd-rbac.yml
+    # prometheus
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-alertmanagerconfigs.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-alertmanagerconfigs.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-podmonitors.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-podmonitors.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-probes.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-prometheusagents.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-prometheusrules.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-scrapeconfigs.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml

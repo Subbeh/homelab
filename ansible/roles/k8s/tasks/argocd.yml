@@ -10,7 +10,7 @@
 - block:
     - name: Clone git repository
       ansible.builtin.git:
-        repo: "https://{{ common_git_user }}:{{ common_git_pass }}@git.sbbh.cloud/infra/homelab.git"
+        repo: "{{ k8s.argocd.repo }}"
         dest: /tmp/repo
         version: main
 
@@ -24,11 +24,10 @@
 
     - name: Deploy app to cluster
       ansible.builtin.shell: |
-        kubectl kustomize --enable-alpha-plugins /tmp/repo/k8s/{{ item }} | kubectl apply --kubeconfig {{ k8s.kubeconfig }} -f -
+        kubectl kustomize --enable-alpha-plugins /tmp/repo/k8s/{{ item }} | kubectl create --kubeconfig {{ k8s.kubeconfig }} -f -
       environment:
         SOPS_AGE_KEY_FILE: /root/.agekey
       loop:
-        - apps/external-secrets
+        - apps/kube-system/external-secrets
         - argocd
-  when:
-    - argocd_server.api_found is false
+  when: _argocd_server.resources | length == 0
