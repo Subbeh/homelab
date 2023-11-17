@@ -1,0 +1,6 @@
+---
+- name: Clone git repository
+  ansible.builtin.git:
+    repo: "{{ k8s.repo }}"
+    dest: "{{ k8s.repo_dir }}"
+    version: main

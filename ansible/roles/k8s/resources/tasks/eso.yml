@@ -1,0 +1,40 @@
+---
+- name: Create external-secrets namespace
+  kubernetes.core.k8s:
+    name: external-secrets
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create Doppler secret
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: doppler-token-auth-api
+        namespace: external-secrets
+      data:
+        dopplerToken: "{{ k8s.external_secrets.doppler_token | b64encode }}"
+
+- name: Deploy external secrets operator to cluster
+  ansible.builtin.shell: |
+    kubectl kustomize --enable-helm {{ k8s.repo_dir }}/{{ k8s.external_secrets.dir }} | kubectl apply -f -
+
+- name: Resource Readiness Check
+  kubernetes.core.k8s_info:
+    kind: "{{ item.kind }}"
+    name: "{{ item.name }}"
+    api_version: "{{ item.api_version | default(omit) }}"
+    namespace: external-secrets
+    wait: true
+    wait_sleep: 10
+    wait_timeout: 360
+  loop:
+    - kind: Secret
+      name: doppler-token-auth-api
+    - kind: ClusterSecretStore
+      name: doppler-auth-api
+      api_version: external-secrets.io/v1beta1

@@ -1,0 +1,19 @@
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb
+spec:
+  addresses:
+    - 10.11.80.100-10.11.80.150
+
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default
+  namespace: metallb
+spec:
+  ipAddressPools:
+    - default-pool

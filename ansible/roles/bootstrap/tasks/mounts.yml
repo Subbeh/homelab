@@ -19,7 +19,7 @@
 - name: Mount shares / devices
   ansible.posix.mount:
     src: "{{ item.src }}"
-    path: "{{ item.dest }}"
+    path: "{{ item.path }}"
     opts: "{{ item.opts | default('rw,sync,hard' if item.type == 'nfs' else omit) }}"
     state: mounted
     fstype: "{{ item.type }}"

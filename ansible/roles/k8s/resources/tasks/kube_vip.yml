@@ -1,0 +1,14 @@
+---
+- name: Pull kube-vip image and create manifest
+  ansible.builtin.shell: |
+    set -eo pipefail
+    ctr image pull ghcr.io/kube-vip/kube-vip:{{ _version }}
+    ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:{{ _version }} vip /kube-vip manifest pod \
+    --interface {{ k8s.vip.iface }} \
+    --address {{ k8s.vip.ip }} \
+    --controlplane \
+    --services \
+    --arp \
+    --leaderElection | tee  /etc/kubernetes/manifests/kube-vip.yaml
+  vars:
+    _version: "{{ k8s.vip.version | default((lookup('ansible.builtin.url', 'https://api.github.com/repos/kube-vip/kube-vip/releases') | from_json)[0].name) }}"

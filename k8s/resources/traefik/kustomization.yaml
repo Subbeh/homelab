@@ -1,0 +1,19 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  - name: traefik
+    repo: https://traefik.github.io/charts
+    version: 24.0.0
+    valuesFile: values.yaml
+    namespace: traefik
+    includeCRDs: false
+    releaseName: traefik
+
+resources:
+  - tlsstore.yaml
+  - certificate.yaml
+  - middleware.yaml
+  - ingressroute.yaml
+  - service-metrics.yaml

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+pushd ${INFRA:?not set}/ansible
+ansible-vault edit inventory.yml

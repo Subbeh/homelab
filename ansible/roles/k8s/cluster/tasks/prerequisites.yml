@@ -1,0 +1,27 @@
+---
+- name: Install Helm
+  ansible.builtin.shell: |
+    curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  args:
+    creates: /usr/local/bin/helm
+
+- name: Install Kustomize
+  ansible.builtin.shell: |
+    pushd /usr/local/bin
+    curl -s https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh | bash
+  args:
+    creates: /usr/local/bin/kustomize
+
+- name: Install ArgoCD cli
+  ansible.builtin.shell: |
+    curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+    sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+  args:
+    creates: /usr/local/bin/argocd
+
+- name: Set strictARP to true (MetalLB)
+  ansible.builtin.shell: |
+    set -eo pipefail
+    kubectl get configmap kube-proxy -n kube-system -o yaml | \
+      sed -e "s/strictARP: false/strictARP: true/" | \
+      kubectl apply -f - -n kube-system

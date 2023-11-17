@@ -1,0 +1,35 @@
+---
+- name: Check if ArgoCD is installed
+  kubernetes.core.k8s_info:
+    kind: "Deployment"
+    name: "argocd-server"
+    namespace: "argocd"
+  register: _argocd_server
+
+- block:
+    - name: Deploy app to cluster
+      ansible.builtin.shell: |
+        kubectl kustomize --enable-helm {{ k8s.repo_dir }}/{{ k8s.argocd.dir }} | kubectl apply -f -
+  when: _argocd_server.resources | length == 0
+
+- name: Resource Readiness Check
+  kubernetes.core.k8s_info:
+    kind: "{{ item.kind }}"
+    name: "{{ item.name }}"
+    api_version: "{{ item.api_version | default(omit) }}"
+    namespace: argocd
+    wait: true
+    wait_sleep: 10
+    wait_timeout: 360
+  loop:
+    - kind: AppProject
+      name: default
+      api_version: argoproj.io/v1alpha1
+    - kind: Secret
+      name: argocd-secret
+
+- name: Set admin password
+  ansible.builtin.shell: |
+    kubectl get -n argocd secret argocd-secret -o json | jq '.data["admin.password"]="{{ _password }}"' | kubectl apply -f -
+  vars:
+    _password: "{{ k8s.argocd.password | password_hash('bcrypt') | b64encode }}"

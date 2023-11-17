@@ -1,9 +1,0 @@
----
-- name: Apply CRDs
-  ansible.builtin.shell: |
-    kubectl create --kubeconfig=/etc/kubernetes/admin.conf -f {{ item }}
-  loop: "{{ k8s.crds }}"
-  register: _crds
-  failed_when:
-    - _crds.rc > 0
-    - '"already exists" not in _crds.stderr'

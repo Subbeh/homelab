@@ -1,0 +1,17 @@
+---
+- name: Check if Calico is installed
+  kubernetes.core.k8s_info:
+    kind: "Namespace"
+    name: "calico-system"
+  register: _calico_system
+
+- block:
+    - name: Apply Calico manifests
+      ansible.builtin.shell: |
+        kubectl create -f {{ k8s.calico.tigera_operator_url }}
+
+    - name: Apply Calico CRDs
+      ansible.builtin.shell: |
+        set -eo pipefail
+        curl -Ls {{ k8s.calico.crd_url }} | yq --yaml-output 'if .spec.calicoNetwork? then .spec.calicoNetwork.ipPools[0].cidr = "{{ k8s.network.cluster_cidr }}" else . end' | kubectl apply -f -
+  when: _calico_system.resources | length == 0

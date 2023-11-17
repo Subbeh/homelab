@@ -1,0 +1,23 @@
+---
+fullnameOverride: argocd
+
+configs:
+  params:
+    applicationsetcontroller.policy: "create-only"
+
+server:
+  replicas: 2
+  config:
+    kustomize.buildOptions: "--enable-helm"
+
+controller:
+  replicas: 2
+  pdb:
+    enabled: true
+    minAvailable: 1
+
+applicationSet:
+  replicaCount: 2
+
+repoServer:
+  replicas: 2
