@@ -21,7 +21,7 @@
 
 - name: Install extra packages
   ansible.builtin.apt:
-    name: "{{ item.name | default(omit) }}"
+    name: "{{ item.name | default(item) }}"
     deb: "{{ item.deb | default(omit) }}"
     default_release: "{{ item.default_release | default(omit) }}"
     install_recommends: "{{ item.install_recommends | default(false) }}"

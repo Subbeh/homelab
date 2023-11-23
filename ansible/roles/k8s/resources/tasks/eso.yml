@@ -38,3 +38,5 @@
     - kind: ClusterSecretStore
       name: doppler-auth-api
       api_version: external-secrets.io/v1beta1
+    - kind: Deployment
+      name: external-secrets-webhook

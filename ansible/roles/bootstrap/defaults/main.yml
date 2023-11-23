@@ -1,7 +1,6 @@
 ---
 bootstrap: []
 bootstrap_defaults:
-  reboot: false
   sys_sync_time: false
   sys_microcode: false
   sys_disable_swap: false

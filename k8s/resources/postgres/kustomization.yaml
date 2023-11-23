@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: postgres
+
+helmCharts:
+  - name: cloudnative-pg
+    repo: https://cloudnative-pg.github.io/charts
+    version: 0.18.2
+    namespace: postgres
+    releaseName: cloudnative-pg
+    includeCRDs: true
+
+resources:
+  - externalsecret.yaml
+  - cluster.yaml

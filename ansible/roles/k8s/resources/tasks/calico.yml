@@ -15,3 +15,10 @@
         set -eo pipefail
         curl -Ls {{ k8s.calico.crd_url }} | yq --yaml-output 'if .spec.calicoNetwork? then .spec.calicoNetwork.ipPools[0].cidr = "{{ k8s.network.cluster_cidr }}" else . end' | kubectl apply -f -
   when: _calico_system.resources | length == 0
+
+- name: Set strictARP to true (MetalLB)
+  ansible.builtin.shell: |
+    set -eo pipefail
+    kubectl get configmap kube-proxy -n kube-system -o yaml | \
+      sed -e "s/strictARP: false/strictARP: true/" | \
+      kubectl apply -f - -n kube-system

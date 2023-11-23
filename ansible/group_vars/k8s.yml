@@ -9,11 +9,11 @@ pve_vm:
   memory: "{{ pve_memory }}"
   ip: "{{ ansible_host }}/24"
   tag: 80
-  # mount: /dev/disk/by-label/k8s
+  mount: "{{ pve_mount | default(omit) }}"
+
   start: true
 
 bootstrap:
-  reboot: true
   net_hostname: true
   net_hosts: true
   net_dns: true
@@ -96,10 +96,10 @@ k8s:
     - https://raw.githubusercontent.com/traefik/traefik/v2.10/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
     - https://raw.githubusercontent.com/traefik/traefik/v2.10/docs/content/reference/dynamic-configuration/kubernetes-crd-rbac.yml
     # prometheus
-    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-alertmanagerconfigs.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-podmonitors.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-probes.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-prometheusagents.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-prometheusrules.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-scrapeconfigs.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml
+    # - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-alertmanagerconfigs.yaml

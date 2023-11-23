@@ -1,0 +1,11 @@
+persistence:
+  defaultClassReplicaCount: 3
+defaultSettings:
+  defaultReplicaCount: 3
+  defaultDataPath: /srv/longhorn
+  # backupTarget: s3://longhorn@us-east-1/longhorn
+  # backupTargetCredentialSecret: minio-secret
+  backupTarget: nfs://nas.int.sbbh.cloud:/data/hdd/backups/longhorn
+  allowRecurringJobWhileVolumeDetached: true
+helmPreUpgradeCheckerJob:
+  enabled: false

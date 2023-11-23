@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres
+  namespace: storage
+spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:15.3
+
+  instances: 3
+  primaryUpdateStrategy: unsupervised
+
+  storage:
+    size: 20Gi
+    storageClass: longhorn
+
+  # superuserSecret:
+  #   name: doppler-minio
+
+  postgresql:
+    parameters:
+      max_connections: "600"
+      shared_buffers: 512MB
+    pg_hba:
+      - host all all 0.0.0.0/0 md5
+
+  monitoring:
+    enablePodMonitor: true
+
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore:
+      wal:
+        compression: bzip2
+        maxParallel: 8
+      destinationPath: s3://k3s-postgres/
+      endpointURL: https://s3.sbbh.cloud
+      s3Credentials:
+        accessKeyId:
+          name: doppler-postgres
+          key: POSTGRES_MINIO_USER
+        secretAccessKey:
+          name: doppler-postgres
+          key: POSTGRES_MINIO_PASSWORD

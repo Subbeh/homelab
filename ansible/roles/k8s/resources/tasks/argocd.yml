@@ -27,9 +27,8 @@
       api_version: argoproj.io/v1alpha1
     - kind: Secret
       name: argocd-secret
-
-- name: Set admin password
-  ansible.builtin.shell: |
-    kubectl get -n argocd secret argocd-secret -o json | jq '.data["admin.password"]="{{ _password }}"' | kubectl apply -f -
-  vars:
-    _password: "{{ k8s.argocd.password | password_hash('bcrypt') | b64encode }}"
+# - name: Set admin password
+#   ansible.builtin.shell: |
+#     kubectl get -n argocd secret argocd-secret -o json | jq '.data["admin.password"]="{{ _password }}"' | kubectl apply -f -
+#   vars:
+#     _password: "{{ k8s.argocd.password | password_hash('bcrypt') | b64encode }}"

@@ -18,10 +18,3 @@
     sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
   args:
     creates: /usr/local/bin/argocd
-
-- name: Set strictARP to true (MetalLB)
-  ansible.builtin.shell: |
-    set -eo pipefail
-    kubectl get configmap kube-proxy -n kube-system -o yaml | \
-      sed -e "s/strictARP: false/strictARP: true/" | \
-      kubectl apply -f - -n kube-system

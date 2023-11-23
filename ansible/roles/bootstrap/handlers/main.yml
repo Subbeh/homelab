@@ -23,4 +23,3 @@
     pre_reboot_delay: 0
     post_reboot_delay: 10
     test_command: uptime
-  when: _bts.reboot

@@ -1,14 +1,14 @@
 ---
 minio:
   container:
-    image: quay.io/minio/minio:RELEASE.2023-06-19T19-52-50Z
+    image: quay.io/minio/minio:RELEASE.2023-11-20T22-40-07Z
     ports:
       - "{{ net_svc.minio.port }}:9000"
       - "{{ net_svc.minio.port_console }}:9001"
     env:
       MINIO_ROOT_USER: "{{ common_user }}"
       MINIO_ROOT_PASSWORD: "{{ vault_minio_pass }}"
-      MINIO_SITE_REGION: "ap-southeast-4"
+      MINIO_SITE_REGION: "us-east-1"
       MINIO_SERVER_URL: "https://s3.{{ net_domain.tld }}"
     volumes:
       - "{{ common_apps_dir }}/minio:/data"

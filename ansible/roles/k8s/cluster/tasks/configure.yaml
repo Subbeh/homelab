@@ -1,0 +1,41 @@
+---
+- block:
+    - name: Approve pending CSRs
+      ansible.builtin.shell: |
+        {{ _cmd }} | grep -q csr && {{ _cmd }} | xargs kubectl certificate approve || exit 0
+      vars:
+        _cmd: !unsafe kubectl get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}'
+      when: inventory_hostname == 'k8s-master-01'
+
+    - name: Label master node
+      ansible.builtin.shell: |
+        set -eo pipefail
+        kubectl label node "{{ inventory_hostname }}" role=master
+      when: inventory_hostname in groups['k8s-masters']
+
+    - name: Label worker node
+      ansible.builtin.shell: |
+        set -eo pipefail
+        kubectl label node "{{ inventory_hostname }}" role=worker
+      when: inventory_hostname in groups['k8s-workers']
+  delegate_to: k8s-master-01
+  environment:
+    KUBECONFIG: "{{ k8s.kubeconfig }}"
+
+- name: Install iscsi on worker nodes (required for Longhorn)
+  block:
+    - ansible.builtin.apt:
+        name: open-iscsi
+        state: present
+
+    - name: Ensure iscsi_tcp kernel module is loaded
+      ansible.builtin.modprobe:
+        name: iscsi_tcp
+        persistent: present
+
+    - name: Enable and start open-iscsi service
+      ansible.builtin.service:
+        name: iscsid
+        state: started
+        enabled: true
+  when: inventory_hostname in groups['k8s-workers']
