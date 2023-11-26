@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tmate
+  name: tmate
+  namespace: drone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tmate
+  template:
+    metadata:
+      labels:
+        app: tmate
+    spec:
+      volumes:
+        - name: ssh-keys
+          secret:
+            secretName: tmate-ssh-secret
+      containers:
+        - image: tmate/tmate-ssh-server
+          name: tmate
+          ports:
+            - containerPort: 2200
+              name: ssh
+          volumeMounts:
+            - mountPath: /etc/ssh-keys
+              name: ssh-keys
+          securityContext:
+            capabilities:
+              add: [SYS_ADMIN] # needed to spawn containers (CLONE_NEWPID, etc.)
+          env:
+            - name: SSH_KEYS_PATH
+              value: /etc/ssh-keys
+            - name: SSH_HOSTNAME
+              value: tmate
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tmate
+  namespace: drone
+spec:
+  selector:
+    app: tmate
+  ports:
+    - port: 2200
+      name: ssh

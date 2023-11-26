@@ -19,14 +19,22 @@ spec:
       secret:
         name: drone-db-secret
 
+  postgresql:
+    parameters:
+      max_connections: "600"
+      shared_buffers: 512MB
+    pg_hba:
+      - host all all 0.0.0.0/0 md5
+
   backup:
     barmanObjectStore:
       destinationPath: s3://drone/
+      endpointURL: https://s3.sbbh.cloud
       s3Credentials:
         accessKeyId:
-          name: aws-creds
+          name: drone-db-minio-secret
           key: ACCESS_KEY_ID
         secretAccessKey:
-          name: aws-creds
+          name: drone-db-minio-secret
           key: ACCESS_SECRET_KEY
     retentionPolicy: "30d"

@@ -8,7 +8,7 @@ trigger:
     - main
 
 image_pull_secrets:
-  - DRONE_DOCKER_CONFIG
+  - DOCKER_CONFIG
 
 steps:
   - name: lint
@@ -29,9 +29,9 @@ steps:
       ANSIBLE_VAULT_PASSWORD:
         from_secret: ANSIBLE_VAULT_PASSWORD
       DRONE_SSH_KEY:
-        from_secret: DRONE_SSH_KEY
+        from_secret: SSH_KEY
       DRONE_SSH_PUB_KEY:
-        from_secret: DRONE_SSH_PUB_KEY
+        from_secret: SSH_PUB_KEY
     when:
       status: [success]
       event: [push, custom]
@@ -41,9 +41,9 @@ steps:
     settings:
       username: Drone
       webhook_id:
-        from_secret: DRONE_DISCORD_ID
+        from_secret: DISCORD_ID
       webhook_token:
-        from_secret: DRONE_DISCORD_TOKEN
+        from_secret: DISCORD_TOKEN
       message: >
         {{#success build.status}}✅{{else}}⚠️{{/success}}
         repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
@@ -54,59 +54,59 @@ steps:
 kind: secret
 name: GITHUB_USER
 get:
-  path: doppler-drone
+  path: drone-secret
   name: GITHUB_USER
 ---
 kind: secret
 name: GITHUB_TOKEN
 get:
-  path: doppler-drone
+  path: drone-secret
   name: GITHUB_TOKEN
 ---
 kind: secret
 name: DOCKER_USER
 get:
-  path: doppler-drone
+  path: drone-secret
   name: DOCKER_USER
 ---
 kind: secret
 name: DOCKER_PASSWORD
 get:
-  path: doppler-drone
+  path: drone-secret
   name: DOCKER_PASSWORD
 ---
 kind: secret
-name: DRONE_DOCKER_CONFIG
+name: DOCKER_CONFIG
 get:
-  path: doppler-drone
-  name: DRONE_DOCKER_CONFIG
+  path: drone-secret
+  name: DOCKER_CONFIG
 ---
 kind: secret
-name: DRONE_DISCORD_ID
+name: DISCORD_ID
 get:
-  path: doppler-drone
-  name: DRONE_DISCORD_ID
+  path: drone-secret
+  name: DISCORD_ID
 ---
 kind: secret
-name: DRONE_DISCORD_TOKEN
+name: DISCORD_TOKEN
 get:
-  path: doppler-drone
-  name: DRONE_DISCORD_TOKEN
+  path: drone-secret
+  name: DISCORD_TOKEN
 ---
 kind: secret
-name: DRONE_SSH_KEY
+name: SSH_KEY
 get:
-  path: doppler-drone
-  name: DRONE_SSH_KEY
+  path: drone-secret
+  name: SSH_KEY
 ---
 kind: secret
-name: DRONE_SSH_PUB_KEY
+name: SSH_PUB_KEY
 get:
-  path: doppler-drone
-  name: DRONE_SSH_PUB_KEY
+  path: drone-secret
+  name: SSH_PUB_KEY
 ---
 kind: secret
 name: ANSIBLE_VAULT_PASSWORD
 get:
-  path: doppler-drone
+  path: drone-secret
   name: ANSIBLE_VAULT_PASSWORD
