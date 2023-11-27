@@ -26,12 +26,10 @@
   serial: 1
 
   tasks:
-    - block:
-        - ansible.builtin.debug: msg="DESTROYING CLUSTER ..."
-        - name: Pausing for 5 seconds...
-          ansible.builtin.pause:
-            seconds: 5
-      run_once: true
+    - ansible.builtin.debug: msg="DESTROYING CLUSTER ..."
+    - name: Pausing for 5 seconds...
+      ansible.builtin.pause:
+        seconds: 5
 
     - name: k8s | Destroy VMs
       ansible.builtin.import_role:

@@ -15,9 +15,6 @@ extraVolumes:
   - name: docker-cache
     persistentVolumeClaim:
       claimName: docker-cache-pvc
-  # - name: docker-config
-  #   configMap:
-  #     name: docker-config
 dind:
   registry: docker.io
   repository: docker
@@ -27,10 +24,6 @@ dind:
   commandArgs:
     - "--host=tcp://localhost:2375"
     - "--mtu=1450"
-    # - "--dns=10.11.80.1"
   extraVolumeMounts:
     - name: docker-cache
       mountPath: /var/cache/
-    # - name: docker-config
-    #   mountPath: /etc/docker/daemon.json
-    #   subPath: daemon.json

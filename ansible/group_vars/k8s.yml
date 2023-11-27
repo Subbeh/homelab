@@ -43,6 +43,7 @@ bootstrap_sysctl_config:
   net.bridge.bridge-nf-call-ip6tables: 1
   net.bridge.bridge-nf-call-iptables: 1
   net.ipv4.ip_forward: 1
+bootstrap_net_dns_search:
 
 k8s:
   cluster_name: k8s-homelab

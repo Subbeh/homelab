@@ -48,6 +48,7 @@ bootstrap_users:
 bootstrap_net_hostname: "{{ ansible_hostname }}"
 bootstrap_net_dns_server: "{{ (ansible_host + '/24') | ansible.utils.nthhost(1) }}"
 bootstrap_net_dns_domain: "{{ net_domain.tld_local }}"
+bootstrap_net_dns_search: "{{ net_domain.tld_local }}"
 bootstrap_net_ntp_server: "{{ (ansible_host + '/24') | ansible.utils.nthhost(1) }}"
 bootstrap_net_ntp_timezone: "{{ common_timezone }}"
 

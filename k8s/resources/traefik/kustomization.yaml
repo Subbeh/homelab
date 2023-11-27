@@ -5,15 +5,16 @@ kind: Kustomization
 helmCharts:
   - name: traefik
     repo: https://traefik.github.io/charts
-    version: 24.0.0
+    version: 25.0.0
     valuesFile: values.yaml
     namespace: traefik
-    includeCRDs: false
+    includeCRDs: true
     releaseName: traefik
 
 resources:
+  - certificate-stg.yaml
+  # - certificate-prd.yaml
   - tlsstore.yaml
-  - certificate.yaml
   - middleware.yaml
   - ingressroute.yaml
   - service-metrics.yaml

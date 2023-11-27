@@ -1,4 +1,7 @@
 ---
+- name: Gather facts
+  ansible.builtin.gather_facts:
+
 - name: Check host OS
   ansible.builtin.fail:
   when:
@@ -40,7 +43,7 @@
         dest: /etc/resolv.conf
         content: |
           nameserver {{ bootstrap_net_dns_server }}
-          search {{ bootstrap_net_dns_domain }}
+          {{ "search " + bootstrap_net_dns_search if bootstrap_net_dns_search }}
   when: _bts.net_dns
 
 - name: Sync time

@@ -15,9 +15,6 @@ spec:
     size: 20Gi
     storageClass: longhorn
 
-  # superuserSecret:
-  #   name: doppler-minio
-
   postgresql:
     parameters:
       max_connections: "600"

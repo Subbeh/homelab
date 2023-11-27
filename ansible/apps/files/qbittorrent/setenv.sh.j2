@@ -15,7 +15,7 @@ MAM_COOKIE="/tmp/mam.cookies"
 
 while true; do
 	PORT="$(curl -Ls $GT_URL | awk -F'[{}:]' '/port/ { print $3 }')"
-	IP="$(curl ifconfig.me)"
+	IP="$(curl ifconfig.io)"
 
 	echo DEBUG: "IP     - $IP:$PORT"
 	echo DEBUG: "MAM_ID - $MAM_ID"

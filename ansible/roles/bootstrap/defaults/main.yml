@@ -59,6 +59,7 @@ bootstrap_users: []
 bootstrap_net_hostname: "{{ ansible_hostname }}"
 bootstrap_net_dns_server:
 bootstrap_net_dns_domain:
+bootstrap_net_dns_search:
 bootstrap_net_ntp_server:
 bootstrap_net_ntp_timezone:
 

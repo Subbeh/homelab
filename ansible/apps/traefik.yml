@@ -49,6 +49,8 @@ traefik:
       dest: "{{ common_apps_dir }}/traefik/configs/middleware-authentik.yml"
     - src: configs/middleware-cloudflare.yml.j2
       dest: "{{ common_apps_dir }}/traefik/configs/middleware-cloudflare.yml"
+    - src: configs/passthrough-k8s.yml.j2
+      dest: "{{ common_apps_dir }}/traefik/configs/passthrough-k8s.yml"
     - src: logrotate.j2
       dest: /etc/logrotate.d/traefik
 

@@ -42,7 +42,7 @@ gluetun:
       type: keyword
       url: "http://{{ net_hosts[net_svc.gluetun.host].ip }}:{{ net_svc.gluetun.port }}/v1/publicip/ip"
       upsideDown: yes
-      keyword: "{{ lookup('ansible.builtin.url', 'http://ifconfig.me', http_agent='curl/8.2.1') }}"
+      keyword: "{{ lookup('ansible.builtin.url', 'http://ifconfig.io', http_agent='curl/8.2.1') }}"
       group: gluetun
     - name: gluetun_port
       type: keyword
