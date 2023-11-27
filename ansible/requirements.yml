@@ -18,3 +18,4 @@ collections:
   - name: kubernetes.core
   - name: community.sops
   - name: lucasheld.uptime_kuma
+  - name: community.postgresql
