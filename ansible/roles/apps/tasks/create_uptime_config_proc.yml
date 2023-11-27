@@ -32,12 +32,12 @@
         name: "{{ _monitor_name }}"
         state: absent
       register: _result
+      failed_when: false
       when: _config.type is undefined or _config.type != "group"
 
     - name: Add {{ _monitor_name }} ({{ _config.type | default('http') | upper }}) monitor config for {{ _app }}
       delegate_to: localhost
       become: false
-      failed_when: false
       lucasheld.uptime_kuma.monitor:
         api_url: "{{ _uptime_api_url }}"
         api_token: "{{ _uptimekuma_api_token }}"
@@ -61,6 +61,7 @@
         databaseQuery: "{{ _config.databaseQuery | default(omit) }}"
         notification_names: "{{ _config.notification_names | default(omit) }}"
         state: present
+      failed_when: false
 
     - name: Change monitor state of {{ _monitor_name }}
       delegate_to: localhost
