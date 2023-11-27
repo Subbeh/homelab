@@ -1,6 +1,6 @@
 homer:
   container:
-    image: b4bz/homer:v23.05.1
+    image: b4bz/homer:v23.10.1
     ports:
       - "{{ net_svc.homer.port }}:8080"
     volumes:
