@@ -10,6 +10,7 @@
 - name: Set database facts
   block:
     - name: Set Postgres facts
+      no_log: "{{ ci | default(false) }}"
       ansible.builtin.set_fact:
         _db_connection_string: "postgres://{{ common_user }}:{{ vault_postgres_pass }}@{{ _config.host | default(net_hosts[net_svc[_app].host].ip) }}:5432/{{ _config.dbname }}"
         _monitor_name: "{{ 'postgres-' + net_svc[_app].host + '-' + _config.dbname }}"
