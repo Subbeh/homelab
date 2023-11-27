@@ -14,7 +14,7 @@ helmCharts:
 
   - name: drone-runner-docker
     repo: https://charts.drone.io
-    version: 0.6.1
+    version: 0.6.2
     valuesFile: values-runner.yaml
     namespace: drone
     releaseName: drone-runner-docker
