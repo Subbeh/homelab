@@ -2,7 +2,7 @@
 authentik:
   name: authentik
   container:
-    image: ghcr.io/goauthentik/server:2023.8.2
+    image: ghcr.io/goauthentik/server:2023.10.4
     restart_policy: always
     command: server
     ports:
@@ -62,7 +62,7 @@ authentik:
 authentik_worker:
   name: authentik-worker
   container:
-    image: ghcr.io/goauthentik/server:2023.8.2
+    image: ghcr.io/goauthentik/server:2023.10.4
     restart_policy: always
     command: worker
     volumes:
