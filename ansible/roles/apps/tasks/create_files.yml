@@ -11,11 +11,12 @@
             _ext: "{{ _file.src | splitext }}"
 
         - name: Get local file stats
-          delegate_to: localhost
           become: false
           ansible.builtin.stat:
             path: "{{ _src }}"
           register: _stat
+          delegate_to: localhost
+          remote_user: "{{ 'root' if ci | default(omit) }}"
 
         - ansible.builtin.fail:
             msg: "File {{ _src }} does not exist"
