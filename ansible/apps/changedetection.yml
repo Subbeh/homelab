@@ -27,7 +27,7 @@ changedetection:
 changedetection_chrome:
   name: changedetection-chrome
   container:
-    image: browserless/chrome:1.59-chrome-stable
+    image: browserless/chrome:1.60-chrome-stable
     restart: false
     state: stopped
     comparisons:
