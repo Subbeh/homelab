@@ -6,7 +6,7 @@ namespace: drone
 helmCharts:
   - name: drone
     repo: https://charts.drone.io
-    version: 0.6.4
+    version: 0.6.5
     valuesFile: values-drone.yaml
     namespace: drone
     releaseName: drone
