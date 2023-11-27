@@ -35,7 +35,8 @@ deployment:
 
 ports:
   web:
-    redirectTo: websecure
+    redirectTo:
+      port: websecure
     proxyProtocol:
       trustedIPs:
         - "127.0.0.1/32"
