@@ -1,6 +1,6 @@
 apprise:
   container:
-    image: lscr.io/linuxserver/apprise-api:0.9.4
+    image: lscr.io/linuxserver/apprise-api:0.9.6
     volumes:
       - "{{ common_dir }}/apprise/config:/config"
     ports:
