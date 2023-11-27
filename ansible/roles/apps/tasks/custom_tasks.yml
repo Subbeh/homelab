@@ -3,11 +3,12 @@
     - ansible.builtin.set_fact:
         _path: "{{ common_ansible_apps + '/tasks/' + _task.file }}"
     - name: Get local taskfile stats
-      delegate_to: localhost
       become: false
       ansible.builtin.stat:
         path: "{{ _path }}"
       register: _stat
+      delegate_to: localhost
+      remote_user: "{{ 'root' if ci | default(omit) }}"
 
     - ansible.builtin.fail:
         msg: "File {{ _src }} does not exist"
