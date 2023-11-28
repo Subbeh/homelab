@@ -11,8 +11,18 @@ helmCharts:
     namespace: cert-manager
     includeCRDs: true
 
+  - name: trust-manager
+    repo: https://charts.jetstack.io
+    releaseName: trust-manager
+    version: v0.7.0
+    namespace: cert-manager
+    includeCRDs: true
+
 resources:
   - namespace.yaml
   - externalsecret.yaml
+  - clusterissuer-selfsigned.yaml
+  - clusterissuer-selfsigned-ca.yaml
   - clusterissuer-stg.yaml
   - clusterissuer-prd.yaml
+  - certificate-selfsigned.yaml
