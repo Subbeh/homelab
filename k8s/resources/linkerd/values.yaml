@@ -1,0 +1,6 @@
+clusterNetworks: "10.42.0.0/16,10.43.0.0/16"
+
+identity:
+  externalCA: true
+  issuer:
+    scheme: kubernetes.io/tls
