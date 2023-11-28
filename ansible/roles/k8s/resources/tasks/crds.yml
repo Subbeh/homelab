@@ -23,3 +23,7 @@
     state: present
     src: "{{ item.path }}"
   loop: "{{ _manifests.files }}"
+
+- name: Apply Kustomize CRD manifests
+  ansible.builtin.shell: kubectl apply --server-side --force-conflicts -k "{{ item }}"
+  loop: "{{ k8s.crds_kustomize }}"

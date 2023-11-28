@@ -86,16 +86,8 @@ k8s:
   crds:
     # metrics-server
     - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-    # - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
     # external-secrets
     - https://github.com/external-secrets/external-secrets/raw/main/config/crds/bases/external-secrets.io_clustersecretstores.yaml
-    # argocd
-    - https://github.com/argoproj/argo-cd/raw/master/manifests/crds/application-crd.yaml
-    - https://github.com/argoproj/argo-cd/raw/master/manifests/crds/applicationset-crd.yaml
-    - https://github.com/argoproj/argo-cd/raw/master/manifests/crds/appproject-crd.yaml
-    # traefik
-    - https://raw.githubusercontent.com/traefik/traefik/v2.10/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
-    - https://raw.githubusercontent.com/traefik/traefik/v2.10/docs/content/reference/dynamic-configuration/kubernetes-crd-rbac.yml
     # prometheus
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-podmonitors.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-probes.yaml
@@ -104,3 +96,8 @@ k8s:
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-scrapeconfigs.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml
     # - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-alertmanagerconfigs.yaml
+  crds_kustomize:
+    # traefik
+    - https://github.com/traefik/traefik-helm-chart/traefik/crds/
+    # argocd
+    - https://github.com/argoproj/argo-cd/manifests/crds
