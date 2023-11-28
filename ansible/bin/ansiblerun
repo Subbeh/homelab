@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ $# -gt 1 ]; then
+	pushd ${INFRA:?not set}/ansible
+	HOST=$1
+	shift
+	ansible $HOST -b -a "$*"
+fi
