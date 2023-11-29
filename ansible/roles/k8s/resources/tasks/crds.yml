@@ -1,28 +1,7 @@
 ---
-- name: Create temporary directory
-  ansible.builtin.tempfile:
-    state: directory
-    suffix: manifests
-  register: _crds
-
-- name: Download manifests to temporary directory
-  ansible.builtin.get_url:
-    url: "{{ item }}"
-    dest: "{{ _crds.path }}"
-    mode: "0664"
-  loop: "{{ k8s.crds }}"
-  when: _crds.path is defined
-
-- name: Get file list
-  find:
-    paths: "{{ _crds.path }}"
-  register: _manifests
-
 - name: Apply CRD manifests to the cluster
-  kubernetes.core.k8s:
-    state: present
-    src: "{{ item.path }}"
-  loop: "{{ _manifests.files }}"
+  ansible.builtin.shell: kubectl apply --server-side --force-conflicts -f "{{ item }}"
+  loop: "{{ k8s.crds }}"
 
 - name: Apply Kustomize CRD manifests
   ansible.builtin.shell: kubectl apply --server-side --force-conflicts -k "{{ item }}"

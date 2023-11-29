@@ -95,9 +95,9 @@ k8s:
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-prometheusrules.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-scrapeconfigs.yaml
     - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml
-    # - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-alertmanagerconfigs.yaml
+    - https://github.com/prometheus-community/helm-charts/raw/main/charts/kube-prometheus-stack/charts/crds/crds/crd-alertmanagerconfigs.yaml
   crds_kustomize:
+    # argocd
+    - https://github.com/argoproj/argo-cd/manifests/crds/
     # traefik
     - https://github.com/traefik/traefik-helm-chart/traefik/crds/
-    # argocd
-    - https://github.com/argoproj/argo-cd/manifests/crds
