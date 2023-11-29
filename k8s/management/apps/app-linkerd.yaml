@@ -13,6 +13,11 @@ spec:
   destination:
     namespace: linkerd
     server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - group: batch
+      kind: CronJob
+      jsonPointers:
+        - /spec/schedule
   project: default
   syncPolicy:
     automated:

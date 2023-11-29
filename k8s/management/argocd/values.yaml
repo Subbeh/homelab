@@ -4,6 +4,19 @@ fullnameOverride: argocd
 configs:
   params:
     applicationsetcontroller.policy: "create-only"
+    server.insecure: true
+  cm:
+    statusbadge.enabled: "true"
+    resource.customizations.ignoreDifferences.all: |
+      jsonPointers:
+      - /spec/conversion/webhook/clientConfig/caBundle
+      - /data/tls.crt
+      - /data/tls.key
+      jqPathExpressions:
+      - .webhooks[].clientConfig.caBundle
+      - .spec.template.metadata.annotations | with_entries(select(.key | test("^checksum")))
+    # Enabling Helm chart rendering with Kustomize
+    kustomize.buildOptions: --enable-helm
 
 server:
   replicas: 2
