@@ -4,9 +4,12 @@
 
   vars:
     pve_template:
-      name: debian-12-template
-      vmid: 1000
-      image: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2
+      # name: debian-12-template
+      # vmid: 1000
+      # image: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2
+      name: ubuntu-2004-template
+      vmid: 1001
+      image: https://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64.img
 
   tasks:
     - name: Create template
