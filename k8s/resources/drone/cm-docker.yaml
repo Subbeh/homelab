@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: docker-config
+data:
+  daemon.json: |
+    {
+      "mtu": 1450,
+      "default-network-opts": {
+        "bridge": { "com.docker.network.driver.mtu": "1450" }
+      }
+    }

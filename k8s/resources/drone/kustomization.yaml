@@ -36,3 +36,4 @@ resources:
   - pg-cluster.yaml
   - ingressroute.yaml
   - pvc-cache.yaml
+  - cm-docker.yaml
