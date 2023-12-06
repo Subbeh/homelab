@@ -74,3 +74,27 @@ bootstrap_sshd_config:
 
 bootstrap_docker_gid: "{{ common_group_id_docker }}"
 bootstrap_docker_app_data: "{{ common_apps_dir }}"
+
+## borg backup
+borg_ssh_key: "{{ vault_ssh_keys.priv.borg }}"
+borg_encryption_passphrase: "{{ vault_borg_passphrase }}"
+borg_user: root
+borg_group: root
+borg_server: "ssh://borg@nas.{{ net_domain.tld_local }}/."
+borg_ssh_key_file_path: ~/.ssh/borg
+borg_ssh_command: "ssh -i ~/.ssh/borg -o StrictHostKeyChecking=no"
+borg_remote_path: /usr/local/bin/borg
+borg_retention_policy:
+  keep_daily: 7
+  keep_weekly: 4
+  keep_monthly: 12
+borg_db_postgres: false
+borgmatic_hooks:
+  before_backup:
+    - echo "$(date) - Starting backup."
+  after_backup:
+    - echo "$(date) - Backup created."
+  on_error:
+    - echo "$(date) - Error while creating a backup."
+  healthchecks:
+    ping_url: "{{ borg_hc_ping_url | default(omit) }}"

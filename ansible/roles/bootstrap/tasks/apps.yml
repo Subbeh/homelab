@@ -1,5 +1,6 @@
 ---
-- block:
+- name: Run Borg Backup role
+  block:
     - name: Copy SSH keys
       no_log: true
       ansible.builtin.copy:
@@ -27,3 +28,8 @@
                 format: custom
       when: _bts.borg_database_postgres
   when: _bts.borg_install
+
+- name: Run Prometheus node exporter role
+  ansible.builtin.include_role:
+    name: prometheus.prometheus.node_exporter
+  when: _bts.node_exporter

@@ -19,3 +19,4 @@ collections:
   - name: community.sops
   - name: lucasheld.uptime_kuma
   - name: community.postgresql
+  - name: prometheus.prometheus

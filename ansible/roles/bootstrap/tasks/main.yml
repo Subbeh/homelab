@@ -17,4 +17,4 @@
 - ansible.builtin.include_tasks: ntp.yml
 - ansible.builtin.include_tasks: ssh.yml
 - ansible.builtin.include_tasks: docker.yml
-- ansible.builtin.include_tasks: borg.yml
+- ansible.builtin.include_tasks: apps.yml
