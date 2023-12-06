@@ -1,8 +1,8 @@
 env:
   DRONE_RPC_HOST: drone:8080
   # fix: https://community.harness.io/t/docker-mtu-problem/11246/8
-  # DRONE_RUNNER_NETWORK_OPTS: "com.docker.network.driver.mtu:1450"
-  # DRONE_RUNNER_NETWORKS: bridge
+  DRONE_RUNNER_NETWORK_OPTS: "com.docker.network.driver.mtu:1450"
+  DRONE_RUNNER_NETWORKS: bridge
   DRONE_RUNNER_CAPACITY: 1
   # tmate ssh server
   # DRONE_TMATE_ENABLED: true
@@ -15,15 +15,21 @@ extraVolumes:
   - name: docker-cache
     persistentVolumeClaim:
       claimName: docker-cache-pvc
+  - name: docker-config
+    configMap:
+      name: docker-config
 dind:
   registry: docker.io
   repository: docker
   tag: 24-dind
   command:
     - "dockerd"
-  commandArgs:
-    - "--host=tcp://localhost:2375"
-    - "--mtu=1450"
+  # commandArgs:
+  #   - "--host=tcp://localhost:2375"
+  #   - "--mtu=1450"
   extraVolumeMounts:
     - name: docker-cache
       mountPath: /var/cache/
+    - name: docker-config
+      mountPath: /etc/docker/daemon.json
+      subPath: daemon.json
