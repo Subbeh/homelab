@@ -27,7 +27,7 @@ main() {
 		if git log -1 --oneline | grep -q "from renovate/.\+ into main$"; then
 			while read app; do
 				run_playbook $app
-			done <<<$(git diff --name-only --diff-filter=ACMR HEAD~1 main | grep -oP '(?<=ansible/)apps/[^/]*.ya?ml' | xargs awk -F: '/^[^ -]/{ print $1 }')
+			done <<<$(git diff --name-only --diff-filter=ACMR HEAD~1 main | grep -oP '(?<=ansible/)apps/[^/]*.ya?ml' | xargs awk -F: '/^[^ -\#]/{ print $1 }')
 		fi
 	fi
 }
