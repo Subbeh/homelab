@@ -2,7 +2,7 @@
 ---
 trilium:
   container:
-    image: zadam/trilium:0.62.2
+    image: zadam/trilium:0.62.3
     ports:
       - "{{ net_svc.trilium.port }}:8080"
     volumes:
