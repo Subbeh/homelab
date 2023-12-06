@@ -13,7 +13,7 @@ helmCharts:
 
 resources:
   - certificate-stg.yaml
-  # - certificate-prd.yaml
+  - certificate-prd.yaml
   - tlsstore.yaml
   - middleware.yaml
   - ingressroute.yaml

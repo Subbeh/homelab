@@ -6,4 +6,4 @@ metadata:
   namespace: traefik
 spec:
   defaultCertificate:
-    secretName: k8s-sbbh-cloud-stg
+    secretName: k8s-sbbh-cloud-prd
