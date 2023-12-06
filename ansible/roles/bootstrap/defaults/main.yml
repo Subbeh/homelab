@@ -34,6 +34,7 @@ bootstrap_defaults:
   docker_auto_completion: false
   borg_install: false
   borg_database_postgres: false
+  node_exporter: false
 
 bootstrap_pkg_prereq:
   - ca-certificates

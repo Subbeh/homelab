@@ -1,0 +1,8 @@
+#!/bin/bash
+
+NAMESPACE=${1?not set}
+
+for i in $(kubectl api-resources --verbs=list --namespaced -o name | grep -v "events.events.k8s.io" | grep -v "events" | sort | uniq); do
+	echo "Resource:" $i
+	kubectl -n ${NAMESPACE} get --ignore-not-found ${i}
+done
