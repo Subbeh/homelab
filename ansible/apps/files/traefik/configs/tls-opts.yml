@@ -1,5 +1,4 @@
 ---
-
 tls:
   options:
     tls-opts:
@@ -15,7 +14,8 @@ tls:
         - TLS_AES_256_GCM_SHA384
         - TLS_CHACHA20_POLY1305_SHA256
         - TLS_FALLBACK_SCSV # Client is doing version fallback. See RFC 7507
-      curvePreferences:
-        - CurveP521
-        - CurveP384
+      ## disabled due to git tls issues: https://github.com/traefik/traefik/issues/10198
+      # curvePreferences:
+      #   - CurveP521
+      #   - CurveP384
       sniStrict: true
