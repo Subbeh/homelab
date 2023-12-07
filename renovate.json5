@@ -17,8 +17,7 @@
     {
       "matchPackageNames": [
         "lscr.io/linuxserver/calibre-web",
-        "lscr.io/linuxserver/overseerr",
-        "lscr.io/linuxserver/prowlarr"
+        "lscr.io/linuxserver/overseerr"
       ],
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-ls(?<build>\\d+)$"
     },
