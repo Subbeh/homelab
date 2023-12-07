@@ -1,7 +1,7 @@
 ---
 - name: Create Postgres database
   delegate_to: localhost
-  ansible.builtin.postgresql_db:
+  community.postgresql.postgresql_db:
     name: "{{ _db.name }}"
     login_host: "{{ _db.host | default(net_svc[_app].host) }}"
     login_user: "{{ _db.user | default(common_user) }}"
