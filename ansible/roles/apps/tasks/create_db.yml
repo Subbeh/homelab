@@ -7,3 +7,5 @@
     login_user: "{{ _db.user | default(common_user) }}"
     login_password: "{{ _db.pass | default(vault_postgres_pass) }}"
   when: _db.type == 'postgres'
+  vars:
+    ansible_user: "{{ _user | default(common_user) }}"

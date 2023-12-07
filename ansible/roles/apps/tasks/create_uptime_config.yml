@@ -4,11 +4,6 @@
     _uptime_config: "{{ _app_config.uptime }}"
     _uptime_api_url: "http://{{ net_hosts[net_svc.uptimekuma.host].ip }}:{{ net_svc.uptimekuma.port }}"
 
-- name: Set Ansible environment for ci pipeline
-  ansible.builtin.set_fact:
-    _python_interpreter: "{{ lookup('ansible.builtin.env', 'VIRTUAL_ENV') + '/bin/python' if lookup('ansible.builtin.env', 'VIRTUAL_ENV') != '' else lookup('ansible.builtin.pipe', 'which python') }}"
-    _user: "{{ 'root' if lookup('ansible.builtin.env', 'DRONE') == 'true' else ansible_user }}"
-
 - block:
     - block:
         - name: Login to Uptime Kuma and fetch token

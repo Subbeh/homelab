@@ -16,7 +16,8 @@
             path: "{{ _src }}"
           register: _stat
           delegate_to: localhost
-          remote_user: "{{ 'root' if ci | default(omit) }}"
+          vars:
+            ansible_user: "{{ _user | default(common_user) }}"
 
         - ansible.builtin.fail:
             msg: "File {{ _src }} does not exist"
