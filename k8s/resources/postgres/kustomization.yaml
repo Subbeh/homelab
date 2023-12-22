@@ -6,7 +6,7 @@ namespace: postgres
 helmCharts:
   - name: cloudnative-pg
     repo: https://cloudnative-pg.github.io/charts
-    version: 0.19.1
+    version: 0.20.0
     namespace: postgres
     releaseName: cloudnative-pg
     includeCRDs: true
