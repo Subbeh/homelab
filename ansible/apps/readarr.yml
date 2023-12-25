@@ -2,7 +2,7 @@
 readarr:
   name: readarr
   container:
-    image: lscr.io/linuxserver/readarr:0.3.12-develop
+    image: lscr.io/linuxserver/readarr:0.3.13-develop
     ports:
       - "{{ net_svc.readarr.port }}:8787"
     volumes:
