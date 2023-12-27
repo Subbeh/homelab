@@ -1,0 +1,31 @@
+---
+filebrowser:
+  container:
+    image: filebrowser/filebrowser:v2.26.0
+    ports:
+      - "{{ net_svc.filebrowser.port }}:80"
+    env:
+      PUID: "1026"
+      PGID: "101"
+    volumes:
+      - "{{ common_apps_dir }}/filebrowser/database.db:/database.db"
+      - "{{ common_apps_dir }}/filebrowser/filebrowser.json:/.filebrowser.json"
+      - "{{ common_data_dir }}/downloads:/srv/downloads"
+      - "{{ common_data_dir }}/media:/srv/media"
+      - "{{ common_data_dir }}/media-fast:/srv/media-fast"
+
+  files:
+    - dest: "{{ common_apps_dir }}/filebrowser/database.db"
+      state: touch
+      mode: 0600
+    - src: filebrowser.json
+      dest: "{{ common_apps_dir }}/filebrowser/filebrowser.json"
+      force: false
+
+  traefik:
+    name: files
+    rtr_middlewares:
+      - chain-external-no-auth
+
+  uptime:
+    group: services
