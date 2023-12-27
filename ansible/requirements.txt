@@ -9,3 +9,4 @@ kubernetes==27.2.0
 uptime-kuma-api
 proxmoxer
 pexpect
+psycopg2
