@@ -18,7 +18,6 @@ common_ansible_root: "{{ common_repo_root }}/ansible"
 common_ansible_tasks: "{{ common_ansible_root }}/tasks"
 common_ansible_apps: "{{ common_ansible_root }}/apps"
 common_k8s_root: "{{ common_repo_root }}/k8s"
-common_media_dir:
 
 common_python_interpreter: "{{ common_ansible_root }}/.direnv/python-3.11/bin/python"
 
