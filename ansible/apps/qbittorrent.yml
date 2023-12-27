@@ -9,7 +9,7 @@ qbittorrent:
       - "{{ common_apps_dir }}/qbittorrent/webui:/webui"
       - "{{ common_apps_dir }}/qbittorrent/env:/env"
       - "{{ common_apps_dir }}/qbittorrent/setenv.sh:/setenv.sh"
-      - "/data/downloads/torrents:/downloads"
+      - "{{ common_data_dir }}/downloads/torrents:/downloads"
     command: /setenv.sh
 
   traefik:
