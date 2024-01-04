@@ -1,7 +1,7 @@
 ---
 sabnzbd:
   container:
-    image: lscr.io/linuxserver/sabnzbd:4.1.0
+    image: lscr.io/linuxserver/sabnzbd:4.2.0
     ports:
       - "{{ net_svc.sabnzbd.port }}:8080"
     volumes:
