@@ -15,7 +15,7 @@ plex:
 plex_meta_manager:
   name: plex-meta-manager
   container:
-    image: meisnate12/plex-meta-manager:v1.19.1
+    image: meisnate12/plex-meta-manager:v1.20.0
     volumes:
       - "{{ common_apps_dir }}/plex-meta-manager/config:/config"
 
