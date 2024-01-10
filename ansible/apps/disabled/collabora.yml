@@ -1,5 +1,5 @@
 collabora:
-  image: collabora/code:23.05.6.4.1
+  image: collabora/code:23.05.6.5.1
   ports:
     - "{{ net_svc.collabora.port }}:9980"
   capabilities:
