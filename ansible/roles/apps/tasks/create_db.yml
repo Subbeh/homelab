@@ -3,7 +3,7 @@
   delegate_to: localhost
   community.postgresql.postgresql_db:
     name: "{{ _db.name }}"
-    login_host: "{{ _db.host | default(net_svc[_app].host) }}"
+    login_host: "{{ _db.host | default(net_svc[_app].host) }}.{{ net_domain.tld_local }}"
     login_user: "{{ _db.user | default(common_user) }}"
     login_password: "{{ _db.pass | default(vault_postgres_pass) }}"
   when: _db.type == 'postgres'
