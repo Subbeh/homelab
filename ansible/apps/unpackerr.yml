@@ -1,7 +1,7 @@
 ---
 unpackerr:
   container:
-    image: golift/unpackerr:0.12.0
+    image: golift/unpackerr:0.13.0
     volumes:
       - "{{ common_apps_dir }}/unpackerr/config:/config"
       - "/data:/data"
