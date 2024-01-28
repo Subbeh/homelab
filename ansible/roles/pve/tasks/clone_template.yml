@@ -21,7 +21,7 @@
       failed_when: _result.stderr != ''
 
     - name: Configure VM network settings
-      ansible.builtin.shell: qm set {{ _vars.vmid }} --net0 model=virtio,bridge=vmbr0,tag={{ _vars.tag }},macaddr={{ _vars.macaddr }}
+      ansible.builtin.command: qm set {{ _vars.vmid }} --net0 model=virtio,bridge=vmbr0,tag={{ _vars.tag }},macaddr={{ _vars.macaddr }}
       register: _result
       failed_when: _result.stderr != ''
 
