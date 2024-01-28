@@ -1,6 +1,5 @@
-# Homelab
-
-![Home](https://img.shields.io/uptimerobot/status/m794403672-d8d77f6c6e04bba27fcbcd9c?label=home)
+<h1 align="center">Homelab <img src="https://img.shields.io/uptimerobot/status/m794403672-d8d77f6c6e04bba27fcbcd9c?label=home" alt="Home Status">
+</h1>
 
 ## :wrench: Hardware
 
