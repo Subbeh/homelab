@@ -43,7 +43,7 @@
           failed_when: _result.stderr != ''
 
         - name: Wait for host to come online
-          wait_for:
+          ansible.builtin.wait_for:
             host: "{{ hostvars[_vars.name].ansible_host }}"
             port: 22
             delay: 10
