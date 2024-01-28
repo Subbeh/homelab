@@ -22,9 +22,14 @@ pve_template_defaults:
   password: "{{ common_pass }}"
 
 pve_vm_defaults:
+  template: 1000
+  name: "{{ inventory_hostname }}"
+  vmid: "{{ pve_vmid | default(omit) }}"
+  node: "{{ pve_node | default(omit) }}"
+  size: "{{ pve_size | default('2G') }}"
+  cores: "{{ pve_cores | default(1) }}"
+  memory: "{{ pve_memory | default(1024) }}"
+  macaddr: "{{ net_macaddr | default(omit) }}"
+  tag: "{{ ((net_cidr[net_subnet] | split('.'))[2]) }}"
   storage: local-lvm
-  size: 50G
-  cores: 1
-  memory: 1024
-  tag: 20
   start: false

@@ -45,11 +45,12 @@ bootstrap_users:
     uid: "{{ common_user_id }}"
     sudoers: true
 
+bootstrap_net_gw: "{{ (net_cidr[net_subnet] | split('.'))[:3] | join('.') }}.1"
 bootstrap_net_hostname: "{{ ansible_hostname }}"
-bootstrap_net_dns_server: "{{ (ansible_host + '/24') | ansible.utils.nthhost(1) }}"
+bootstrap_net_dns_server: "{{ bootstrap_net_gw }}"
 bootstrap_net_dns_domain: "{{ net_domain.tld_local }}"
 bootstrap_net_dns_search: "{{ net_domain.tld_local }}"
-bootstrap_net_ntp_server: "{{ (ansible_host + '/24') | ansible.utils.nthhost(1) }}"
+bootstrap_net_ntp_server: "{{ bootstrap_net_gw }}"
 bootstrap_net_ntp_timezone: "{{ common_timezone }}"
 
 bootstrap_profile_users:

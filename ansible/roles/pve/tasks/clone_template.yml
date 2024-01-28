@@ -21,14 +21,12 @@
       failed_when: _result.stderr != ''
 
     - name: Configure VM network settings
-      ansible.builtin.shell: |
-        qm set {{ _vars.vmid }} --ipconfig0 ip={{ _vars.ip }},gw={{ _vars.ip | ansible.utils.nthhost(1) }}
-        qm set {{ _vars.vmid }} --net0 model=virtio,bridge=vmbr0,tag={{ _vars.tag }}
+      ansible.builtin.shell: qm set {{ _vars.vmid }} --net0 model=virtio,bridge=vmbr0,tag={{ _vars.tag }},macaddr={{ _vars.macaddr }}
       register: _result
       failed_when: _result.stderr != ''
 
     - name: Resize VM disk
-      ansible.builtin.command: qm disk resize {{ _vars.vmid }} "scsi0" {{ _vars.size | default("50G") }}
+      ansible.builtin.command: qm disk resize {{ _vars.vmid }} "scsi0" {{ _vars.size }}
       register: _result
       failed_when: _result.stderr != ''
 
@@ -46,7 +44,7 @@
 
         - name: Wait for host to come online
           wait_for:
-            host: "{{ _vars.ip | ansible.utils.ipaddr('address') }}"
+            host: "{{ hostvars[_vars.name].ansible_host }}"
             port: 22
             delay: 10
             connect_timeout: 5
