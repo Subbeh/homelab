@@ -1,11 +1,6 @@
 # Homelab
 
 ![Home](https://img.shields.io/uptimerobot/status/m794403672-d8d77f6c6e04bba27fcbcd9c?label=home)
-![Build Status](https://badges.sbbh.cloud/infra/homelab/status.svg)
-
-## :construction:
-
-Work in progress
 
 ## :wrench: Hardware
 
