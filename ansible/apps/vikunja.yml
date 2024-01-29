@@ -53,7 +53,7 @@ vikunja_api:
 
 vikunja:
   container:
-    image: vikunja/frontend:0.22.0
+    image: vikunja/frontend:0.22.1
     ports:
       - "{{ net_svc.vikunja.port }}:80"
     env:
