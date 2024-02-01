@@ -57,7 +57,7 @@ prometheus:
             requests:
               storage: 20Gi
     additionalScrapeConfigs:
-      - job_name: node
+      - job_name: ext_nodes
         static_configs:
           - targets:
               - "services.int.sbbh.cloud:9100"
