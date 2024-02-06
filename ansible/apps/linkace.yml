@@ -1,6 +1,6 @@
 linkace:
   container:
-    image: linkace/linkace:v1.13.0-simple
+    image: linkace/linkace:v1.14.0-simple
     ports:
       - "{{ net_svc.linkace.port }}:80"
     volumes:
