@@ -49,7 +49,7 @@ postgres_services:
 
 pgadmin:
   container:
-    image: dpage/pgadmin4:8.2
+    image: dpage/pgadmin4:8.3
     ports:
       - "{{ net_svc.pgadmin.port }}:80"
     volumes:
