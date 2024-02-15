@@ -1,6 +1,6 @@
 flatnotes:
   container:
-    image: dullage/flatnotes:v3.6.1
+    image: dullage/flatnotes:v4.0.2
     ports:
       - "{{ net_svc.flatnotes.port }}:8080"
     volumes:
