@@ -1,7 +1,7 @@
 ---
 radarr:
   container:
-    image: lscr.io/linuxserver/radarr:5.2.6
+    image: lscr.io/linuxserver/radarr:5.3.6
     ports:
       - "{{ net_svc.radarr.port }}:7878"
     volumes:
