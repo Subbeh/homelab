@@ -1,7 +1,7 @@
 ---
 nextcloud:
   container:
-    image: nextcloud:28.0.2
+    image: nextcloud:28.0.3
     hostname: "next.{{ net_domain.tld }}"
     ports:
       - "{{ net_svc.nextcloud.port }}:80"
