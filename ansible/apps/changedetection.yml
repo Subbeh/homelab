@@ -1,7 +1,7 @@
 ---
 changedetection:
   container:
-    image: ghcr.io/dgtlmoon/changedetection.io:0.45.14
+    image: ghcr.io/dgtlmoon/changedetection.io:0.45.16
     restart: false
     state: stopped
     comparisons:
