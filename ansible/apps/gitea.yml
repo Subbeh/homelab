@@ -1,7 +1,7 @@
 ---
 gitea:
   container:
-    image: gitea/gitea:1.21.7
+    image: gitea/gitea:1.21.8
     volumes:
       - "{{ common_apps_dir }}/gitea/data:/data"
     ports:
