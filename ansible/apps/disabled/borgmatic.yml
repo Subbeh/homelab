@@ -2,7 +2,7 @@
 borgmatic_nas:
   name: borgmatic
   container:
-    image: ghcr.io/borgmatic-collective/borgmatic:1.8.8
+    image: ghcr.io/borgmatic-collective/borgmatic:1.8.9
     capabilities:
       - net_admin
     devices:
