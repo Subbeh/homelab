@@ -22,7 +22,7 @@ portainer:
 portainer_agent_bastion:
   name: portainer-agent
   container:
-    image: portainer/agent:2.19.4
+    image: portainer/agent:2.20.0
     ports:
       - "{{ net_svc.portainer.port_agent }}:9001"
     volumes:
@@ -37,7 +37,7 @@ portainer_agent_bastion:
 portainer_agent_plex:
   name: portainer-agent
   container:
-    image: portainer/agent:2.19.4
+    image: portainer/agent:2.20.0
     ports:
       - "{{ net_svc.portainer.port_agent }}:9001"
     volumes:
