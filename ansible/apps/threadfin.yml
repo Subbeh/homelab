@@ -1,7 +1,7 @@
 ---
 threadfin:
   container:
-    image: fyb3roptik/threadfin:1.0.24
+    image: fyb3roptik/threadfin:1.0.26
     ports:
       - "{{ net_svc.threadfin.port }}:34400"
       - "{{ net_svc.threadfin.port_dvr }}:1900"
