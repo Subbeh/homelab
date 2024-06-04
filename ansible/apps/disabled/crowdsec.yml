@@ -1,7 +1,7 @@
 ---
 crowdsec:
   container:
-    image: crowdsecurity/crowdsec:v1.6.0
+    image: crowdsecurity/crowdsec:v1.6.2
     ports:
       - "{{ net_svc.crowdsec.port }}:8080"
     env:
