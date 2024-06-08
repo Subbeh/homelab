@@ -1,7 +1,7 @@
 ---
 geoipupdate:
   container:
-    image: maxmindinc/geoipupdate:v6.1
+    image: maxmindinc/geoipupdate:v7.0
     volumes:
       - "{{ common_apps_dir }}/geoip/data:/usr/share/GeoIP"
     env:
