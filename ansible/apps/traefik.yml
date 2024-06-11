@@ -1,7 +1,7 @@
 ---
 traefik:
   container:
-    image: traefik:v2.11.3
+    image: traefik:v2.11.4
     restart_policy: always
     ports:
       - "80:80"
