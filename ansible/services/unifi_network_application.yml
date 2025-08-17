@@ -1,0 +1,44 @@
+---
+unifi_db:
+  host: mgmt
+  container:
+    image: docker.io/mongo:4.4
+    env:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "{{ mongo_initdb_root_password }}"
+      MONGO_USER: unifi
+      MONGO_PASS: "{{ mongo_password }}"
+      MONGO_DBNAME: unifi
+      MONGO_AUTHSOURCE: admin
+    volumes:
+      - "{{ common_data_dir }}/unifi/db:/data/db"
+      - "{{ common_data_dir }}/unifi/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro"
+
+  files:
+    - src: mongodb/init-mongo.sh
+      dest: "{{ common_data_dir }}/unifi/init-mongo.sh"
+      mode: "0755"
+
+unifi_network_application:
+  host: mgmt
+  container:
+    image: lscr.io/linuxserver/unifi-network-application:9.0.114
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    env:
+      MONGO_USER: unifi
+      MONGO_PASS: "{{ mongo_password }}"
+      MONGO_HOST: unifi_db
+      MONGO_PORT: "27017"
+      MONGO_DBNAME: unifi
+      MONGO_AUTHSOURCE: admin
+    volumes:
+      - "{{ common_data_dir }}/unifi/data:/config"

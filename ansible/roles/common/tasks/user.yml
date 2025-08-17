@@ -1,0 +1,30 @@
+---
+- name: Ensure user is created
+  ansible.builtin.user:
+    name: "{{ common_user }}"
+    createhome: true
+    password: "{{ common_password | string | password_hash }}"
+    uid: "{{ common_user_id }}"
+    shell: /bin/bash
+    state: present
+
+- name: Ensure sudoers.d directory exists
+  ansible.builtin.file:
+    path: /etc/sudoers.d
+    state: directory
+    mode: 0755
+
+- name: Add user to sudoers
+  ansible.builtin.copy:
+    content: "{{ common_user }} ALL=(ALL:ALL) NOPASSWD:ALL"
+    dest: "/etc/sudoers.d/{{ common_user }}_nopasswd"
+    mode: 0440
+
+- name: Silence the login prompt
+  ansible.builtin.file:
+    dest: "/home/{{ common_user }}/.hushlogin"
+    state: touch
+    owner: "{{ common_user }}"
+    mode: 0775
+    modification_time: preserve
+    access_time: preserve

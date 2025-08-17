@@ -1,0 +1,10 @@
+---
+machine:
+  sysctls:  # TODO
+    fs.inotify.max_user_watches: "1048576"  # Watchdog
+    fs.inotify.max_user_instances: "8192"  # Watchdog
+    net.ipv4.tcp_fastopen: 3  # Send and accept data in the opening SYN packet
+    sunrpc.tcp_slot_table_entries: 128  # NFS
+    sunrpc.tcp_max_slot_table_entries: 128  # NFS
+    user.max_user_namespaces: 11255  # User Namespaces
+    vm.nr_hugepages: 1024  # PostgreSQL

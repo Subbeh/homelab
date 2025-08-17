@@ -1,0 +1,22 @@
+---
+- name: Set service facts
+  ansible.builtin.set_fact:
+    service_params: "{{ service_configs[item] | combine({'container': {'name': service_configs[item].container.name | default(item)}}, recursive=true) }}"
+
+- name: Set container facts
+  ansible.builtin.set_fact:
+    container_params: "{{ container_defaults | combine(service_params.container) }}"
+
+- name: Ensure app_data directory exists
+  become: true
+  delegate_to: "{{ service_params.host }}"
+  ansible.builtin.file:
+    path: "/opt/data/{{ service_params.container.name }}"
+    state: directory
+    mode: 0755
+
+- name: Create Docker container {{ service_params.container.name }}
+  become: true
+  delegate_to: "{{ service_params.host }}"
+  community.docker.docker_container: "{{ container_params }}"
+

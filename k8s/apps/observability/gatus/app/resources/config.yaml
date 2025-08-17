@@ -1,0 +1,39 @@
+---
+web:
+  port: ${WEB_PORT}
+storage:
+  type: sqlite
+  path: /config/sqlite.db
+  caching: true
+metrics: true
+debug: false
+ui:
+  title: Status | Gatus
+  header: Status
+connectivity:
+  checker:
+    target: 10.11.80.1:53
+    interval: 1m
+endpoints:
+  - name: flux-webhook
+    group: external
+    url: https://flux-webhook.sbbh.cloud
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    ui:
+      hide-hostname: true
+      hide-url: true
+    conditions:
+      - "[STATUS] == 404"
+  - name: nas-nfs
+    group: infra
+    url: tcp://nas-k8s.int.sbbh.cloud:2049
+    interval: 1m
+    client:
+      dns-resolver: tcp://10.11.80.1:53
+    ui:
+      hide-hostname: true
+      hide-url: true
+    conditions:
+      - "[CONNECTED] == true"

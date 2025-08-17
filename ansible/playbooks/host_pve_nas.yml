@@ -1,0 +1,73 @@
+---
+- name: Proxmox host pve-nas
+  hosts: pve-nas
+  gather_facts: true
+
+  vars:
+    pve_setup_tasks:
+      - sources
+      - microcode
+      - powersave
+      - dependencies
+      - cluster
+    common_tasks:
+      - update
+      - packages
+      - ssh
+      - profile
+    apps:
+      - node_exporter
+    host_packages:
+      - name: nfs-kernel-server
+    ssh_config_settings:
+      - {regexp: "^#?PasswordAuthentication", line: "PasswordAuthentication no"}
+      - {regexp: "^#?PermitRootLogin", line: "PermitRootLogin yes"}
+      - {regexp: "^#?PubkeyAuthentication", line: "PubkeyAuthentication yes"}
+      - {regexp: "^#?PermitEmptyPasswords", line: "PermitEmptyPasswords no"}
+      - {regexp: "^#?X11Forwarding", line: "X11Forwarding no"}
+      - {regexp: "^#?MaxAuthTries", line: "MaxAuthTries 3"}
+      - {regexp: "^#?ClientAliveInterval", line: "ClientAliveInterval 300"}
+      - {regexp: "^#?ClientAliveCountMax", line: "ClientAliveCountMax 2"}
+      - {regexp: "^#?Protocol", line: "Protocol 2"}
+    nfs_opts: rw,sync,no_subtree_check,no_root_squash
+    nfs_exports:
+      - {path: /data/hdd0/pub, options: "*({{ nfs_opts}})"}
+      - {path: /data/hdd0/backups, options: "10.11.10.0/24({{ nfs_opts}}) 100.64.0.0/10({{ nfs_opts}})"}
+      - {path: /data/hdd1/media, options: "10.11.0.0/16({{ nfs_opts}}) 100.64.0.0/10({{ nfs_opts}})"}
+      - {path: /data/nvme/downloads, options: "10.11.0.0/16({{ nfs_opts}}) 100.64.0.0/10({{ nfs_opts}}) 192.168.80.0/24({{ nfs_opts}})"}
+      - {path: /data/nvme/k8s/data, options: "192.168.80.0/24({{ nfs_opts}})"}
+      - {path: /data/nvme/k8s/volsync, options: "192.168.80.0/24({{ nfs_opts}})",}
+
+  roles:
+    - {role: pve_setup, tags: pve_setup}
+    - {role: common, tags: common}
+    - {role: apps, tags: apps,}
+
+  tasks:
+    - name: Set up NFS shares
+      tags: nfs
+      become: true
+      block:
+        - name: Clear existing exports file
+          ansible.builtin.file:
+            path: /etc/exports
+            state: absent
+
+        - name: Create exports file
+          ansible.builtin.lineinfile:
+            path: /etc/exports
+            regexp: '^"{{ item.path }}"'
+            line: '"{{ item.path }}" {{ item.options }}'
+            create: true
+            mode: 0600
+          loop: "{{ nfs_exports }}"
+
+        - name: Export shares
+          ansible.builtin.command: exportfs -rav
+          changed_when: false
+
+  handlers:
+    - name: restart nfs
+      ansible.builtin.systemd:
+        name: nfs-kernel-server
+        state: restarted

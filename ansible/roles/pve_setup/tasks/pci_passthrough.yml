@@ -1,0 +1,40 @@
+---
+- name: Enable required modules
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    line: "{{ item }}"
+    create: true
+  loop:
+    - vfio
+    - vfio_iommu_type1
+    - vfio_pci
+    - vfio_virqfd
+
+- name: Add IOMMU kernel parameters for Intel
+  ansible.builtin.lineinfile:
+    path: /etc/kernel/cmdline
+    line: "quiet intel_iommu=on iommu=pt"
+    create: true
+  when: ansible_facts['processor'][1] is search('Intel')
+
+- name: Add IOMMU kernel parameters for AMD
+  ansible.builtin.lineinfile:
+    path: /etc/kernel/cmdline
+    line: "quiet amd_iommu=on iommu=pt"
+    create: true
+  when: ansible_facts['processor'][1] is search('AMD')
+
+- name: Update initramfs
+  ansible.builtin.command: update-initramfs -u -k all
+  register: initramfs_update
+  changed_when: initramfs_update.rc == 0
+
+- name: Update GRUB
+  ansible.builtin.command: pve-efiboot-tool refresh
+  register: grub_update
+  changed_when: grub_update.rc == 0
+
+- name: Check if reboot is needed
+  ansible.builtin.debug:
+    msg: "PCI passthrough has been enabled. A system reboot is required to apply the changes."
+  when: initramfs_update.changed or grub_update.changed 

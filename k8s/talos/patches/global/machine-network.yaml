@@ -1,0 +1,9 @@
+---
+machine:
+  network:
+    disableSearchDomain: true
+    nameservers:
+      - 10.11.80.1
+  features:
+    hostDNS:
+      resolveMemberNames: true

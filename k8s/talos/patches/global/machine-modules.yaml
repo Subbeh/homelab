@@ -1,0 +1,6 @@
+---
+machine:
+  kernel:
+    modules:
+      - name: nbd
+

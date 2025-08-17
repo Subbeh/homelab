@@ -1,0 +1,342 @@
+---
+- name: Create vault user
+  ansible.builtin.user:
+    name: vault
+    password: '!'  # disabled
+    comment: HashiCorp Vault service user
+    create_home: false
+    shell: /sbin/nologin
+    system: true
+    state: present
+  register: vault_user
+  become: true
+
+- name: Add ansible user to vault group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: vault
+    append: true
+  become: true
+
+- name: Create Vault directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0750'
+    owner: vault
+    group: vault
+  loop:
+    - /opt/vault
+    - /opt/vault/data
+    - /opt/vault/tls
+    - /opt/vault/policies
+  become: true
+
+- name: Add HashiCorp GPG key
+  ansible.builtin.apt_key:
+    url: https://apt.releases.hashicorp.com/gpg
+    state: present
+  become: true
+
+- name: Add HashiCorp repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+    state: present
+    filename: hashicorp
+  become: true
+
+- name: Install Vault and OpenSSL
+  ansible.builtin.apt:
+    name:
+      - vault
+      - openssl
+    state: present
+    update_cache: true
+  become: true
+
+- name: Get Tailscale IP
+  ansible.builtin.command: tailscale ip --4
+  register: tailscale_ip
+  changed_when: false
+
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: /opt/vault/tls/vault.key
+    owner: vault
+    group: vault
+    mode: '0600'
+    type: RSA
+    size: 4096
+  become: true
+
+- name: Generate CSR
+  community.crypto.openssl_csr:
+    path: /opt/vault/tls/vault.csr
+    privatekey_path: /opt/vault/tls/vault.key
+    common_name: "{{ ansible_fqdn }}"
+    subject_alt_name:
+      - "DNS:{{ inventory_hostname }}"
+      - "DNS:{{ inventory_hostname }}.{{ net_domain_loc }}"
+      - "DNS:localhost"
+      - "DNS:vault-tailscale.external-secrets.svc.cluster.local"
+      - "IP:{{ tailscale_ip.stdout }}"
+      - "IP:127.0.0.1"
+    owner: vault
+    group: vault
+    mode: '0600'
+  become: true
+
+- name: Generate self-signed certificate
+  ansible.builtin.openssl_certificate:
+    path: /opt/vault/tls/vault.crt
+    privatekey_path: /opt/vault/tls/vault.key
+    csr_path: /opt/vault/tls/vault.csr
+    provider: selfsigned
+    owner: vault
+    group: vault
+    mode: '0644'
+  become: true
+
+- name: Download Vault certificate to localhost
+  ansible.builtin.fetch:
+    src: /opt/vault/tls/vault.crt
+    dest: "{{ ansible_root }}/../.secret/vault.crt"
+    flat: true
+  become: true
+
+- name: Fetch Vault AWS credentials from Terraform Cloud
+  ansible.builtin.command: terraform output -raw {{ item }}
+  environment:
+    TF_WORKSPACE: aws-security-account
+  args:
+    chdir: "{{ ansible_root }}/../terraform/aws/security-account"
+  register: tf_output
+  with_items:
+    - vault_aws_region
+    - vault_access_key_id
+    - vault_secret_key
+    - vault_kms_key_arn
+  delegate_to: localhost
+  become: false
+  no_log: true
+
+- name: Set Vault AWS credential facts
+  ansible.builtin.set_fact:
+    vault_aws_region: "{{ tf_output.results[0].stdout }}"
+    vault_aws_access_key: "{{ tf_output.results[1].stdout }}"
+    vault_aws_secret_key: "{{ tf_output.results[2].stdout }}"
+    vault_kms_key_arn: "{{ tf_output.results[3].stdout }}"
+  no_log: true
+
+- name: Ensure Vault config
+  ansible.builtin.template:
+    src: vault/vault.hcl.j2
+    dest: /opt/vault/vault_config.hcl
+    owner: vault
+    group: vault
+    mode: '0600'
+  notify: Restart vault
+  become: true
+
+- name: Configure Vault Service
+  ansible.builtin.copy:
+    src: vault/vault.service
+    dest: /etc/systemd/system/vault.service
+    mode: "0644"
+    owner: root
+  notify: Restart vault
+  become: true
+
+- name: Initialize Vault Service
+  ansible.builtin.systemd:
+    name: vault.service
+    enabled: true
+    daemon_reload: true
+    state: restarted
+  become: true
+  register: vault_initialize
+
+- name: Wait for Vault to start
+  ansible.builtin.wait_for:
+    host: "{{ tailscale_ip.stdout }}"
+    port: 8200
+    timeout: 30
+
+- name: Check Vault status
+  ansible.builtin.command: vault status
+  environment:
+    VAULT_ADDR: "https://{{ tailscale_ip.stdout }}:8200"
+    VAULT_SKIP_VERIFY: "true"
+  register: vault_status
+  changed_when: false
+  failed_when: false
+  become: false
+
+- name: Initialize Vault if not initialized
+  ansible.builtin.command: >
+    vault operator init
+      -recovery-shares=1
+      -recovery-threshold=1
+      -format=json
+  environment:
+    VAULT_ADDR: "https://{{ tailscale_ip.stdout }}:8200"
+    VAULT_SKIP_VERIFY: "true"
+  register: vault_init
+  when: "vault_status.stdout is regex('Initialized\\s+false')"
+  become: false
+
+- name: Save initialization output
+  ansible.builtin.copy:
+    content: "{{ vault_init.stdout }}"
+    dest: "/home/{{ ansible_user }}/vault-init.json"
+    mode: '0600'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  when: vault_init.changed
+  become: false
+
+- name: Template Vault policies
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "/opt/vault/policies/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: '0640'
+    owner: vault
+    group: vault
+  become: true
+  with_fileglob:
+    - "{{ role_path }}/templates/vault/policies/*.hcl.j2"
+
+- name: Find Vault policy files
+  ansible.builtin.find:
+    paths: "/opt/vault/policies"
+    patterns: "*.hcl"
+  register: vault_policy_files
+  become: true
+
+- name: Read existing vault init file
+  ansible.builtin.slurp:
+    src: "/home/{{ ansible_user }}/vault-init.json"
+  register: vault_init_file
+  ignore_errors: true
+  become: false
+  no_log: true
+
+- name: Set vault token fact
+  ansible.builtin.set_fact:
+    vault_root_token: "{{ vault_init.stdout | from_json | json_query('root_token') if vault_init.changed else (vault_init_file['content'] | b64decode | from_json).root_token }}"
+  when: vault_init.changed or (vault_init_file is defined and vault_init_file.content is defined)
+  no_log: true
+
+- name: Create Vault policies
+  ansible.builtin.command: >
+    vault policy write {{ item.path | basename | regex_replace('\.hcl$', '') }} {{ item.path }}
+  environment:
+    VAULT_ADDR: "https://{{ tailscale_ip.stdout }}:8200"
+    VAULT_SKIP_VERIFY: "true"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  become: false
+  loop: "{{ vault_policy_files.files }}"
+  # failed_when: false
+
+- name: Create admin token
+  ansible.builtin.command: >
+    vault token create -policy=admin -format=json
+  environment:
+    VAULT_ADDR: "https://{{ tailscale_ip.stdout }}:8200"
+    VAULT_SKIP_VERIFY: "true"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: admin_token
+  when: vault_init.changed
+  become: false
+
+- name: Save admin token
+  ansible.builtin.copy:
+    content: |
+      {{ admin_token.stdout | from_json | json_query('auth.client_token') }}
+    dest: "/home/{{ ansible_user }}/vault-admin-token.txt"
+    mode: '0600'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  when: admin_token.changed
+  become: false
+  no_log: true
+
+- name: Read existing admin token file
+  ansible.builtin.slurp:
+    src: "/home/{{ ansible_user }}/vault-admin-token.txt"
+  register: admin_token_file
+  ignore_errors: true
+  become: false
+  no_log: true
+  when: not vault_init.changed and vault_init_file.content is defined
+
+- name: Set admin token fact
+  ansible.builtin.set_fact:
+    vault_admin_token: "{{ admin_token.stdout | from_json | json_query('auth.client_token') if vault_init.changed else admin_token_file['content'] | b64decode | regex_search('Admin Token: ([^\\n]+)', '\\1') | first }}"
+  when: vault_init.changed or (admin_token_file.content is defined)
+  no_log: true
+
+- name: Update Vault environment variables in local environment file
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_root }}/../.secret/env.d/vault.env"
+    regexp: "^{{ item.key }}="
+    line: '{{ item.key }}="{{ item.value }}"'
+    mode: '0600'
+    create: true
+  loop:
+    - key: VAULT_ADDR
+      value: "https://{{ tailscale_ip.stdout }}:8200"
+    - key: VAULT_SKIP_VERIFY
+      value: "true"
+    - key: VAULT_TOKEN
+      value: "{{ vault_admin_token }}"
+  delegate_to: localhost
+  become: false
+  when: vault_admin_token is defined
+  no_log: true
+
+- name: Use provided or default secret engines
+  ansible.builtin.set_fact:
+    vault_secret_engines_to_enable: "{{ vault_secret_engines | default(vault_default_secret_engines) }}"
+  when: vault_root_token is defined
+
+- name: Check enabled secret engines
+  ansible.builtin.command: >
+    vault secrets list -format=json
+  environment:
+    VAULT_ADDR: "https://{{ tailscale_ip.stdout }}:8200"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+    VAULT_SKIP_VERIFY: "true"
+  register: vault_mounts
+  changed_when: false
+  delegate_to: localhost
+  become: false
+  failed_when: false
+  when: vault_root_token is defined
+  no_log: true
+
+- name: Enable secret engines
+  when: vault_root_token is defined and vault_mounts.rc is defined and vault_mounts.rc == 0
+  no_log: true
+  block:
+    - name: Parse current mounts
+      ansible.builtin.set_fact:
+        current_mounts: "{{ vault_mounts.stdout | from_json }}"
+      when: vault_mounts.rc is defined and vault_mounts.rc == 0
+
+    - name: Enable secret engines that are not already enabled
+      community.hashi_vault.vault_write:
+        path: "sys/mounts/{{ item.path }}"
+        data:
+          type: "{{ item.type }}"
+          description: "{{ item.description | default(omit) }}"
+      environment:
+        VAULT_ADDR: "https://{{ tailscale_ip.stdout }}:8200"
+        VAULT_TOKEN: "{{ vault_root_token }}"
+        VAULT_SKIP_VERIFY: "true"
+      delegate_to: localhost
+      become: false
+      loop: "{{ vault_secret_engines_to_enable }}"
+      when: "current_mounts is defined and (item.path + '/') not in current_mounts"
+      register: enable_result
+      failed_when: "enable_result.failed and 'path is already in use' not in enable_result.msg"

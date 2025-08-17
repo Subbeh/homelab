@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+tasks:
+  init:
+    desc: Initialize Ansible dependencies
+    cmds:
+      - ansible-galaxy collection install -r requirements.yml -p "{{.ROOT_DIR}}/.cache/ansible/collections"
+      - ansible-galaxy role install -r requirements.yml -p "{{.ROOT_DIR}}/.cache/ansible/roles"
+
+  upgrade:
+    desc: Upgrade Ansible dependencies
+    cmds:
+      - ansible-galaxy collection install -r requirements.yml -p "{{.ROOT_DIR}}/.cache/ansible/collections" --force
+      - ansible-galaxy role install -r requirements.yml -p "{{.ROOT_DIR}}/.cache/ansible/roles" --force
+
+  list:
+    desc: List all the hosts
+    cmds:
+      - ansible all --list-hosts
+
+  ping:
+    desc: Ping all the hosts
+    cmds:
+      - 'ansible {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}all:!exclude{{end}} --one-line -m "ping"'
+
+  uptime:
+    desc: Uptime of all the hosts
+    cmds:
+      - ansible {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}all:!exclude{{end}} --one-line -a 'uptime'
+
+  reboot:
+    desc: Reboot hosts
+    cmds:
+      - ansible {{.CLI_ARGS}} --one-line -a 'reboot'

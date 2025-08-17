@@ -1,0 +1,13 @@
+---
+- name: Install services
+  hosts: localhost
+  become: false
+  gather_facts: false
+
+  vars:
+    services: "{{ ansible_run_tags }}"
+    ansible_root: "{{ playbook_dir }}/.."
+
+  roles:
+    - role: services
+      tags: always

@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://schemas.tholinka.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &appname prowlarr
+  namespace: &namespace media
+spec:
+  targetNamespace: *namespace
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *appname
+  interval: 1h
+  retryInterval: 2m
+  timeout: 5m
+  path: ./k8s/apps/media/prowlarr/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  dependsOn:
+    - name: storage-ready
+      namespace: flux-system
+  components:
+    - ../../../../components/gatus/internal
+    - ../../../../components/volsync
+  postBuild:
+    substitute:
+      APP: *appname
+      VOLSYNC_CAPACITY: 1Gi
+      GATUS_GROUP: media
+

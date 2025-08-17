@@ -1,0 +1,53 @@
+---
+- name: Install ACME plugin
+  ansibleguy.opnsense.package:
+    name: os-acme-client
+    action: install
+
+- name: Activate ACME client
+  ansibleguy.opnsense.acme_general:
+    enabled: true
+
+- name: Add ACME account
+  ansibleguy.opnsense.acme_account:
+    name: LE opnsense
+    description: "Let's Encrypt"
+    email: "{{ acme_email }}"
+    ca: letsencrypt
+
+- name: Add ACME DNS validation with CloudFlare
+  ansibleguy.opnsense.acme_validation:
+    name: CloudFlare DNS
+    description: DNS Validation w/ CloudFlare
+    method: dns01
+    dns_service: dns_cf
+    dns_cf_email: "{{ common_email }}"
+    dns_cf_account_id: "{{ lookup('ansible.builtin.env', 'CF_ACCOUNT_ID') }}"
+    dns_cf_zone_id: "{{ lookup('ansible.builtin.env', 'CF_SBBH_CLOUD_ZONE_ID') }}"
+    dns_cf_token: "{{ lookup('ansible.builtin.env', 'CF_SBBH_CLOUD_API_TOKEN') }}"
+
+- name: Add ACME action
+  ansibleguy.opnsense.acme_action:
+    name: Restart GUI
+    description: Restart OPNsense GUI
+    type: configd_restart_gui
+
+- name: Add wildcard ACME certificate for internal domain
+  ansibleguy.opnsense.acme_certificate:
+    name: "*.{{ net_domain_loc }}"
+    description: "*.{{ net_domain_loc }} (ACME Client)"
+    alt_names:
+      - '{{ net_domain_loc }}'  # Include apex domain as well
+    account: LE opnsense
+    validation: CloudFlare DNS
+    restart_actions:
+      - 'Restart GUI'
+
+- name: List jobs
+  ansibleguy.opnsense.list:
+    target: 'acme_certificate'
+  register: existing_certificates
+
+- name: Print cert data
+  ansible.builtin.debug:
+    var: existing_certificates.data

@@ -1,0 +1,147 @@
+---
+- name: Extract cloud_init_template variables
+  ansible.builtin.set_fact:
+    "{{ item.key }}": "{{ item.value }}"
+  loop: "{{ cloud_init_template | default({}) | dict2items }}"
+  when: cloud_init_template is defined
+
+- name: Download the cloud image
+  ansible.builtin.get_url:
+    url: "{{ cloud_image_url }}"
+    dest: "{{ cloud_image_storage }}/{{ cloud_image_name }}"
+    owner: root
+    group: root
+    mode: '0644'
+    timeout: 60
+
+- name: Check if VM ID is in use
+  ansible.builtin.shell: "qm status {{ vm_id }}"
+  register: vm_status
+  ignore_errors: true
+  args:
+    executable: /bin/bash
+  changed_when: vm_status.rc == 0 or vm_status.rc == 1
+
+- name: Check if local storage has snippets content type
+  ansible.builtin.shell: |
+    pvesm status -storage local | grep -q "snippets"
+  args:
+    executable: /bin/bash
+  register: local_snippets_check
+  changed_when: false
+  failed_when: false
+  when: vm_status.rc != 0
+
+- name: Add snippets content type to local storage if needed
+  ansible.builtin.shell: |
+    pvesm set local --content rootdir,images,iso,vztmpl,backup,snippets
+  args:
+    executable: /bin/bash
+  when: vm_status.rc != 0 and local_snippets_check.rc != 0
+  register: add_snippets_content
+  changed_when: add_snippets_content.rc == 0
+  failed_when: add_snippets_content.rc not in [0]
+
+- name: Copy user-data to Proxmox node
+  ansible.builtin.template:
+    src: "user-data.yaml.j2"
+    remote_src: false
+    dest: "/var/lib/vz/snippets/user-data.yaml"
+    owner: root
+    group: root
+    mode: '0644'
+  when: vm_status.rc != 0
+
+# - name: Copy ssh key to Proxmox node temporarily
+#   ansible.builtin.copy:
+#     dest: "/var/lib/vz/snippets/{{ vm_id }}.pub" # Specify the destination path here
+#     content: "{{ common_pub_key_file }}"
+#     remote_src: false
+#     owner: root
+#     group: root
+#     mode: '0644'
+#   when: vm_status.rc != 0
+
+# - name: Delete temporarily copied ssh key
+#   ansible.builtin.file:
+#     path: "/var/lib/vz/snippets/{{ vm_id }}.pub"
+#     state: absent
+#   when: vm_status.rc != 0
+
+- name: Create VM for template
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_name }}"
+    api_token_secret: "{{ pve_token_secret }}"
+    validate_certs: false
+
+    name: "{{ template_name }}"
+    node: "{{ inventory_hostname_short }}"
+    vmid: "{{ vm_id }}"
+
+    memory: "{{ memory }}"
+    cores: "{{ cores }}"
+    serial:
+      serial0: 'socket'
+    vga: serial0
+    scsihw: 'virtio-scsi-pci'
+    net: "{{ net }}"
+
+    citype: nocloud
+    cicustom: "user=local:snippets/user-data.yaml"
+    ipconfig:
+      ipconfig0: "ip=dhcp"
+  delegate_to: localhost
+  become: false
+  when: vm_status.rc != 0
+
+- name: Import the disk to Proxmox
+  ansible.builtin.shell: |
+    qm importdisk {{ vm_id }} {{ cloud_image_storage }}/{{ cloud_image_name }} {{ proxmox_storage }}
+  args:
+    executable: /bin/bash
+  when: vm_status.rc != 0
+  register: import_disk
+  changed_when: import_disk.rc == 0
+  failed_when: import_disk.rc not in [0]
+
+- name: Attach the disk to the VM
+  ansible.builtin.shell: |
+    qm set {{ vm_id }} --scsi0 {{ proxmox_storage }}:vm-{{ vm_id }}-disk-0,discard=on,ssd=1
+  args:
+    executable: /bin/bash
+  when: vm_status.rc != 0
+  register: attach_disk
+  changed_when: attach_disk.rc == 0
+  failed_when: attach_disk.rc not in [0]
+
+- name: Configure Cloud-Init drive, boot order, and qemu-agent
+  ansible.builtin.shell: |
+    qm set {{ vm_id }} --ide2 {{ proxmox_storage }}:cloudinit --boot c --bootdisk scsi0 --agent 1
+  args:
+    executable: /bin/bash
+  when: vm_status.rc != 0
+  register: cloud_init
+  changed_when: cloud_init.rc == 0
+  failed_when: cloud_init.rc not in [0]
+
+- name: Resize disk
+  ansible.builtin.shell: |
+    qm resize {{ vm_id }} scsi0 +{{ resize_disk }}G
+  args:
+    executable: /bin/bash
+  when: vm_status.rc != 0
+  register: resize_disk
+  changed_when: resize_disk.rc == 0
+  failed_when: resize_disk.rc not in [0]
+
+- name: Convert VM to template
+  ansible.builtin.shell: |
+    qm template {{ vm_id }}
+  args:
+    executable: /bin/bash
+  when: vm_status.rc != 0
+  register: convert_template
+  changed_when: convert_template.rc == 0
+  failed_when: convert_template.rc not in [0]

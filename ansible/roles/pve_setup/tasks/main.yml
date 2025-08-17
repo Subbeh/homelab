@@ -1,0 +1,49 @@
+---
+- name: Add repository sources
+  ansible.builtin.import_tasks: sources.yml
+  when: "'sources' in pve_setup_tasks"
+  tags:
+    - pve
+    - sources
+
+- name: Configure Proxmox users
+  ansible.builtin.import_tasks: users.yml
+  when: "'users' in pve_setup_tasks"
+  tags:
+    - pve
+    - users
+
+- name: Install CPU microcode
+  ansible.builtin.import_tasks: microcode.yml
+  when: "'microcode' in pve_setup_tasks"
+  tags:
+    - pve
+    - microcode
+
+- name: Enable PCI passthrough
+  ansible.builtin.import_tasks: pci_passthrough.yml
+  when: "'pci_passthrough' in pve_setup_tasks"
+  tags:
+    - pve
+    - pci_passthrough
+
+- name: Enable powersave mode
+  ansible.builtin.import_tasks: powersave.yml
+  when: "'powersave' in pve_setup_tasks"
+  tags:
+    - pve
+    - powersave
+
+- name: Install dependencies
+  ansible.builtin.import_tasks: dependencies.yml
+  when: "'dependencies' in pve_setup_tasks"
+  tags:
+    - pve
+    - dependencies
+
+- name: Create/Join Cluster
+  ansible.builtin.import_tasks: cluster.yml
+  when: "'cluster' in pve_setup_tasks"
+  tags:
+    - pve
+    - cluster

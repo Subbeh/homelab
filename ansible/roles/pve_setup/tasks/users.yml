@@ -1,0 +1,60 @@
+---
+- name: Create PVE user
+  block:
+    - name: Check if API user exists
+      ansible.builtin.command: "pveum user list --output-format json"
+      register: user_list
+      changed_when: false
+
+    - name: Add PVE user
+      ansible.builtin.command: "pveum user add {{ pve_api_user }} --password {{ pve_api_password }}"
+      when: "user_list.stdout | from_json | map(attribute='userid') | list | select('match', pve_api_user) | list | length == 0"
+      # no_log: true
+
+- name: Create role
+  block:
+    - name: Check if role exists
+      ansible.builtin.command: "pveum role list --output-format json"
+      register: role_list
+      changed_when: false
+
+    - name: Add role
+      ansible.builtin.command: 'pveum role add {{ pve_api_role }} -privs "{{ pve_api_role_privs | join(" ") }}"'
+      when: "role_list.stdout | from_json | map(attribute='roleid') | list | select('match', pve_api_role) | list | length == 0"
+
+    - name: Modify existing role
+      ansible.builtin.command: 'pveum role modify {{ pve_api_role }} -privs "{{ pve_api_role_privs | join(" ") }}"'
+      when:
+        - "role_list.stdout | from_json | map(attribute='roleid') | list | select('match', pve_api_role) | list | length != 0"
+        - "(role_list.stdout | from_json | selectattr('roleid', 'eq', pve_api_role) | map(attribute='privs') | first | split(',') | sort | join(' ')) != (pve_api_role_privs | sort | join(' '))"
+
+- name: Set user permissions
+  ansible.builtin.command: "pveum aclmod / -user {{ pve_api_user }} -role {{ pve_api_role }}"
+  when: "pve_api_user not in user_list.stdout"
+
+- name: Create API token
+  block:
+    - name: Check if API token exists
+      ansible.builtin.command: "pveum user token list {{ pve_api_user }}"
+      register: token_list
+      changed_when: false
+
+    - name: Remove existing API token
+      ansible.builtin.command: "pveum user token remove {{ pve_api_user }} {{ pve_api_user | regex_replace('@pve$', '') }}-token"
+      when: "pve_api_user | regex_replace('@pve$', '') + '-token' in token_list.stdout"
+
+    - name: Create Proxmox API token
+      ansible.builtin.command: >
+        pveum user token add {{ pve_api_user }} {{ pve_api_user | regex_replace('@pve$', '') }}-token --privsep=0 --output-format json
+      register: pve_api_token
+      no_log: true
+
+- name: Store API token in Vault
+  community.hashi_vault.vault_kv2_write:
+    path: proxmox/api-token
+    data:
+      token_id: "{{ (pve_api_token.stdout | from_json)['full-tokenid'] }}"
+      token_secret: "{{ (pve_api_token.stdout | from_json)['value'] }}"
+  when: pve_api_token.changed
+  delegate_to: localhost
+  become: false

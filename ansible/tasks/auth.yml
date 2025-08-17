@@ -1,0 +1,34 @@
+---
+- name: Test default connection
+  ansible.builtin.wait_for_connection:
+    timeout: 5
+  ignore_errors: true
+  register: connection_test
+  no_log: true
+
+- name: Change connection parameters
+  ansible.builtin.set_fact:
+    ansible_user: root
+  when: connection_test.failed
+
+- name: Retry connection with root user
+  ansible.builtin.wait_for_connection:
+    timeout: 5
+  ignore_errors: true
+  register: connection_test_root
+  no_log: true
+  when: connection_test.failed
+
+- name: Fail if both connection attempts failed
+  ansible.builtin.fail:
+    msg: |
+      Connection failed for both default user and root user.
+      Please check:
+      - SSH key permissions
+      - Network connectivity
+      - Firewall settings
+      - SSH service status on target host
+  when:
+    - connection_test.failed
+    - connection_test_root.failed
+

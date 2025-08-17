@@ -1,0 +1,18 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: &app external-${APP}
+  namespace: &namespace ${NS:=external}
+spec:
+  hostnames:
+    - "${EXTERNAL_DOMAIN:=${APP}.sbbh.cloud}"
+  parentRefs:
+    - name: ${GATEWAY:=internal}
+      namespace: kube-system
+      sectionName: https
+  rules:
+    - backendRefs:
+        - name: *app
+          namespace: *namespace
+          port: ${EXTERNAL_PORT:=80}

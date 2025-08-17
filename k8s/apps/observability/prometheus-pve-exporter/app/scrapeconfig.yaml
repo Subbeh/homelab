@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/scrapeconfig_v1alpha1.json
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: &name prometheus-pve-exporter
+spec:
+  staticConfigs:
+    - targets:
+        - 10.11.10.100  # pve-fw
+  metricsPath: /pve
+  params:
+    module: [default]
+    cluster: ['1']
+    node: ['1']
+  relabelings:
+    - action: replace
+      sourceLabels: [__address__]
+      targetLabel: __param_target
+    - action: replace
+      sourceLabels: [__param_target]
+      targetLabel: instance
+    - action: replace
+      targetLabel: __address__
+      replacement: prometheus-pve-exporter.observability.svc.cluster.local:9221
+    - action: replace
+      targetLabel: job
+      replacement: *name

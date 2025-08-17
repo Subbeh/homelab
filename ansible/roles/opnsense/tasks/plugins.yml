@@ -1,0 +1,12 @@
+---
+- name: Pull updates
+  ansibleguy.opnsense.system:
+    action: 'update'
+
+- name: Install plugins
+  tags: plugins
+  ansibleguy.opnsense.package:
+    name: "{{ item }}"
+    action: install
+  loop: "{{ plugins }}"
+

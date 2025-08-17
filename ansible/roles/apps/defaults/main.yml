@@ -1,0 +1,13 @@
+---
+# List of apps to install
+apps: []
+
+# Optional: Tailscale auth key for automatic authentication
+# tailscale_authkey: "tskey-xxxxx" 
+
+# Default Vault secret engines to enable
+vault_default_secret_engines:
+  - path: secret
+    type: kv-v2
+    description: "KV Secrets Engine - v2"
+

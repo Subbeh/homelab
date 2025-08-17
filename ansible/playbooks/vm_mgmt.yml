@@ -1,0 +1,48 @@
+---
+- name: Provision management VM
+  hosts: pve-fw
+  gather_facts: true
+  tags: ["provision"]
+
+  vars:
+    pve_tasks: [create_vm]
+    vm_id: 1002
+    vm_name: mgmt
+    vm_template: debian-12-template
+    vm_ipconfig:
+      ipconfig0: "ip={{ hostvars[vm_name].ip_addr }},gw={{ hostvars[vm_name].ip_addr | ansible.utils.nthhost(1) }}"
+      ipconfig1: "ip=192.168.100.110/24,gw=192.168.100.1"
+
+  roles:
+    - role: pve
+      vars:
+        pve_tasks:
+          - create_vm
+          - start
+
+- name: Configure management VM
+  hosts: mgmt
+  gather_facts: true
+  tags: ["configure"]
+
+  vars:
+    common_tasks:
+      - update
+      - packages
+      - hostname
+      - ssh
+      - profile
+    apps:
+      - docker
+      - borg
+    services:
+      - unifi_db
+      - unifi_network_application
+    borgbase_repo_name: mgmt
+    borg_source_directories:
+      - "/opt/data"
+
+  roles:
+    - {role: common, tags: common}
+    - {role: apps, tags: apps}
+    - {role: services, tags: services}

@@ -1,0 +1,41 @@
+[DEFAULT]
+# Ban hosts for 1 hour
+bantime  = 1h
+# Retain IP addresses in database for 24 hours
+findtime  = 24h
+# 5 retries triggers a ban
+maxretry = 5
+# Use systemd journal
+backend = systemd
+
+# Email settings (optional, uncomment and set your email to enable)
+#destemail = your-email@example.com
+#sender = fail2ban@{{ ansible_hostname }}
+#action = %(action_mwl)s
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = %(sshd_log)s
+# More aggressive settings for SSH
+bantime = 24h
+maxretry = 3
+findtime = 1h
+
+[sshd-ddos]
+enabled = true
+port = ssh
+filter = sshd-ddos
+logpath = %(sshd_log)s
+maxretry = 2
+findtime = 1h
+
+[recidive]
+enabled = true
+filter = recidive
+logpath = /var/log/fail2ban.log
+action = %(action_mwl)s
+bantime = 1w
+findtime = 1d
+maxretry = 5 

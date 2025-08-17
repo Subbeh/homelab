@@ -1,0 +1,8 @@
+---
+- name: Enable powersave mode
+  ansible.builtin.cron:
+    name: "enable powersave mode"
+    special_time: reboot
+    job: 'echo "conservative" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
+    user: root
+    cron_file: powersave

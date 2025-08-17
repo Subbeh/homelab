@@ -1,0 +1,43 @@
+---
+# Areas
+- name: area/docs
+  color: "#afffaf"
+- name: area/github
+  color: "#afffaf"
+- name: area/kubernetes
+  color: "#afffaf"
+- name: area/ansible
+  color: "#afffaf"
+- name: area/terraform
+  color: "#afffaf"
+- name: area/renovate
+  color: "#afffaf"
+- name: area/taskfile
+  color: "#afffaf"
+# Renovate Types
+- name: renovate/container
+  color: "#87d7ff"
+- name: renovate/github-action
+  color: "#87d7ff"
+- name: renovate/grafana-dashboard
+  color: "#87d7ff"
+- name: renovate/github-release
+  color: "#87d7ff"
+- name: renovate/helm
+  color: "#87d7ff"
+- name: renovate/terraform
+  color: "#87d7ff"
+# Semantic Types
+- name: type/digest
+  color: "#d7d7af"
+- name: type/patch
+  color: "#d7d7af"
+- name: type/minor
+  color: "#fab387"
+- name: type/major
+  color: "#d75f5f"
+# Uncategorized
+- name: community
+  color: "#d7afd7"
+- name: hold
+  color: "#ff5f5f"

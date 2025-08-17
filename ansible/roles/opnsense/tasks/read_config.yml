@@ -1,0 +1,27 @@
+---
+- name: Read config file
+  ansible.builtin.slurp:
+    src: /conf/config.xml
+  register: config_file_content
+  delegate_to: "{{ inventory_hostname }}"
+  connection: ssh
+  no_log: true
+  vars:
+    ansible_shell_executable: /bin/sh
+
+- name: Parse XML config into variable
+  ansible.builtin.set_fact:
+    opnsense_config: "{{ config_file_content['content'] | b64decode | ansible.utils.from_xml | from_json | community.general.json_query('opnsense') }}"
+  no_log: true
+
+- name: Create interface name to device mapping
+  set_fact:
+    interface_mapping: "{{ interface_mapping | default({}) | combine({opnsense_config.interfaces[item].descr: item}) }}"
+  loop: "{{ opnsense_config.interfaces.keys() | list }}"
+  when: opnsense_config.interfaces[item].descr is defined
+  no_log: true
+
+- name: Debug interface mapping
+  debug:
+    var: interface_mapping
+    verbosity: 1

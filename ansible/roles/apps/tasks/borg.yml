@@ -1,0 +1,158 @@
+---
+- name: Create borgmatic directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0750'
+    owner: root
+    group: root
+  loop:
+    - /etc/borgmatic
+    - /root/.ssh
+  become: true
+
+- name: Check if SSH key exists locally
+  ansible.builtin.stat:
+    path: /root/.ssh/borgbase
+  register: local_key
+
+- name: Generate new SSH key
+  community.crypto.openssh_keypair:
+    path: /root/.ssh/borgbase
+    type: ed25519
+  become: true
+  when: not local_key.stat.exists
+
+- name: Read key from file
+  ansible.builtin.slurp:
+    src: /root/.ssh/borgbase.pub
+  register: ssh_key
+  check_mode: true
+
+- name: Get list of existing BorgBase SSH keys
+  ansible.builtin.uri:
+    url: "https://api.borgbase.com/graphql"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer {{ borgbase_api_key }}"
+    body_format: json
+    body: |
+      {
+        "query": "{ sshList {id, name}}"
+      }
+  register: existing_keys
+
+- name: Find existing repository key
+  ansible.builtin.set_fact:
+    borgbase_key_org: "{{ existing_keys.json.data.sshList | selectattr('name', 'equalto', borgbase_repo_name) | list | default([]) }}"
+
+- name: Fail if new key was generated and key exists in BorgBase
+  ansible.builtin.fail:
+    msg: "SSH key '{{ borgbase_repo_name }}' already exists in BorgBase. Please delete it manually from the web UI before running this playbook."
+  when:
+    - not local_key.stat.exists
+    - borgbase_key_org | length > 0
+
+- name: Create SSH key in BorgBase if it doesn't exist
+  adhawkins.borgbase.borgbase_ssh:
+    apikey: "{{ borgbase_api_key }}"
+    name: "{{ borgbase_repo_name }}"
+    key: "{{ ssh_key['content'] | b64decode }}"
+  register: borgbase_key
+  when: borgbase_key_org | length == 0
+
+- name: Set key ID from existing key
+  ansible.builtin.set_fact:
+    borgbase_key: {"key_id": "{{ borgbase_key_org[0].id }}"}
+  when: borgbase_key_org | length > 0
+
+- name: Find admin key ID
+  ansible.builtin.set_fact:
+    admin_key_id: "{{ existing_keys.json.data.sshList | selectattr('name', 'equalto', 'borg@infra') | map(attribute='id') | first }}"
+
+- name: Create Borgbase repository
+  adhawkins.borgbase.borgbase_repo:
+    state: present
+    apikey: "{{ borgbase_api_key }}"
+    name: "{{ borgbase_repo_name }}"
+    full_access_keys: ["{{ borgbase_key.key_id }}", "{{ admin_key_id }}"]
+    quota_enabled: false
+    alert_days: 1
+  register: borgbase_repo
+
+- name: Set borgbase repo path
+  set_fact:
+    borgbase_repo: "{{ borgbase_repo.repo_id }}@{{ borgbase_repo.repo_id }}.repo.borgbase.com"
+
+- name: Install required packages
+  ansible.builtin.package:
+    name:
+      - borgbackup
+      - borgmatic
+    state: present
+  become: true
+
+- name: Configure borgmatic
+  ansible.builtin.template:
+    src: borgmatic/config.yaml.j2
+    dest: /etc/borgmatic/config.yaml
+    mode: '0600'
+    owner: root
+    group: root
+  become: true
+  vars:
+    retention:
+      keep_daily: "{{ backup_retention_daily | default(7) }}"
+      keep_weekly: "{{ backup_retention_weekly | default(4) }}"
+      keep_monthly: "{{ backup_retention_monthly | default(6) }}"
+
+- name: Create borgmatic systemd timer
+  ansible.builtin.template:
+    src: borgmatic/borgmatic.timer.j2
+    dest: /etc/systemd/system/borgmatic.timer
+    mode: '0644'
+  become: true
+  notify: Restart borgmatic timer
+
+- name: Create borgmatic systemd service
+  ansible.builtin.template:
+    src: borgmatic/borgmatic.service.j2
+    dest: /etc/systemd/system/borgmatic.service
+    mode: '0644'
+  become: true
+  notify: Restart borgmatic timer
+
+- name: Create SSH config for BorgBase
+  ansible.builtin.copy:
+    dest: "/root/.ssh/config"
+    content: |
+      Host *.repo.borgbase.com
+          StrictHostKeyChecking no
+          UserKnownHostsFile /dev/null
+          IdentityFile /root/.ssh/borgbase
+    owner: root
+    group: root
+    mode: "0600"
+  become: true
+
+- name: Set SSH key permissions
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: "0400"
+  loop:
+    - /root/.ssh/borgbase
+    - /root/.ssh/borgbase.pub
+  become: true
+
+- name: Initialize Borg repository
+  ansible.builtin.command: "borg init -e repokey-blake2 ssh://{{ borgbase_repo }}/./repo"
+  become: true
+  environment:
+    BORG_PASSPHRASE: "{{ borg_encryption_passphrase }}"
+    BORG_RSH: "ssh -i /root/.ssh/borgbase"
+  register: init_result
+  failed_when: init_result.rc != 0 and 'repository already exists' not in init_result.stderr
+  changed_when: "'repository already exists' not in init_result.stderr"

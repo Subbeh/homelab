@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+vars:
+  K8S_DIR: "{{.ROOT_DIR}}/k8s"
+  TERRAFORM_DIR: "{{.ROOT_DIR}}/terraform"
+  ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
+  SECRET_DIR: "{{.ROOT_DIR}}/.secret"
+  ANSIBLE_PLAYBOOK_DIR: "{{.ANSIBLE_DIR}}/playbooks"
+  TALOS_DIR: "{{.ROOT_DIR}}/k8s/talos"
+  DEPS_OS: talosctl talhelper minijinja-cli-bin krew
+
+includes:
+  init: .taskfiles/init.yml
+  ansible:
+    taskfile: .taskfiles/ansible.yml
+    aliases: [a]
+    dir: "{{.ANSIBLE_DIR}}"
+  k8s:
+    taskfile: .taskfiles/k8s
+    dir: "{{.K8S_DIR}}"
+
+tasks:
+  default:
+    desc: List tasks
+    cmds:
+      - task --list-all

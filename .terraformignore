@@ -1,0 +1,15 @@
+# First ignore everything
+*
+
+# Then include only terraform directory
+!terraform/
+
+# Ignore terraform cache and provider directories
+**/.terraform/
+**/.terraform.lock.hcl
+.terraform.d/
+.cache/
+
+# Ignore state files
+*.tfstate
+*.tfstate.*

@@ -1,0 +1,68 @@
+---
+- name: Add Syncthing repository key
+  apt_key:
+    url: https://syncthing.net/release-key.gpg
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Add Syncthing repository
+  apt_repository:
+    repo: deb https://apt.syncthing.net/ syncthing stable
+    state: present
+    filename: syncthing
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Install Syncthing
+  apt:
+    name: syncthing
+    state: present
+    update_cache: true
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Create Syncthing config directory
+  file:
+    path: "/home/{{ ansible_user }}/.config/syncthing"
+    state: directory
+    mode: "0700"
+  become: false
+
+- name: Install Syncthing config
+  template:
+    src: syncthing/config.xml.j2
+    dest: "/home/{{ ansible_user }}/.config/syncthing/config.xml"
+    mode: "0600"
+  become: false
+  register: syncthing_config
+
+- name: Create Syncthing systemd user service directory
+  file:
+    path: "/home/{{ ansible_user }}/.config/systemd/user"
+    state: directory
+    mode: "0755"
+  become: false
+
+- name: Install Syncthing systemd user service
+  template:
+    src: syncthing/syncthing.service.j2
+    dest: "/home/{{ ansible_user }}/.config/systemd/user/syncthing.service"
+    mode: "0644"
+  become: false
+  register: syncthing_service
+
+- name: Enable lingering for user
+  ansible.builtin.command:
+    cmd: "loginctl enable-linger {{ ansible_user }}"
+  become: true
+  changed_when: false
+
+- name: Enable and start Syncthing service for user
+  systemd:
+    name: syncthing.service
+    enabled: true
+    state: restarted
+    scope: user
+    daemon_reload: "{{ syncthing_service.changed }}"
+  become: false

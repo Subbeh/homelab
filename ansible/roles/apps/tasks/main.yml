@@ -1,0 +1,50 @@
+---
+- name: Install and configure Tailscale
+  ansible.builtin.import_tasks: tailscale.yml
+  when: "'tailscale' in apps or 'tailscale' in ansible_run_tags"
+  tags:
+    - apps
+    - tailscale
+
+- name: Install and configure fail2ban
+  ansible.builtin.import_tasks: fail2ban.yml
+  when: "'fail2ban' in apps or 'fail2ban' in ansible_run_tags"
+  tags:
+    - apps
+    - fail2ban
+
+- name: Install and configure Syncthing
+  ansible.builtin.import_tasks: syncthing.yml
+  when: "'syncthing' in apps or 'syncthing' in ansible_run_tags"
+  tags:
+    - apps
+    - syncthing
+
+- name: Install and configure HashiCorp Vault
+  ansible.builtin.import_tasks: vault.yml
+  when: "'vault' in apps or 'vault' in ansible_run_tags"
+  tags:
+    - apps
+    - vault
+
+- name: Install and configure Borg Backup
+  ansible.builtin.import_tasks: borg.yml
+  when: "'borg' in apps or 'borg' in ansible_run_tags"
+  tags:
+    - apps
+    - borg
+
+- name: Install Docker
+  ansible.builtin.import_tasks: docker.yml
+  when: "'docker' in apps or 'docker' in ansible_run_tags"
+  tags:
+    - apps
+    - docker
+
+- name: Install node exporter
+  ansible.builtin.import_tasks: node_exporter.yml
+  when: "'node_exporter' in apps or 'node_exporter' in ansible_run_tags"
+  tags:
+    - apps
+    - node_exporter
+

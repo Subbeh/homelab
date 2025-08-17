@@ -1,0 +1,60 @@
+---
+- name: Install base packages
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
+    state: present
+  become: true
+
+- name: Add apt signing keys
+  ansible.builtin.apt_key:
+    keyserver: "{{ item.key_server | default(omit) }}"
+    id: "{{ item.key_id | default(omit) }}"
+    url: "{{ item.key_url | default(omit) }}"
+    data: "{{ item.key_data | default(omit) }}"
+    file: "{{ item.key_file | default(omit) }}"
+    keyring: "{{ item.key_ring | default(omit) }}"
+    state: present
+  when:
+    - apt_repositories is defined and apt_repositories | length > 0
+    - item.dearmor is not defined or item.dearmor is false
+    - item.key_id is defined or item.key_url is defined or item.key_data is defined
+  loop: "{{ apt_repositories }}"
+  become: true
+
+- name: Add apt signing keys (dearmor)
+  ansible.builtin.shell: |
+    set -eo pipefail
+    curl -fsSL {{ item.key_url }} | gpg --dearmor -o {{ item.key_ring }}
+  args:
+    creates: "{{ item.key_ring }}"
+  when:
+    - apt_repositories is defined and apt_repositories | length > 0
+    - item.dearmor is defined and item.dearmor is true
+  loop: "{{ apt_repositories }}"
+  become: true
+
+- name: Add specified repositories into sources list
+  ansible.builtin.apt_repository:
+    repo: "{{ item.repo }}"
+    filename: "{{ item.filename | default(omit) }}"
+    codename: "{{ item.codename | default(omit) }}"
+    state: present
+  loop: "{{ apt_repositories }}"
+  become: true
+  when: apt_repositories is defined and apt_repositories | length > 0
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+
+- name: Install host packages
+  ansible.builtin.apt:
+    name: "{{ item.name | default(omit) }}"
+    deb: "{{ item.deb | default(omit) }}"
+    default_release: "{{ item.default_release | default(omit) }}"
+    install_recommends: "{{ item.install_recommends | default(false) }}"
+    allow_unauthenticated: "{{ item.allow_unauthenticated | default(omit) }}"
+    state: present
+  become: true
+  loop: "{{ host_packages | default([]) }}"

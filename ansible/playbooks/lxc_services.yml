@@ -1,0 +1,77 @@
+---
+- name: Provision services LXC
+  hosts: pve-nas
+  gather_facts: true
+  tags: ["provision"]
+
+  vars:
+    pve_tasks:
+      - create_lxc
+      - start
+    pve_lxc:
+      os:
+        type: debian
+        version: 12
+      config:
+        vmid: 1020
+        hostname: services
+        memory: 4096
+        cpus: 2
+        disk: "local-lvm:20"
+        netif:
+          net0: "name=eth0,ip={{ hostvars['services'].ip_addr }},gw={{ hostvars['services'].ip_addr | ansible.utils.nthhost(1) }},bridge=vmbr0"
+          net1: "name=eth1,ip=192.168.80.101/24,bridge=vmbr1"
+        features:
+          - nesting=1
+        mounts:
+          mp0: "/data/nvme/app_data/services,mp=/opt/data"
+          mp1: "/data/hdd1/media,mp=/data/media"
+
+  pre_tasks:
+    - name: Ensure data directory exists
+      ansible.builtin.file:
+        path: /data/nvme/app_data/services
+        state: directory
+        owner: 100000
+        group: 100000
+        mode: 0755
+
+  roles:
+    - role: pve
+
+- name: Configure services LXC
+  hosts: services
+  gather_facts: false
+  tags: ["configure"]
+
+  vars:
+    common_tasks:
+      - update
+      - packages
+      - hostname
+      - user
+      - ssh
+      - profile
+    apps:
+      - docker
+      - borg
+    services:
+      - netbootxyz
+
+    borgbase_repo_name: services
+    borg_source_directories:
+      - "/opt/data"
+
+  pre_tasks:
+    - name: Connection test
+      tags: always
+      block:
+        - name: Include connection testing
+          ansible.builtin.include_tasks: ../tasks/auth.yml
+        - name: Gather facts
+          ansible.builtin.setup:
+
+  roles:
+    - {role: common, tags: common}
+    - {role: apps, tags: apps}
+    - {role: services, tags: services}

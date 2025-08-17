@@ -1,0 +1,28 @@
+---
+- name: Add SSH public key to authorized_keys
+  ansible.posix.authorized_key:
+    user: "{{ common_user if 'user' in common_tasks else ansible_user }}"
+    state: present
+    key: "{{ common_pub_key }}"
+
+- name: Secure SSH configuration
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop: "{{ ssh_config_settings }}"
+  become: true
+  notify: restart sshd
+
+- name: Ensure strong SSH key exchange, ciphers, and MACs are used
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    block: "{{ ssh_crypto_settings }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - SSH SECURITY SETTINGS"
+  become: true
+  notify: restart sshd
+
+- name: Include connection testing
+  ansible.builtin.include_tasks: "{{ ansible_root }}/tasks/auth.yml"
+

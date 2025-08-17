@@ -1,0 +1,49 @@
+---
+- name: Set PVE facts
+  ansible.builtin.set_fact:
+    lxc_config: "{{ pve_lxc_defaults | ansible.builtin.combine(pve_lxc.config, list_merge='append_rp', recursive=true) }}"
+
+- name: Get latest OS template filename
+  ansible.builtin.shell: |
+    set -eo pipefail
+    pveam available | awk -v os={{ pve_lxc.os.type }}-{{ pve_lxc.os.version }}-standard '$0 ~ os { print $2; i=1 } i { exit }'
+  register: pveam_template
+  failed_when: pveam_template.stdout == ''
+  changed_when: false
+
+- name: Download OS template
+  ansible.builtin.command: pveam download local {{ pveam_template.stdout }}
+  register: pveam_download
+  changed_when: "'no need to download' not in pveam_download.stdout"
+
+- name: Set PVE facts
+  ansible.builtin.set_fact:
+    lxc_config: "{{ lxc_config | ansible.builtin.combine({'ostemplate': 'local:vztmpl/' + pveam_template.stdout}) }}"
+
+- name: Debug LXC config
+  ansible.builtin.debug:
+    var: lxc_config
+
+- name: Create LXC container
+  community.proxmox.proxmox: "{{ lxc_config }}"
+
+- name: Add custom LXC security configuration for NFS
+  ansible.builtin.blockinfile:
+    path: /etc/pve/lxc/{{ lxc_config.vmid }}.conf
+    block: |
+      {{ pve_lxc_exta_config }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - NFS Security"
+  when: pve_lxc_exta_config is defined and pve_lxc_exta_config != ''
+
+# - name: Create initial snapshot
+#   community.general.proxmox_snap:
+#     api_host: "{{ ansible_host }}"
+#     api_user: "{{ pve_api_user }}"
+#     api_token_id: "{{ pve_api_token_name }}"
+#     api_token_secret: "{{ pve_token_secret }}"
+#     validate_certs: false
+#     vmid: "{{ lxc_id }}"
+#     snapname: "init-lxc"
+#     description: "Initial LXC snapshot after creation"
+#     state: present
+#   when: lxc_creation is defined and lxc_creation.changed

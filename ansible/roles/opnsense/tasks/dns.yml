@@ -1,0 +1,48 @@
+---
+- name: Enable and set up Unbound
+  ansibleguy.opnsense.unbound_general: "{{ dns.unbound }}"
+
+- name: Enable DNS-over-TLS
+  ansibleguy.opnsense.unbound_dot: "{{ item }}"
+  loop: "{{ dns.unbound_dot }}"
+
+- name: Add hostname overrides
+  ansibleguy.opnsense.unbound_host:
+    hostname: "{{ item }}"
+    domain: "{{ net_domain_loc }}"
+    value: "{{ hostvars[item].ip_addr | ansible.utils.ipaddr('address') }}"
+    match_fields: ['hostname']
+    reload: false
+  when:
+    - hostvars[item].ip_addr is defined
+  loop: "{{ groups['all'] }}"
+
+- name: Add manual host overrides
+  ansibleguy.opnsense.unbound_host:
+    hostname: "{{ item.hostname }}"
+    domain: "{{ item.domain }}"
+    value: "{{ item.ip }}"
+    description: "{{ item.description | default('') }}"
+    match_fields: ['hostname']
+    reload: false
+  loop: "{{ dns.host_overrides | default([]) }}"
+
+- name: Add domain overrides
+  ansibleguy.opnsense.unbound_domain:
+    domain: "{{ item.domain }}"
+    server: "{{ item.server }}"
+    description: "{{ item.description | default('') }}"
+    match_fields: ['domain']
+    reload: false
+  loop: "{{ dns.domain_overrides | default([]) }}"
+
+- name: Add query forwarding
+  ansibleguy.opnsense.unbound_forward:
+    domain: "{{ item.domain }}"
+    target: "{{ item.target }}"
+    reload: false
+  loop: "{{ dns.query_forwarding | default([]) }}"
+
+- name: Reloading host overrides
+  ansibleguy.opnsense.reload:
+    target: unbound

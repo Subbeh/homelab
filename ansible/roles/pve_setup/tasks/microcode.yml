@@ -1,0 +1,68 @@
+---
+- name: Get current microcode revision
+  ansible.builtin.shell: "journalctl -k | grep -i 'microcode: Current revision:' | grep -oP 'Current revision: \\K0x[0-9a-f]+'"
+  register: current_microcode
+  changed_when: false
+  failed_when: false
+
+- name: Install Intel microcode
+  when: ansible_facts['processor'][1] is search('Intel')
+  block:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Intel microcode tools
+      ansible.builtin.apt:
+        name: iucode-tool
+        state: present
+        update_cache: false
+
+    - name: Get latest Intel microcode package name
+      ansible.builtin.uri:
+        url: https://ftp.debian.org/debian/pool/non-free-firmware/i/intel-microcode/
+        return_content: true
+      register: intel_microcode_page
+
+    - name: Set Intel microcode package name
+      ansible.builtin.set_fact:
+        microcode_package: "{{ intel_microcode_page.content | regex_findall('href=\"([^\"]*amd64.deb)\"') | map('regex_replace', 'href=\"', '') | map('regex_replace', '\"', '') | sort | last }}"
+        microcode_url: "http://ftp.debian.org/debian/pool/non-free-firmware/i/intel-microcode/"
+
+- name: Get AMD microcode
+  when: ansible_facts['processor'][1] is search('AMD')
+  block:
+    - name: Get latest AMD microcode package name
+      ansible.builtin.uri:
+        url: https://ftp.debian.org/debian/pool/non-free-firmware/a/amd64-microcode/
+        return_content: true
+      register: amd_microcode_page
+
+    - name: Set AMD microcode package name
+      ansible.builtin.set_fact:
+        microcode_package: "{{ amd_microcode_page.content | regex_findall('href=\"([^\"]*amd64.deb)\"') | map('regex_replace', 'href=\"', '') | map('regex_replace', '\"', '') | sort | last }}"
+        microcode_url: "https://ftp.debian.org/debian/pool/non-free-firmware/a/amd64-microcode/"
+
+- name: Install microcode package
+  when: ansible_facts['processor'][1] is search('Intel|AMD')
+  block:
+    - name: Download microcode package
+      ansible.builtin.get_url:
+        url: "{{ microcode_url }}{{ microcode_package }}"
+        dest: "/tmp/{{ microcode_package }}"
+
+    - name: Install microcode package
+      ansible.builtin.apt:
+        deb: "/tmp/{{ microcode_package }}"
+      register: microcode_install
+
+    - name: Clean up downloaded package
+      ansible.builtin.file:
+        path: "/tmp/{{ microcode_package }}"
+        state: absent
+
+    - name: Check if reboot is needed
+      ansible.builtin.debug:
+        msg: "Microcode updated. A system reboot is required to apply the changes."
+      when: microcode_install.changed 

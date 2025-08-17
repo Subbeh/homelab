@@ -1,0 +1,9 @@
+---
+- name: Update all hosts
+  hosts: all
+  become: true
+  tasks:
+    - name: Include update tasks from common role
+      ansible.builtin.include_tasks:
+        file: ../roles/common/tasks/update.yml
+

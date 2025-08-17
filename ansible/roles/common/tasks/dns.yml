@@ -1,0 +1,30 @@
+---
+- name: Ensure systemd-resolved is enabled and started
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    enabled: true
+    state: started
+  become: true
+
+- name: Configure DNS in systemd-resolved.conf
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/resolved.conf
+    regexp: '^#?DNS='
+    line: "DNS={{ ansible_default_ipv4.gateway }}"
+    backup: true
+  become: true
+  notify: restart systemd-resolved
+
+- name: Set DNS server using resolvectl (runtime configuration)
+  ansible.builtin.command:
+    cmd: "resolvectl dns {{ ansible_default_ipv4.interface }} {{ ansible_default_ipv4.gateway }}"
+  become: true
+  changed_when: false
+
+- name: Ensure /etc/resolv.conf is symlinked to systemd-resolved stub
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+  become: true

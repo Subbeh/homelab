@@ -1,0 +1,29 @@
+location:
+    source_directories:
+        {{ (borg_source_directories | default([])) | to_nice_yaml | indent(8) }}
+    repositories:
+        - ssh://{{ borgbase_repo }}/./repo
+    exclude_patterns:
+        - '*.pyc'
+        - '*.tmp'
+        - '*/.cache'
+        - '*/node_modules'
+        - '/home/*/.local/share/Trash'
+
+storage:
+    encryption_passphrase: "{{ borg_encryption_passphrase }}"
+    ssh_command: ssh -i /root/.ssh/borgbase
+    borg_base_directory: /var/lib/borgmatic
+    archive_name_format: '{hostname}-{now:%Y-%m-%d-%H%M%S}'
+
+retention:
+    keep_daily: {{ retention.keep_daily }}
+    keep_weekly: {{ retention.keep_weekly }}
+    keep_monthly: {{ retention.keep_monthly }}
+
+consistency:
+    checks:
+        - repository
+        - archives
+    check_last: 3
+    prefix: '{hostname}-' 

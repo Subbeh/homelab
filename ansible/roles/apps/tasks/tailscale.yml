@@ -1,0 +1,90 @@
+---
+- name: Check Tailscale status
+  ansible.builtin.command:
+    cmd: tailscale status
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
+  ignore_errors: true
+  become: true
+
+- name: Check if Tailscale is installed and running
+  ansible.builtin.command:
+    cmd: tailscale status --json
+  register: tailscale_json_status
+  changed_when: false
+  failed_when: false
+  ignore_errors: true
+  become: true
+  when: tailscale_status.rc == 0
+
+- name: Set fact for Tailscale installation needed
+  ansible.builtin.set_fact:
+    needs_tailscale: >-
+      {{
+        tailscale_status.rc != 0 or
+        (tailscale_json_status.rc == 0 and
+         (tailscale_json_status.stdout | from_json).BackendState != 'Running')
+      }}
+
+- name: Prompt for Tailscale authkey
+  ansible.builtin.pause:
+    prompt: "Enter your Tailscale authkey"
+    echo: false
+  register: tailscale_key_prompt
+  when: (needs_tailscale | default(true) or 'tailscale' in ansible_run_tags) and tailscale_auth_key is not defined
+
+- name: Set Tailscale authkey
+  ansible.builtin.set_fact:
+    tailscale_authkey: "{{ tailscale_key_prompt.user_input | default(omit) }}"
+  when: (needs_tailscale | default(true) or 'tailscale' in ansible_run_tags) and tailscale_key_prompt.user_input is defined
+
+- name: Install and configure Tailscale
+  when: needs_tailscale | default(true) or 'tailscale' in ansible_run_tags
+  block:
+    - name: Install Tailscale (Debian)
+      when: ansible_os_family == "Debian"
+      block:
+        - name: Add Tailscale repository signing key
+          ansible.builtin.apt_key:
+            url: https://pkgs.tailscale.com/stable/debian/bullseye.noarmor.gpg
+            state: present
+          become: true
+
+        - name: Add Tailscale repository
+          ansible.builtin.apt_repository:
+            repo: deb https://pkgs.tailscale.com/stable/debian bullseye main
+            state: present
+            filename: tailscale
+          become: true
+
+        - name: Install Tailscale
+          ansible.builtin.apt:
+            name: tailscale
+            state: present
+            update_cache: true
+          become: true
+
+    - name: Install Tailscale (PiKVM)
+      community.general.pacman:
+        name: tailscale-pikvm
+        state: present
+      when: inventory_hostname == "pikvm"
+
+    - name: Start and enable Tailscale service
+      ansible.builtin.systemd:
+        name: tailscaled
+        state: started
+        enabled: true
+      become: true
+      no_log: true
+
+    - name: Connect to Tailscale network
+      ansible.builtin.command:
+        cmd: >-
+          tailscale up --accept-routes {{ '--authkey=' + tailscale_authkey }} {{ '--hostname=' + tailscale_hostname }} {{ '--advertise-exit-node' if tailscale_exit_node | default(false) | bool else '' }}
+      become: true
+      register: tailscale_up
+      changed_when: "'Success' in tailscale_up.stdout"
+      failed_when: tailscale_up.rc != 0 and 'already running' not in tailscale_up.stderr
+      # no_log: true

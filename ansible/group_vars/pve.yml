@@ -1,0 +1,68 @@
+---
+# API user for Proxmox
+pve_api_user: "iac-prov@pve"
+pve_api_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  31313862303332333632663830393238323465616464336366396239643436393639346630353663
+  6438663539646334343930396431646430653437353838330a396565396462363136666235653735
+  31363666303761626563616231386437366139323763366334636166643535323834306633363662
+  3832653166356263310a313938353138313865646135663361356638373863326339653264663332
+  31356632643865393531353333633637663465646137623538653530316239393839
+pve_root_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  36356661363338363161666338643139323266336330303636643461663730356263323139326630
+  6635363237646534303134313538326464353333363033350a393731323536383230633731623332
+  34616162323232316365643861363464353134646339353630303939646233636565313761386463
+  3430306562636133300a613236323030366632613232356365396631386162326561333061333238
+  3435
+pve_api_role: "IaCProv"
+pve_api_role_privs:
+  - Datastore.AllocateSpace
+  - Datastore.AllocateTemplate
+  - Datastore.Audit
+  - Pool.Allocate
+  - Sys.Audit
+  - Sys.Console
+  - Sys.Modify
+  - VM.Allocate
+  - VM.Audit
+  - VM.Clone
+  - VM.Config.CDROM
+  - VM.Config.Cloudinit
+  - VM.Config.CPU
+  - VM.Config.Disk
+  - VM.Config.HWType
+  - VM.Config.Memory
+  - VM.Config.Network
+  - VM.Config.Options
+  - VM.Migrate
+  - VM.Monitor
+  - VM.PowerMgmt
+  - VM.Snapshot
+  - SDN.Use
+
+pve_lxc_defaults:
+  # Connection parameters
+  api_host: "{{ ansible_host }}"
+  api_user: "root@pam"
+  api_password: "{{ pve_root_password }}"
+  validate_certs: false
+
+  # Basic LXC settings
+  ostype: "debian"
+  node: "{{ inventory_hostname_short }}"
+  password: "{{ common_password }}"
+  pubkey: "{{ common_pub_key }}"
+  timezone: "{{ common_timezone }}"
+
+  # Hardware configuration
+  memory: 2048
+  cores: 1
+
+  # Unprivileged container settings
+  unprivileged: 1
+
+  # Startup and creation state
+  onboot: true
+  state: present
+

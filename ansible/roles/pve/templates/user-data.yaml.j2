@@ -1,0 +1,35 @@
+#cloud-config
+
+# Creation of the user account and associated SSH keys
+user: {{ common_user }}
+password: {{ common_password | string | password_hash('sha512') }}
+ssh_authorized_keys:
+  - {{ common_pub_key }}
+chpasswd:
+  expire: False
+users:
+  - name: {{ common_user }}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: users, wheel
+    shell: /bin/bash
+
+# Place distro specific packages here
+packages:
+  - qemu-guest-agent
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+# misc
+timezone: {{ common_timezone }}
+
+# Ensures qemu-guest-agent is enabled and started. Note that if you have 
+# "package_reboot_if_required" set to "true" and you are installing
+# something like linux-generic-hwe-22.04, this will cause the system 
+# to reboot. Consequently, the command "systemctl start --no-block
+# qemu-guest-agent.service" is not strictly necessary.
+runcmd:
+  - [ systemctl, daemon-reload ]
+  - [ systemctl, enable, qemu-guest-agent.service ]
+  - [ systemctl, start, --no-block, qemu-guest-agent.service ]
+

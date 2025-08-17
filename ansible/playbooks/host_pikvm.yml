@@ -1,0 +1,91 @@
+---
+- hosts: pikvm
+  gather_facts: false
+
+  vars:
+    common_tasks:
+      - ssh
+      - update
+    apps:
+      - tailscale
+    tailscale_hostname: pikvm
+    ssh_config_settings:
+      - {regexp: "^#?PasswordAuthentication", line: "PasswordAuthentication yes"}
+      - {regexp: "^#?PermitRootLogin", line: "PermitRootLogin yes"}
+      - {regexp: "^#?PubkeyAuthentication", line: "PubkeyAuthentication yes"}
+      - {regexp: "^#?PermitEmptyPasswords", line: "PermitEmptyPasswords no"}
+      - {regexp: "^#?X11Forwarding", line: "X11Forwarding no"}
+      - {regexp: "^#?MaxAuthTries", line: "MaxAuthTries 3"}
+      - {regexp: "^#?ClientAliveInterval", line: "ClientAliveInterval 300"}
+      - {regexp: "^#?ClientAliveCountMax", line: "ClientAliveCountMax 2"}
+      - {regexp: "^#?Protocol", line: "Protocol 2",}
+
+  pre_tasks:
+    - name: Import authentication tasks
+      tags: auth
+      ansible.builtin.import_tasks: ../tasks/auth.yml
+
+    - name: Gather facts
+      tags: always
+      setup:
+
+    - name: Enable Read-Write mode
+      tags: always
+      ansible.builtin.command: rw
+      changed_when: false
+
+    - name: Optimize mirrorlist
+      tags: update
+      ansible.builtin.command: |
+        sed -i.bak 's/^Server/# &/;s/# \(.*jp.mirror\)/\1/' /etc/pacman.d/mirrorlist
+
+  roles:
+    - {role: common, tags: common}
+    - {role: apps, tags: apps,}
+
+  tasks:
+    - name: Change root password if it's still default
+      tags: auth
+      ansible.builtin.user:
+        name: root
+        update_password: always
+        password: "{{ common_password | string | password_hash('sha512') }}"
+      when: ansible_password == 'root'
+      register: password_change
+
+    - name: Update ansible_password after password change
+      tags: auth
+      set_fact:
+        ansible_password: "{{ common_password }}"
+      when: password_change.changed
+      no_log: true
+
+    - name: Change admin password
+      tags: auth
+      ansible.builtin.copy:
+        content: "admin:{{ pikvm_admin_password | string | password_hash('bcrypt') }}"
+        dest: /etc/kvmd/htpasswd
+        mode: '0600'
+      no_log: true
+
+    - name: Set up Wifi Acccess Point
+      tags: ap
+      block:
+        - name: Copy AP script to /etc/hotspot
+          ansible.builtin.template:
+            src: "{{ ansible_root }}/templates/pikvm_hotspot.j2"
+            dest: /etc/hotspot
+            mode: "0700"
+
+        - name: Run AP script
+          ansible.builtin.command: /etc/hotspot -f
+
+  post_tasks:
+    - name: Return to Read-Only mode
+      tags: always
+      ansible.builtin.command: ro
+      changed_when: false
+
+  handlers:
+    - name: Import handlers
+      ansible.builtin.import_tasks: ../handlers/main.yml

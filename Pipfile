@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pre-commit = "*"
+infisical-python = "*"
+netaddr = "*"
+passlib = "*"
+bcrypt = "*"
+proxmoxer = "*"
+requests = "*"
+aws-sso-util = "*"
+hvac = "*"
+httpx = "*"
+go-task-bin = "*"
+lxml = "*"
+xmltodict = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"

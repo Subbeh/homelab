@@ -1,0 +1,58 @@
+---
+- name: Import update tasks
+  ansible.builtin.import_tasks: update.yml
+  when: "'update' in common_tasks"
+  tags:
+    - common
+    - update
+
+- name: Import package tasks
+  ansible.builtin.import_tasks: packages.yml
+  when: "'packages' in common_tasks"
+  tags:
+    - common
+    - packages
+
+- name: Configure hostname
+  ansible.builtin.import_tasks: hostname.yml
+  when: "'hostname' in common_tasks"
+  tags:
+    - common
+    - hostname
+
+- name: Configure DNS
+  ansible.builtin.import_tasks: dns.yml
+  when: "'dns' in common_tasks"
+  tags:
+    - common
+    - dns
+
+- name: Configure administrator user
+  ansible.builtin.import_tasks: user.yml
+  when: "'user' in common_tasks"
+  tags:
+    - common
+    - user
+
+- name: Import SSH tasks
+  ansible.builtin.import_tasks: ssh.yml
+  when: "'ssh' in common_tasks"
+  tags:
+    - common
+    - ssh
+
+- name: Import firewall tasks
+  ansible.builtin.import_tasks: firewall.yml
+  when: "'firewall' in common_tasks"
+  tags:
+    - common
+    - firewall
+
+- name: Import profile tasks
+  ansible.builtin.import_tasks: profile.yml
+  when: "'profile' in common_tasks"
+  become: false
+  tags:
+    - common
+    - profile
+

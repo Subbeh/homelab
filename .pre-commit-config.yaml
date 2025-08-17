@@ -1,0 +1,19 @@
+---
+repos:
+  # - repo: https://github.com/zricethezav/gitleaks
+  #   rev: v8.27.2
+  #   hooks:
+  #     - id: gitleaks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        exclude: ansible/(host_vars|group_vars|playbooks)/.*\.yml
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      - id: mixed-line-ending

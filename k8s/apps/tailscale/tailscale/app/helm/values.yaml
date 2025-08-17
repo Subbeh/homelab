@@ -1,0 +1,7 @@
+---
+# Enable CRD installation
+installCRDs: true
+
+operatorConfig:
+  image:
+    repository: ghcr.io/tailscale/k8s-operator

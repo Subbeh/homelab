@@ -1,0 +1,33 @@
+---
+- name: Update system packages
+  when: ansible_os_family == "Debian"
+  block:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+
+    - name: Upgrade packages
+      ansible.builtin.apt:
+        upgrade: dist
+        state: latest
+      become: true
+
+- name: Update PiKVM system
+  when: inventory_hostname == "pikvm"
+  block:
+    - name: Run pikvm-update command
+      ansible.builtin.command: pikvm-update --no-reboot
+      register: update_result
+      retries: 3
+      delay: 5
+      until: update_result is success
+      failed_when: update_result.rc != 0 and "already up-to-date" not in update_result.stdout | lower
+      changed_when: false
+
+    - name: Run reboot handler
+      ansible.builtin.debug:
+        msg: "System update complete. Reboot required and will be triggered."
+      notify: reboot
+      when: '"Reboot required" in update_result.stdout'

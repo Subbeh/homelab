@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+tasks:
+  default:
+    desc: List tasks
+    cmds:
+      - task --list-all
+
+  :init:
+    desc: Initialize workstation dependencies
+    cmds:
+      - task: init_linux
+      - task: init_macos
+      - task: init_misc
+      - pipenv install
+      # - task: precommit:init # TODO
+      - task: ansible:init
+      - pre-commit install --install-hooks
+      - direnv allow {{.ROOT_DIR}}
+
+  init_linux:
+    desc: Initialize workstation dependencies (MacOS)
+    platforms: [amd64]
+    internal: true
+    cmds:
+      - yay -S --noconfirm {{.DEPS_OS}}
+    preconditions:
+      - sh: command -v yay
+        msg: |
+          yay is not installed
+
+  init_macos:
+    desc: Initialize workstation dependencies (MacOS)
+    platforms: [darwin]
+    internal: true
+    cmds:
+      - brew install {{.DEPS_OS}}
+    preconditions:
+      - sh: command -v brew
+        msg: |
+          brew is not installed
+
+  init_misc:
+    desc: Other stuff
+    internal: true
+    cmds:
+      - kubectl krew update
+      - kubectl krew index add netshoot https://github.com/nilic/kubectl-netshoot.git || true
+      - kubectl krew install netshoot/netshoot
+      - kubectl krew install get-all
+
+  :update:
+    desc: Update all dependencies
+    cmds:
+      - pipenv update
+      - task: ansible:upgrade
+      # - task: precommit:update # TODO
+      - pre-commit autoupdate
+      - kubectl krew update
+

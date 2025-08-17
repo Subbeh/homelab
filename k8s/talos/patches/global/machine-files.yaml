@@ -1,0 +1,26 @@
+---
+machine:
+  files:
+    # https://spegel.dev/docs/getting-started/#talos
+    - op: create
+      path: /etc/cri/conf.d/20-customization.part
+      permissions: 0o644
+      content: |-
+        [plugins."io.containerd.cri.v1.images"]
+          discard_unpacked_layers = false
+        [plugins."io.containerd.gc.v1.scheduler"]
+          # Enable garbage collection
+          deletion_threshold = 0
+          mutation_threshold = 100
+          pause_threshold = 0.02
+          schedule_delay = "0s"
+          startup_delay = "100ms"
+    - op: overwrite
+      path: /etc/nfsmount.conf
+      permissions: 0o644
+      content: |
+        [ NFSMount_Global_Options ]
+        nfsvers=4.2
+        hard=True
+        nconnect=16
+        noatime=True

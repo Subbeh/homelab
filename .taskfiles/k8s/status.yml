@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+tasks:
+  status:
+    desc: Get cluster status
+    cmds:
+      - task: flux_status
+      - task: cilium_status
+
+  validate:
+    desc: Validate the cluster
+    cmds:
+      - task: cilium_connection_test
+
+  flux_status:
+    desc: Get Flux status
+    cmd: flux check
+
+  cilium_status:
+    desc: Get Cilium status
+    cmd: cilium-cli status --wait
+
+  connection_test:
+    desc: Run Cilium connection test
+    cmd: cilium-cli connectivity test
+

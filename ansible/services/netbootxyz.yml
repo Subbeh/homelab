@@ -1,0 +1,12 @@
+---
+netbootxyz:
+  host: services
+  container:
+    image: ghcr.io/netbootxyz/netbootxyz:0.7.6-nbxyz4
+    ports:
+      - 3000:3000
+      - 80:8080
+      - 69:69/udp
+    volumes:
+      - "{{ common_data_dir }}/netbootxyz/config:/config"
+      - "/data/hdd0/iso:/assets"

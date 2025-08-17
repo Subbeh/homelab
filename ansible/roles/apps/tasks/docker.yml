@@ -1,0 +1,17 @@
+---
+- name: Gather facts
+  setup:
+
+- name: Install Docker
+  ansible.builtin.include_role:
+    name: "{{ item }}"
+  loop:
+    - geerlingguy.pip
+    - geerlingguy.docker
+  vars:
+    pip_install_packages:
+      - name: docker
+
+- name: Create Docker network
+  community.docker.docker_network:
+    name: "{{ docker_default_network }}"

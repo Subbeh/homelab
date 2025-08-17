@@ -1,0 +1,52 @@
+---
+- name: Remove repository files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list
+    - /etc/apt/sources.list.d/pve-enterprise.list
+    - /etc/apt/sources.list.d/ceph.list
+
+- name: Add Debian repositories
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+    filename: sources
+    update_cache: no
+  loop:
+    - "deb http://deb.debian.org/debian bookworm main contrib"
+    - "deb http://deb.debian.org/debian bookworm-updates main contrib"
+    - "deb http://security.debian.org/debian-security bookworm-security main contrib"
+
+- name: Add Proxmox VE no-subscription repository
+  apt_repository:
+    repo: "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription"
+    state: present
+    filename: pve-install-repo
+    update_cache: no
+
+- name: Configure APT to suppress non-free firmware warnings
+  copy:
+    content: 'APT::Get::Update::SourceListWarnings::NonFreeFirmware "false";'
+    dest: /etc/apt/apt.conf.d/no-bookworm-firmware.conf
+    mode: '0644'
+
+- name: Remove subscription nag from UI
+  replace:
+    path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+    regexp: 'data\.status.*\{.*\!active.*\}'
+    replace: 'data.status === "NoMoreNagging"'
+    backup: yes
+
+- name: Create APT hook to maintain nag removal across updates
+  copy:
+    dest: /etc/apt/apt.conf.d/no-nag-script
+    mode: '0644'
+    content: |
+      DPkg::Post-Invoke { "dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ $? -eq 1 ]; then { echo 'Removing subscription nag from UI...'; sed -i '/.*data\.status.*{/{s/\!//;s/active/NoMoreNagging/}' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi"; };
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+

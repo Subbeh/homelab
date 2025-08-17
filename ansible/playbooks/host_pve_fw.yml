@@ -1,0 +1,49 @@
+---
+- name: Proxmox host pve-fw
+  hosts: pve-fw
+  gather_facts: true
+
+  vars:
+    pve_setup_tasks:
+      - sources
+      - users
+      - microcode
+      - powersave
+      - dependencies
+      - cluster
+    common_tasks:
+      - update
+      - packages
+      - ssh
+      - profile
+    ssh_config_settings:
+      - {regexp: "^#?PasswordAuthentication", line: "PasswordAuthentication no"}
+      - {regexp: "^#?PermitRootLogin", line: "PermitRootLogin yes"}
+      - {regexp: "^#?PubkeyAuthentication", line: "PubkeyAuthentication yes"}
+      - {regexp: "^#?PermitEmptyPasswords", line: "PermitEmptyPasswords no"}
+      - {regexp: "^#?X11Forwarding", line: "X11Forwarding no"}
+      - {regexp: "^#?MaxAuthTries", line: "MaxAuthTries 3"}
+      - {regexp: "^#?ClientAliveInterval", line: "ClientAliveInterval 300"}
+      - {regexp: "^#?ClientAliveCountMax", line: "ClientAliveCountMax 2"}
+      - {regexp: "^#?Protocol", line: "Protocol 2"}
+    cloud_init_template:
+      cloud_image_url: https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2
+      cloud_image_name: debian-12-genericcloud-amd64.qcow2
+      cloud_image_storage: /var/lib/vz/template/iso
+      template_name: debian-12-template
+      proxmox_storage: local-lvm
+      vm_id: 5001
+      cores: 2
+      memory: 2048
+      resize_disk: 16
+      qemu_agent: true
+      net: {net0: "virtio,bridge=vmbr2,tag=10,firewall=0,queues=2"}
+
+  roles:
+    - {role: pve_setup, tags: pve_setup}
+    - {role: common, tags: common}
+    - role: pve
+      tags: cloudinit
+      vars:
+        pve_tasks:
+          - create_cloudinit

@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: github-deploy-key
+  namespace: flux-system
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault-backend
+  target:
+    name: github-deploy-key
+    creationPolicy: Owner
+  data:
+    - secretKey: identity
+      remoteRef:
+        key: k8s/github-deploy
+        property: identity
+    - secretKey: known_hosts
+      remoteRef:
+        key: k8s/github-deploy
+        property: known_hosts
+

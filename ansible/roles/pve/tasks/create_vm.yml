@@ -1,0 +1,109 @@
+---
+- name: Download ISO file
+  when: vm_iso_url is defined
+  block:
+    - name: Set file facts
+      set_fact:
+        file_ext: "{{ vm_iso_url | splitext | last }}"
+        file_name: "{{ vm_iso_url | basename | regex_replace('\\.bz2$', '') }}"
+
+    - name: Set destination file facts
+      set_fact:
+        dest_file: "/var/lib/vz/template/iso/{{ file_name }}"
+
+    - name: Check if ISO exists
+      stat:
+        path: "{{ dest_file }}"
+      register: iso_check
+
+    - name: Fail if URL doesn't end with .iso or .bz2
+      fail:
+        msg: "The URL must end with either .iso or .bz2"
+      when: file_ext not in ['.iso', '.bz2']
+
+    - name: Download ISO file
+      get_url:
+        url: "{{ vm_iso_url }}"
+        dest: "{{ dest_file }}"
+        mode: '0644'
+      when: not iso_check.stat.exists
+      register: download_file
+
+    - name: Extract ISO archive
+      command: "bzip2 -d {{ dest_file }}.bz2"
+      when: download_file.changed and file_ext == '.bz2'
+
+- name: Create VM
+  community.proxmox.proxmox_kvm:
+    # Connection parameters
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_name }}"
+    api_token_secret: "{{ pve_token_secret }}"
+    validate_certs: false
+
+    # Basic VM settings
+    name: "{{ vm_name }}"
+    node: "{{ inventory_hostname_short }}"
+    vmid: "{{ omit if vm_template is defined else vm_id }}"
+    newid: "{{ vm_id if vm_template is defined  else omit }}"
+    clone: "{{ vm_template | default(omit) }}"
+    ostype: "{{ vm_ostype | default('l26') }}"
+    bios: "{{ vm_bios | default(omit) }}"
+
+    # Hardware configuration
+    memory: "{{ vm_memory | default(omit) }}"
+    cores: "{{ vm_cores | default(omit) }}"
+    sockets: "{{ vm_sockets | default(omit) }}"
+    cpu: "{{ vm_cpu | default('host') }}"
+    numa: "{{ vm_numa | default(omit) }}"
+    numa_enabled: "{{ vm_numa_enabled | default(omit) }}"
+    balloon: "{{ vm_balloon | default(0) }}"
+    machine: "{{ vm_machine | default(omit) }}"
+
+    # Storage configuration
+    scsihw: "{{ vm_scsihw | default('virtio-scsi-single') }}"
+    scsi: "{{ vm_scsi | default(omit) }}"
+    virtio: "{{ vm_virtio | default(omit) }}"
+    ide: "{{ vm_ide | default(omit) }}"
+
+    # Network configuration
+    net: "{{ vm_net | default(omit) }}"
+
+    # Boot and startup configuration
+    onboot: "{{ vm_onboot | default(1) }}"
+    startup: "{{ vm_startup | default(omit) }}"
+    reboot: "{{ vm_reboot | default(false) }}"
+
+    # Guest agent configuration
+    agent: "{{ vm_agent | default(1) }}"
+  delegate_to: localhost
+  register: vm_creation
+
+- name: Regenerate cloud-init drive after cloning (if needed)
+  ansible.builtin.shell: |
+    qm set {{ vm_id }} --ipconfig0 "{{ vm_ipconfig.ipconfig0 | default('ip=dhcp') }}"
+  args:
+    executable: /bin/bash
+  when:
+    - vm_template is defined
+    - vm_ipconfig is defined
+    - vm_creation is defined and vm_creation.changed
+  register: regenerate_cloudinit
+  changed_when: regenerate_cloudinit.rc == 0
+  failed_when: regenerate_cloudinit.rc not in [0]
+
+- name: Create initial snapshot
+  community.proxmox.proxmox_snap:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_name }}"
+    api_token_secret: "{{ pve_token_secret }}"
+    validate_certs: false
+    vmid: "{{ vm_id }}"
+    snapname: "init-vm"
+    description: "Initial VM snapshot after creation"
+    state: present
+  delegate_to: localhost
+  when: vm_creation is defined and vm_creation.changed
+

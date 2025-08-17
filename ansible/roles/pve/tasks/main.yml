@@ -1,0 +1,28 @@
+---
+- name: Set Proxmox API credential facts
+  set_fact:
+    pve_token_id: "{{ lookup('community.hashi_vault.hashi_vault', 'secret=secret/data/proxmox/api-token:token_id validate_certs=False') }}"
+    pve_token_secret: "{{ lookup('community.hashi_vault.hashi_vault', 'secret=secret/data/proxmox/api-token:token_secret validate_certs=False') }}"
+  no_log: true
+
+- name: Parse Proxmox API credentials
+  set_fact:
+    pve_api_user: "{{ pve_token_id.split('!')[0] }}"
+    pve_api_token_name: "{{ pve_token_id.split('!')[1] }}"
+    no_log: true
+
+- name: Create Proxmox VM
+  ansible.builtin.import_tasks: create_vm.yml
+  when: "'create_vm' in pve_tasks"
+
+- name: Create cloud-init template
+  ansible.builtin.import_tasks: create_cloudinit.yml
+  when: "'create_cloudinit' in pve_tasks"
+
+- name: Create Proxmox LXC
+  ansible.builtin.import_tasks: create_lxc.yml
+  when: "'create_lxc' in pve_tasks"
+
+- name: Start Proxmox VM/LXC
+  ansible.builtin.import_tasks: start.yml
+  when: "'start' in pve_tasks"

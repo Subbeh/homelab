@@ -1,0 +1,61 @@
+---
+- hosts: vps
+  become: true
+  vars:
+    common_tasks:
+      - update
+      - packages
+      - hostname
+      - dns
+      - ssh
+      - firewall
+      - profile
+    apps:
+      - fail2ban
+      - tailscale
+      - syncthing
+      - vault
+      - borg
+
+    tailscale_hostname: vps
+    tailscale_exit_node: true
+    pip_install_packages:
+      - name: docker
+    docker_users:
+      - "{{ ansible_user }}"
+    docker_install_compose_plugin: true
+    syncthing_device_name: vps
+    syncthing_device_id: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      30353761613338376338396264353437396565363433316265393232383665663063323266366333
+      3639613763363930653439633336356238383033353866370a656133363166616230323466373330
+      33336631333235613464303733623962386536313533376331336130666363643333326334353033
+      3939323263333663650a653831373636633032646461623663306636373363363136353039393732
+      31653835333731393634613436336235636336666235306633323464633762343264363234633235
+      65303637336662613536386639306636623935303064303235666531653162386166653465303361
+      313032633165623837633733383932306334
+    borgbase_repo_name: vps
+    borg_source_directories:
+      - "/home/{{ ansible_user }}/.config"
+      - "/opt/vault"
+      - "/opt/data"
+
+    vault_secret_engines:
+      - path: secret
+        type: kv-v2
+        description: "KV Secrets Engine - v2"
+      - path: aws
+        type: aws
+        description: "AWS Secrets Engine"
+      - path: transit
+        type: transit
+        description: "Transit Encryption Engine"
+      - path: pki
+        type: pki
+        description: "PKI Secrets Engine"
+
+  roles:
+    - {role: common, tags: common}
+    - {role: geerlingguy.pip, tags: pip}
+    - {role: geerlingguy.docker, tags: docker}
+    - {role: apps, tags: apps}

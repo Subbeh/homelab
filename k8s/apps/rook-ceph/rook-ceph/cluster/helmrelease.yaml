@@ -1,0 +1,164 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: rook-ceph-cluster
+spec:
+  interval: 5m
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: v1.17.7
+  url: oci://ghcr.io/rook/rook-ceph-cluster
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rook-ceph-cluster
+spec:
+  interval: 1h
+  timeout: 15m
+  chartRef:
+    kind: OCIRepository
+    name: rook-ceph-cluster
+  driftDetection:
+    mode: enabled
+    ignore:
+      - paths: ['']
+        target:
+          kind: CephCluster
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    monitoring:
+      enabled: true
+      createPrometheusRules: true
+      prometheusRule:
+        additionalRuleLabels: {}
+        spec:
+          groups:
+            - name: ceph.rules
+              rules:
+                # Override the problematic CephNodeDiskspaceWarning rule
+                - alert: CephNodeDiskspaceWarning
+                  annotations:
+                    description: Mountpoint {{ $labels.mountpoint }} on {{ $labels.nodename }} will be full in less than 5 days based on the 48 hour trailing fill rate.
+                    summary: Host filesystem free space is getting low
+                  expr: |
+                    predict_linear(node_filesystem_free_bytes{
+                      device=~"/dev/.*",
+                      fstype!~"tmpfs|fuse.lxcfs|squashfs|overlay",
+                      mountpoint!="/etc/nfsmount.conf"
+                    }[2d], 3600 * 24 * 5) * on(instance) group_left(nodename) node_uname_info < 0
+                  labels:
+                    oid: 1.3.6.1.4.1.50495.1.2.1.8.4
+                    severity: warning
+                    type: ceph_default
+    toolbox:
+      enabled: true
+    cephClusterSpec:
+      cephConfig:
+        global:
+          bdev_enable_discard: "true"  # quote
+          bdev_async_discard_threads: "1"  # quote
+          osd_class_update_on_start: "false"  # quote
+          device_failure_prediction_mode: local  # requires mgr module
+        mgr:
+          "mgr/prometheus/server_addr": "0.0.0.0"  # Fix IPv4 binding for prometheus metrics
+      cleanupPolicy:
+        wipeDevicesFromOtherClusters: true
+      crashCollector:
+        disable: false
+      csi:
+        readAffinity:
+          enabled: true
+      dashboard:
+        enabled: true
+        urlPrefix: /
+        ssl: false
+        prometheusEndpoint: http://prometheus-operated.observability.svc.cluster.local:9090
+      mgr:
+        modules:
+          - name: devicehealth
+            enabled: true
+          - name: insights
+            enabled: true
+          - name: pg_autoscaler
+            enabled: true
+          - name: rook
+            enabled: true
+      resources:
+        mgr:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            memory: 1Gi
+        mon:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            memory: 1Gi
+        osd:
+          requests:
+            cpu: 250m
+            memory: 2Gi
+          limits:
+            memory: 4Gi
+      network:
+        provider: host
+        connections:
+          requireMsgr2: true
+        addressRanges:
+          cluster:
+            - 192.168.80.0/24
+      storage:
+        useAllNodes: true
+        useAllDevices: false
+        devicePathFilter: /dev/disk/by-id/ata-.*
+        config:
+          osdsPerDevice: "1"
+    cephBlockPools:
+      - name: ceph-blockpool
+        spec:
+          failureDomain: host
+          replicated:
+            size: 3
+        storageClass:
+          enabled: true
+          name: ceph-block
+          isDefault: true
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          volumeBindingMode: Immediate
+          mountOptions: ["discard"]
+          parameters:
+            compression_mode: aggressive
+            compression_algorithm: zstd
+            imageFormat: "2"
+            imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/controller-expand-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+            csi.storage.k8s.io/node-stage-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/fstype: ext4
+    cephBlockPoolsVolumeSnapshotClass:
+      enabled: true
+      name: csi-ceph-blockpool
+      isDefault: false
+      deletionPolicy: Delete
+    # NOTE: After disabling the filesystem, the filesystem can be removed with the following commands:
+    # ceph fs fail ceph-filesystem && ceph fs rm ceph-filesystem --yes-i-really-mean-it
+    cephFileSystems: []
+    cephObjectStores: []

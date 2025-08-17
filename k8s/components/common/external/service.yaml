@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-${APP}
+  namespace: external
+spec:
+  type: ClusterIP
+  ports:
+    - port: &port ${EXTERNAL_PORT:=80}
+      targetPort: *port
+      protocol: TCP
+      name: http
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: external-${APP}
+  namespace: external
+subsets:
+  - addresses:
+      - ip: ${EXTERNAL_IP}
+    ports:
+      - port: ${EXTERNAL_PORT:=80}
+        name: http
+        protocol: TCP
+

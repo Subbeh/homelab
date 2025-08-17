@@ -1,0 +1,50 @@
+---
+- name: List certificates
+  ansibleguy.opnsense.list:
+    target: 'acme_certificate'
+  register: opnsense_certificates
+
+- name: Install Postfix plugin
+  ansibleguy.opnsense.package:
+    name: os-postfix
+    action: install
+
+- name: Setup Postfix
+  ansibleguy.opnsense.postfix_general:
+    enabled: true
+    myhostname: "mail.{{ net_domain_loc }}"
+    mydomain: "{{ net_domain_loc }}"
+    myorigin: "{{ net_domain_loc }}"
+    inet_interfaces:
+      - 'all'
+    inet_port: 25
+    mynetworks:
+      - '127.0.0.0/8'
+      - '[::ffff:127.0.0.0]/104'
+      - '[::1]/128'
+      - '10.0.0.0/8' # Standard private network
+      - '172.16.0.0/12' # Standard private network
+      - '192.168.0.0/16' # Standard private network
+      - '192.168.100.239/32' # Your laptop's IP address
+      - '100.64.0.0/10'
+    smtpclient_security: may
+    relayhost: smtp.gmail.com:587
+    smtpauth_enabled: true
+    smtpauth_user: "{{ common_email_svc }}"
+    smtpauth_password: "{{ common_email_svc_pass }}"
+    tls_server_compatibility: intermediate
+    tls_client_compatibility: intermediate
+    message_size_limit: 10485760 # 10MB in bytes
+    certificate: "{{ opnsense_certificates.data[0].certRefId }}"
+    permit_tls_clientcerts: true
+    permit_mynetworks: true
+    reject_unknown_sender_domain: false
+    reject_unauth_destination: true
+    delay_warning_time: 0
+
+- name: Add Domain for Mail Relay
+  ansibleguy.opnsense.postfix_domain:
+    domainname: "{{ net_domain_loc }}"
+    destination: smtp.gmail.com
+    enabled: true
+

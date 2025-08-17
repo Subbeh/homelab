@@ -1,0 +1,15 @@
+[Unit]
+Description=borgmatic backup
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=/etc /home
+
+[Service]
+Type=oneshot
+
+Environment=BORG_PASSPHRASE={{ borg_encryption_passphrase }}
+Environment=BORG_RSH="ssh -i /root/.ssh/borgbase"
+ExecStart=/usr/bin/borgmatic --verbosity 1 --syslog-verbosity 1
+
+# Restart conditions
+Restart=no 

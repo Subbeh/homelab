@@ -1,0 +1,59 @@
+---
+- name: Set machine ID
+  ansible.builtin.set_fact:
+    vm_lxc_id: "{{ vm_id | default(pve_lxc.config.vmid) }}"
+
+- name: Check if ID is a VM or LXC
+  community.proxmox.proxmox_vm_info:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_name }}"
+    api_token_secret: "{{ pve_token_secret }}"
+    validate_certs: false
+    node: "{{ inventory_hostname_short }}"
+    vmid: "{{ vm_lxc_id }}"
+  register: vm_lxc_info
+
+- name: Set resource type facts
+  set_fact:
+    is_vm: "{{ vm_lxc_info.proxmox_vms[0].type == 'qemu' }}"
+    is_lxc: "{{ vm_lxc_info.proxmox_vms[0].type == 'lxc' }}"
+
+- name: Ensure VM is started
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_name }}"
+    api_token_secret: "{{ pve_token_secret }}"
+    validate_certs: false
+    node: "{{ inventory_hostname_short }}"
+    vmid: "{{ vm_lxc_id }}"
+    state: started
+  when: is_vm
+  register: vm_start
+
+- name: Ensure LXC is started
+  community.proxmox.proxmox:
+    api_host: "{{ ansible_host }}"
+    api_user: "{{ pve_api_user }}"
+    api_token_id: "{{ pve_api_token_name }}"
+    api_token_secret: "{{ pve_token_secret }}"
+    validate_certs: false
+    vmid: "{{ vm_lxc_id }}"
+    state: started
+  when: is_lxc
+  register: lxc_start
+
+- name: Wait for VM to be accessible
+  wait_for:
+    host: "{{ hostvars[vm_lxc_info.proxmox_vms[0].name].ip_addr | ipaddr('address') }}"
+    port: 22
+    delay: 5
+    timeout: 300
+  when:
+    - vm_lxc_info.proxmox_vms[0].name is defined
+    - hostvars[vm_lxc_info.proxmox_vms[0].name].ip_addr is defined
+
+- name: Pause to allow full initialization
+  pause:
+    seconds: 10

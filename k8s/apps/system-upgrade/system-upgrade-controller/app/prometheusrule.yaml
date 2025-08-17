@@ -1,0 +1,118 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: system-upgrade-controller
+spec:
+  groups:
+    - name: system-upgrade-controller.rules
+      interval: 30s
+      rules:
+        - alert: SystemUpgradeStarted
+          expr: |
+            (
+              increase(kube_job_status_start_time{job_name=~"apply-.*-on-.*", namespace="system-upgrade"}[2m]) > 0
+            ) and on(job_name) (
+              kube_job_status_active{job_name=~"apply-.*-on-.*", namespace="system-upgrade"} == 1
+            )
+          for: 0m
+          labels:
+            severity: info
+            component: system-upgrade
+          annotations:
+            summary: "System upgrade started on {{ $labels.job_name }}"
+            description: |
+              A system upgrade job has started on node {{ $labels.job_name }}.
+              
+              Current status:
+              - Job: {{ $labels.job_name }}
+              - Namespace: {{ $labels.namespace }}
+              - Started: {{ $value }} seconds ago
+              
+              Please monitor the upgrade progress and ensure no critical workloads are affected.
+
+        - alert: SystemUpgradeCompleted
+          expr: |
+            (
+              increase(kube_job_status_completion_time{job_name=~"apply-.*-on-.*", namespace="system-upgrade"}[5m]) > 0
+            ) and on(job_name) (
+              kube_job_status_succeeded{job_name=~"apply-.*-on-.*", namespace="system-upgrade"} == 1
+            )
+          for: 0m
+          labels:
+            severity: info
+            component: system-upgrade
+          annotations:
+            summary: "System upgrade completed successfully on {{ $labels.job_name }}"
+            description: |
+              A system upgrade job has completed successfully on node {{ $labels.job_name }}.
+              
+              Details:
+              - Job: {{ $labels.job_name }}
+              - Namespace: {{ $labels.namespace }}
+              - Completion time: {{ $value }} seconds ago
+              
+              The node should now be running the updated version.
+
+        - alert: SystemUpgradeFailed
+          expr: |
+            (
+              kube_job_status_failed{job_name=~"apply-.*-on-.*", namespace="system-upgrade"} == 1
+            )
+          for: 1m
+          labels:
+            severity: critical
+            component: system-upgrade
+          annotations:
+            summary: "System upgrade failed on {{ $labels.job_name }}"
+            description: |
+              A system upgrade job has failed on node {{ $labels.job_name }}.
+              
+              This requires immediate attention:
+              - Job: {{ $labels.job_name }}
+              - Namespace: {{ $labels.namespace }}
+              - Status: Failed
+              
+              Check the job logs: kubectl logs -n system-upgrade {{ $labels.job_name }}
+
+        - alert: SystemUpgradeStuck
+          expr: |
+            (
+              kube_job_status_active{job_name=~"apply-.*-on-.*", namespace="system-upgrade"} == 1
+            ) and (
+              time() - kube_job_status_start_time{job_name=~"apply-.*-on-.*", namespace="system-upgrade"} > 1800
+            )
+          for: 5m
+          labels:
+            severity: warning
+            component: system-upgrade
+          annotations:
+            summary: "System upgrade taking longer than expected on {{ $labels.job_name }}"
+            description: |
+              A system upgrade job has been running for more than 30 minutes on {{ $labels.job_name }}.
+              
+              Details:
+              - Job: {{ $labels.job_name }}
+              - Namespace: {{ $labels.namespace }}
+              - Running for: {{ $value }} seconds
+              
+              This may indicate the upgrade is stuck or encountering issues.
+
+        - alert: SystemUpgradePlanChanged
+          expr: |
+            changes(prometheus_config_last_reload_successful_timestamp_seconds[10m]) > 0
+            and on() kube_customresource_info{customresource_group="upgrade.cattle.io", customresource_kind="Plan", namespace="system-upgrade"}
+          for: 0m
+          labels:
+            severity: info
+            component: system-upgrade
+          annotations:
+            summary: "System upgrade plan has been updated"
+            description: |
+              A system upgrade plan has been updated, which may trigger new upgrades.
+              
+              Check the current upgrade plans:
+              - kubectl get plans -n system-upgrade
+              
+              Monitor for upcoming upgrade jobs.

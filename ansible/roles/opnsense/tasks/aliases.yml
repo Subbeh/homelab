@@ -1,0 +1,13 @@
+---
+- name: Purging all non-configured aliases
+  ansibleguy.opnsense.alias_purge:
+    aliases: {'...': ''}
+
+- name: Reloading
+  ansibleguy.opnsense.reload:
+    target: "alias"
+
+- name: Create aliases
+  ansibleguy.opnsense.alias_multi:
+    fail_verification: true
+    aliases: "{{ aliases }}"

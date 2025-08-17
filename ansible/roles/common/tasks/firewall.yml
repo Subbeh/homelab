@@ -1,0 +1,47 @@
+---
+- name: Install UFW
+  apt:
+    name: ufw
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Set default UFW policies
+  ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - { direction: incoming, policy: deny }
+    - { direction: outgoing, policy: allow }
+  become: true
+
+- name: Allow SSH access
+  ufw:
+    rule: allow
+    port: 22
+    proto: tcp
+  become: true
+
+- name: Allow additional ports from common_firewall_allow variable
+  ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto | default('tcp') }}"
+  loop: "{{ common_firewall_allow | default([]) }}"
+  become: true
+
+- name: Allow Tailscale traffic
+  ufw:
+    rule: allow
+    interface: tailscale0
+    direction: "{{ item }}"
+  loop:
+    - in
+    - out
+  become: true
+  when: "'tailscale' in apps"
+
+- name: Enable UFW
+  ufw:
+    state: enabled
+  become: true 

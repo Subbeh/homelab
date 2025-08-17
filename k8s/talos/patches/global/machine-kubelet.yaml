@@ -1,0 +1,30 @@
+---
+machine:
+  kubelet:
+    extraConfig:
+      serializeImagePulls: false
+      # Image garbage collection settings
+      imageGCHighThresholdPercent: 85
+      imageGCLowThresholdPercent: 80
+      # Container garbage collection settings  
+      maxPods: 110
+      evictionHard:
+        imagefs.available: "10%"
+        nodefs.available: "10%"
+        nodefs.inodesFree: "5%"
+      evictionSoft:
+        imagefs.available: "15%"
+        nodefs.available: "15%" 
+        nodefs.inodesFree: "10%"
+      evictionSoftGracePeriod:
+        imagefs.available: "30s"
+        nodefs.available: "30s"
+        nodefs.inodesFree: "30s"
+    nodeIP:
+      validSubnets:
+        - 10.11.80.0/24
+    extraMounts:
+      - destination: /var/mnt/extra
+        type: bind
+        source: /var/mnt/extra
+        options: ["bind", "rshared", "rw"]

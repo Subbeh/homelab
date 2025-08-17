@@ -1,0 +1,33 @@
+---
+- name: Set PVE host fact
+  ansible.builtin.set_fact:
+    pve_host: "{{ ansible_host }}"
+
+- name: Create cluster
+  ansible.builtin.command: pvecm create homelab --link0 address={{ hostvars[ansible_host].ip_addr | ipaddr('address') }}
+  args:
+    creates: /etc/pve/corosync.conf
+  when: pve_host == groups['pve'][0]
+
+- name: Join cluster
+  when: pve_host != groups['pve'][0]
+  block:
+    - name: Read existing vault init file
+      ansible.builtin.slurp:
+        src: "/root/.ssh/id_rsa.pub"
+      register: pve_pub_key
+
+    - name: Set authorized key for {{ groups['pve'][0] }} taken from file
+      ansible.posix.authorized_key:
+        user: root
+        state: present
+        key: "{{ pve_pub_key.content | b64decode }}"
+      delegate_to: "{{ groups['pve'][0] }}"
+      when: pve_pub_key.content
+
+    - name: Join cluster
+      ansible.builtin.command: pvecm add {{ hostvars[groups['pve'][0]].ip_addr | ipaddr('address') }} --use_ssh 1
+      args:
+        creates: /etc/pve/corosync.conf
+      register: pve_join_cmd
+      failed_when: pve_join_cmd.stderr != ''

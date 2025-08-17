@@ -1,0 +1,34 @@
+---
+docker_users:
+  - "{{ ansible_user }}"
+docker_install_compose_plugin: true
+
+docker_default_network: internal
+
+container_defaults:
+  security_opts:
+    - "no-new-privileges:true"
+  state: started
+  pull: yes
+  restart: true
+  recreate: true
+  restart_policy: unless-stopped
+  log_driver: json-file
+  log_options:
+    max-size: 10m
+    max-file: "3"
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+  env:
+    PUID: "{{ common_user_id | string }}"
+    PGID: "{{ common_group_id | string }}"
+    TZ: "{{ common_timezone }}"
+  network_mode: bridge
+  networks:
+    - name: "{{ docker_default_network }}"
+  comparisons:
+    volumes: strict
+    networks: strict
+    env: strict
+    labels: strict
+
