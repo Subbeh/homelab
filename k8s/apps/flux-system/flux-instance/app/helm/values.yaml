@@ -12,7 +12,7 @@ instance:
     - notification-controller
   sync:
     kind: GitRepository
-    url: "ssh://git@github.com/Subbeh/homelab_v2.git"
+    url: "ssh://git@github.com/Subbeh/homelab.git"
     pullSecret: github-deploy-key
     ref: "refs/heads/main"
     path: k8s/flux/cluster

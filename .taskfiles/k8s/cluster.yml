@@ -152,7 +152,7 @@ tasks:
       gh api \
         -X POST \
         -H "Accept: application/vnd.github+json" \
-        /repos/Subbeh/homelab_v2/hooks \
+        /repos/Subbeh/homelab/hooks \
         --input - <<EOF
       {
         "name": "web",

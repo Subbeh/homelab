@@ -33,7 +33,7 @@ spec:
     remediation:
       retries: 3
   values:
-    githubConfigUrl: https://github.com/Subbeh/homelab_v2
+    githubConfigUrl: https://github.com/Subbeh/homelab
     githubConfigSecret: actions-runner-secret
     minRunners: 1
     maxRunners: 3

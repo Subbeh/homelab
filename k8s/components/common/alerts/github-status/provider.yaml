@@ -6,6 +6,6 @@ metadata:
   name: github-status
 spec:
   type: github
-  address: https://github.com/Subbeh/homelab_v2
+  address: https://github.com/Subbeh/homelab
   secretRef:
     name: github-status-token-secret
