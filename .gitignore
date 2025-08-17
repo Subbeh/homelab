@@ -7,6 +7,7 @@
 .temp/
 .ansible/
 .vscode/
+docs/
 *.ignored.*
 
 # talos
