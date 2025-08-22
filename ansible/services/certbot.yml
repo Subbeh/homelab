@@ -1,0 +1,20 @@
+---
+certbot:
+  host: mgmt
+  container:
+    image: certbot/dns-cloudflare:v4.2.0
+    volumes:
+      - "{{ common_data_dir }}/certbot/data:/etc/letsencrypt"
+      - "{{ common_data_dir }}/certbot/logs:/var/log/letsencrypt"
+    command: >
+      certonly --non-interactive --agree-tos --email {{ common_email }} --dns-cloudflare --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini -d {{ net_domain }} -d '*.{{ net_domain }}'
+    env: {}
+    restart: false
+    restart_policy: "no"
+    auto_remove: true
+    recreate: true
+
+  files:
+    - src: certbot/cloudflare.ini.j2
+      dest: "{{ common_data_dir }}/certbot/data/cloudflare.ini"
+      mode: "0600"
