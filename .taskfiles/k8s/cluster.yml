@@ -96,9 +96,9 @@ tasks:
 
   store-vault-cf-api-token:
     desc: Store Cloudflare API token in Vault
-    cmd: vault kv put secret/k8s/cloudflare-api-token api-token="$CF_SBBH_CLOUD_API_TOKEN"
+    cmd: vault kv put secret/k8s/cloudflare-api-token api-token="$CF_API_TOKEN"
     preconditions:
-      - test -n "$CF_SBBH_CLOUD_API_TOKEN"
+      - test -n "$CF_API_TOKEN"
 
   create-secret-vault-token:  # TODO: create vault token somewhere
     desc: Create vault-token secret for External Secrets Operator

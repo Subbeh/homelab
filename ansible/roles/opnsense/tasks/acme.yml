@@ -23,8 +23,8 @@
     dns_service: dns_cf
     dns_cf_email: "{{ common_email }}"
     dns_cf_account_id: "{{ lookup('ansible.builtin.env', 'CF_ACCOUNT_ID') }}"
-    dns_cf_zone_id: "{{ lookup('ansible.builtin.env', 'CF_SBBH_CLOUD_ZONE_ID') }}"
-    dns_cf_token: "{{ lookup('ansible.builtin.env', 'CF_SBBH_CLOUD_API_TOKEN') }}"
+    dns_cf_zone_id: "{{ lookup('ansible.builtin.env', 'CF_ZONE_ID') }}"
+    dns_cf_token: "{{ lookup('ansible.builtin.env', 'CF_API_TOKEN') }}"
 
 - name: Add ACME action
   ansibleguy.opnsense.acme_action:
