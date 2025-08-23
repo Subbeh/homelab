@@ -8,7 +8,7 @@ spec:
   hostnames:
     - "${EXTERNAL_DOMAIN:=${APP}.sbbh.cloud}"
   parentRefs:
-    - name: ${GATEWAY:=internal}
+    - name: ${GATEWAY:=external}
       namespace: kube-system
       sectionName: https
   rules:
