@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: external-${APP}
-  namespace: external
+  namespace: network
 spec:
   type: ClusterIP
   ports:
@@ -16,7 +16,7 @@ apiVersion: v1
 kind: Endpoints
 metadata:
   name: external-${APP}
-  namespace: external
+  namespace: network
 subsets:
   - addresses:
       - ip: ${EXTERNAL_IP}

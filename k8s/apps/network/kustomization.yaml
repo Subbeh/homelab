@@ -8,3 +8,4 @@ components:
 resources:
   - ./cloudflare-tunnel/ks.yaml
   - ./external-dns/ks.yaml
+  - ./external-svc

@@ -3,8 +3,8 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app sts
-  namespace: &namespace external
+  name: &app syncthing
+  namespace: &namespace network
 spec:
   targetNamespace: *namespace
   commonMetadata:
@@ -14,8 +14,8 @@ spec:
     - name: cilium-gateway
       namespace: kube-system
   components:
-    - ../../components/common/external
-  path: ./k8s/apps/external
+    - ../../../components/common/external
+  path: ./k8s/apps/network/external-svc
   prune: true
   sourceRef:
     kind: GitRepository
@@ -26,6 +26,7 @@ spec:
   postBuild:
     substitute:
       APP: *app
-      EXTERNAL_IP: 10.11.10.20
-      EXTERNAL_PORT: "9110"
+      EXTERNAL_IP: 100.94.245.44
+      EXTERNAL_PORT: "8384"
+      EXTERNAL_DOMAIN: sync.sbbh.cloud
 
