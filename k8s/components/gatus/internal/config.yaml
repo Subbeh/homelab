@@ -2,13 +2,14 @@
 endpoints:
   - name: "${APP}"
     group: "${GATUS_GROUP:=internal}"
-    url: "https://${GATUS_SUBDOMAIN:=${APP}}.sbbh.cloud${GATUS_PATH:=/}"
-    interval: 5m
-    client:
-      dns-resolver: tcp://10.11.80.1:53
+    url: 1.1.1.1
+    interval: 1m
     ui:
       hide-hostname: true
       hide-url: true
+    dns:
+      query-name: "${GATUS_SUBDOMAIN:=${APP}}.sbbh.cloud"
+      query-type: A
     conditions:
-      - '[STATUS] == ${GATUS_STATUS:=200}'
+      - "len([BODY]) == 0"
 
