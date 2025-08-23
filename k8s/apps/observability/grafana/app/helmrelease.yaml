@@ -117,18 +117,23 @@ spec:
           gnetId: 20842
           revision: 3
           datasource: Prometheus
-        # cloudflared: # TODO
-        #   # renovate: depName="Cloudflare Tunnels (cloudflared)"
-        #   gnetId: 17457
-        #   revision: 6
-        #   datasource:
-        #     - {name: DS_PROMETHEUS, value: Prometheus}
+        cloudflared:
+          # renovate: depName="Cloudflare Tunnels (cloudflared)"
+          gnetId: 17457
+          revision: 6
+          datasource:
+            - {name: DS_PROMETHEUS, value: Prometheus}
         envoy:
           # renovate: depName="Envoy Proxy Monitoring gRPC"
           gnetId: 23239
           revision: 1
           datasource:
             - {name: DS_AFRANET_PROMETHEUS, value: Prometheus}
+        external-dns:
+          # renovate: depName="External-dns"
+          gnetId: 15038
+          revision: 3
+          datasource: Prometheus
         kubernetes-api-server:
           # renovate: depName="Kubernetes / System / API Server"
           gnetId: 15761

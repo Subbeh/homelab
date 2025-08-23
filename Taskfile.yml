@@ -9,7 +9,7 @@ vars:
   SECRET_DIR: "{{.ROOT_DIR}}/.secret"
   ANSIBLE_PLAYBOOK_DIR: "{{.ANSIBLE_DIR}}/playbooks"
   TALOS_DIR: "{{.ROOT_DIR}}/k8s/talos"
-  DEPS_OS: talosctl talhelper minijinja-cli-bin krew
+  DEPS_OS: talosctl talhelper minijinja-cli-bin krew cloudflared
 
 includes:
   init: .taskfiles/init.yml
