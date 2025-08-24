@@ -1,0 +1,29 @@
+ui = true
+disable_mlock = "true"
+
+storage "raft" {
+  path    = "/vault/data"
+  node_id = "node1"
+}
+
+listener "tcp" {
+  address       = "[::]:8200"
+  tls_disable   = "false"
+  tls_cert_file = "/certs/cert.pem"
+  tls_key_file  = "/certs/privkey.pem"
+}
+
+seal "awskms" {
+  region      = "{{ vault_aws_region }}"
+  kms_key_id  = "{{ vault_kms_key_arn }}"
+  access_key  = "{{ vault_aws_access_key }}"
+  secret_key  = "{{ vault_aws_secret_key }}"
+}
+
+telemetry {
+  disable_hostname          = true
+  prometheus_retention_time = "24h"
+}
+
+api_addr = "https://vault.{{ net_domain }}:8200"
+cluster_addr = "https://vault.{{ net_domain }}:8201"

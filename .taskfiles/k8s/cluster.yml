@@ -6,30 +6,10 @@ tasks:
   bootstrap:
     desc: Bootstrap the Kubernetes cluster
     cmds:
-      - task: generate-dependencies
-      - task: store-vault-secrets
       - task: create-namespaces
       - task: create-k8s-secrets
       - task: helmfile
       - task: post-bootstrap
-
-  generate-dependencies:
-    desc: Generate cluster dependencies
-    cmds:
-      - task: generate-deploy-key
-      - task: add-github-deploy-key
-      - task: generate-github-webhook-token
-
-  store-vault-secrets:
-    desc: Create Vault secrets
-    cmds:
-      - task: store-vault-github-deploy-key
-      - task: store-vault-github-webhook-token
-      - task: store-vault-github-status-token
-      - task: store-vault-cf-api-token
-      - task: store-vault-cf-tunnel-secret
-    preconditions:
-      - vault status &>/dev/null
 
   create-namespaces:
     desc: Create namespaces
@@ -42,87 +22,27 @@ tasks:
   create-k8s-secrets:
     desc: Create Kubernetes secrets
     cmds:
-      - task: create-secret-vault-token
-      - task: create-secret-vault-ca
+      # - task: create-secret-vault-token
+      # - task: create-secret-vault-ca
       - task: create-secret-github-deploy-key
       - task: create-secret-tailscale
 
   post-bootstrap:
     desc: Post-bootstrap tasks to run after cluster is running
     cmds:
-      - task: add-gh-webhook
+      - task: add-webhook-to-github
 
-  generate-deploy-key:
-    desc: Generate Github deploy key
-    cmd: ssh-keygen -t ecdsa -b 521 -C "deploy-key" -f {{.SECRET_DIR}}/github-deploy.key -q -P ""
-    status:
-      - test -f {{.SECRET_DIR}}/github-deploy.key
+  # create-secret-vault-token:  # TODO: create vault token somewhere
+  #   desc: Create vault-token secret for External Secrets Operator
+  #   cmd: kubectl -n kube-system create secret generic vault-token --from-literal=token="$(cat {{.SECRET_DIR}}/vault-external-secrets-token.txt | tr -d '\n')" --dry-run=client -o yaml | kubectl apply -f -
+  #   preconditions:
+  #     - test -f {{.SECRET_DIR}}/vault-external-secrets-token.txt
 
-  add-github-deploy-key:
-    desc: Add or update deploy key in GitHub repository
-    cmd: |
-      if gh repo deploy-key list | grep -q "Flux Deploy Key"; then
-        echo "Deploy key already exists, updating..."
-        KEY_ID=$(gh repo deploy-key list --json id,title | jq -r '.[] | select(.title == "Flux Deploy Key") | .id')
-        gh repo deploy-key delete $KEY_ID
-      fi
-      gh repo deploy-key add {{.SECRET_DIR}}/github-deploy.key.pub --title "Flux Deploy Key" --allow-write
-    preconditions:
-      - test -f {{.SECRET_DIR}}/github-deploy.key.pub
-      - which gh jq
-
-  generate-github-webhook-token:
-    desc: Generate Github webhook token
-    cmd: python -c "import secrets; print(secrets.token_hex(16), end='')" > {{.SECRET_DIR}}/github-webhook-token.txt
-    status:
-      - test -f {{.SECRET_DIR}}/github-webhook-token.txt
-
-  store-vault-github-deploy-key:
-    desc: Store Github deploy key in Vault
-    cmd: vault kv put secret/k8s/github-deploy identity=@{{.SECRET_DIR}}/github-deploy.key known_hosts="$(ssh-keyscan github.com)"
-    preconditions:
-      - test -f {{.SECRET_DIR}}/github-deploy.key
-
-  store-vault-github-webhook-token:
-    desc: Store Github webhook token in Vault
-    cmd: vault kv put secret/k8s/github-webhook-token token=@{{.SECRET_DIR}}/github-webhook-token.txt
-    preconditions:
-      - test -f {{.SECRET_DIR}}/github-webhook-token.txt
-
-  store-vault-github-status-token:
-    desc: Store Github status token in Vault
-    cmd: vault kv put secret/k8s/github-status-token token=@{{.SECRET_DIR}}/github-status-token.txt
-    preconditions:
-      - test -f {{.SECRET_DIR}}/github-status-token.txt
-
-  store-vault-cf-api-token:
-    desc: Store Cloudflare API token in Vault
-    cmd: vault kv put secret/k8s/cloudflare api_token="$CF_API_TOKEN" zone_id="$CF_ZONE_ID"
-    preconditions:
-      - test -n "$CF_API_TOKEN"
-      - test -n "$CF_ZONE_ID"
-
-  store-vault-cf-tunnel-secret:
-    desc: Store Cloudflare Tunnel secrets in Vault
-    cmd: |
-      jq -r '(.AccountTag + " " + .TunnelSecret + " " + .TunnelID)' < {{.SECRET_DIR}}/cloudflare-tunnel.json | \
-      while read -r account_tag tunnel_secret tunnel_id; do
-        vault kv put secret/k8s/cloudflare-tunnel account_tag="$account_tag" tunnel_id="$tunnel_id" tunnel_secret="$tunnel_secret"
-      done
-    preconditions:
-      - test -f {{.SECRET_DIR}}/cloudflare-tunnel.json
-
-  create-secret-vault-token:  # TODO: create vault token somewhere
-    desc: Create vault-token secret for External Secrets Operator
-    cmd: kubectl -n kube-system create secret generic vault-token --from-literal=token="$(cat {{.SECRET_DIR}}/vault-external-secrets-token.txt | tr -d '\n')" --dry-run=client -o yaml | kubectl apply -f -
-    preconditions:
-      - test -f {{.SECRET_DIR}}/vault-external-secrets-token.txt
-
-  create-secret-vault-ca:
-    desc: Create Vault CA secret
-    cmd: kubectl -n flux-system create secret generic vault-ca-cert --from-file=ca.crt={{.SECRET_DIR}}/vault.crt --dry-run=client -o yaml | kubectl apply -f -
-    preconditions:
-      - test -f {{.SECRET_DIR}}/vault.crt
+  # create-secret-vault-ca:
+  #   desc: Create Vault CA secret
+  #   cmd: kubectl -n flux-system create secret generic vault-ca-cert --from-file=ca.crt={{.SECRET_DIR}}/vault.crt --dry-run=client -o yaml | kubectl apply -f -
+  #   preconditions:
+  #     - test -f {{.SECRET_DIR}}/vault.crt
 
   create-secret-github-deploy-key:
     desc: Apply External Secrets configuration for Flux
@@ -147,7 +67,7 @@ tasks:
     preconditions:
       - test -f helmfile.yaml
 
-  add-gh-webhook:
+  add-webhook-to-github:
     desc: Add Flux receiver webhook to GitHub repository
     cmd: |
       echo "Waiting for GitHub webhook receiver and webhook path to be ready..."

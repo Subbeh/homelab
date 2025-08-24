@@ -1,0 +1,9 @@
+---
+- name: Create policies
+  ansible.builtin.command: >
+    vault policy write {{ item | basename | regex_replace('\.hcl$', '') }} {{ item }}
+  environment:
+    VAULT_ADDR: "{{ service.vars.vault_address }}"
+    VAULT_TOKEN: "{{ root_token }}"
+  loop: "{{ query('fileglob', ansible_root ~ '/services/data/vault/policies/*.hcl') }}"
+

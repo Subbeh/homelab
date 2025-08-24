@@ -1,34 +1,13 @@
 ---
 - name: Load configs
   tags: [always]
-  # no_log: true
+  no_log: true
   ansible.builtin.include_vars:
     dir: "{{ ansible_root }}/services"
     ignore_unknown_extensions: true
     depth: 1
     name: service_configs
 
-- name: Create remote file(s) for each service
-  tags: [files]
-  ansible.builtin.include_tasks:
-    file: files.yml
-    apply: {tags: [always]}
-  vars:
-    file_item: "{{ file_data.1 | combine({'host': file_data.0.host}) }}"
-  loop: >-
-    {{
-      services
-      | map('extract', service_configs)
-      | selectattr('files', 'defined')
-      | subelements('files')
-      | list
-    }}
-  loop_control:
-    loop_var: file_data
-
-- name: Create Docker container(s)
-  tags: [container]
-  ansible.builtin.include_tasks:
-    file: container.yml
-    apply: {tags: [always]}
+- name: Run service tasks
+  ansible.builtin.include_tasks: wrapper.yml
   loop: "{{ services }}"

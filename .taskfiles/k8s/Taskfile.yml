@@ -9,8 +9,10 @@ includes:
   talos:
     taskfile: talos.yml
     dir: "{{.TALOS_DIR}}"
+  vault: vault.yml
+  github: gh.yml
   cluster: cluster.yml
   flux: flux.yml
-  status: flux.yml
+  status: status.yml
   volsync: volsync.yml
 

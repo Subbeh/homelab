@@ -1,0 +1,24 @@
+---
+- name: Fetch Vault AWS credentials from Terraform Cloud
+  ansible.builtin.command: terraform output -raw {{ item }}
+  environment:
+    TF_WORKSPACE: aws-security-account
+  args:
+    chdir: "{{ common_root_dir }}/terraform/aws/security-account"
+  register: tf_output
+  with_items:
+    - vault_aws_region
+    - vault_access_key_id
+    - vault_secret_key
+    - vault_kms_key_arn
+  delegate_to: localhost
+  become: false
+  no_log: true
+
+- name: Set Vault AWS credential facts
+  ansible.builtin.set_fact:
+    vault_aws_region: "{{ tf_output.results[0].stdout }}"
+    vault_aws_access_key: "{{ tf_output.results[1].stdout }}"
+    vault_aws_secret_key: "{{ tf_output.results[2].stdout }}"
+    vault_kms_key_arn: "{{ tf_output.results[3].stdout }}"
+  no_log: true

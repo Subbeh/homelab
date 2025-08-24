@@ -1,0 +1,43 @@
+---
+- name: Set vault address fact
+  ansible.builtin.set_fact:
+    vault_address: "{{ service.vars.vault_address }}"
+
+- name: Check Vault status
+  ansible.builtin.command: vault status -format=json
+  environment:
+    VAULT_ADDR: "{{ service.vars.vault_address }}"
+  register: vault_status
+  changed_when: false
+  failed_when:
+    - vault_status.stderr
+    - '"tls: failed to verify certificate" not in vault_status.stderr'
+
+- name: Initialize Vault if not initialized
+  ansible.builtin.command: >
+    vault operator init
+      -recovery-shares=1
+      -recovery-threshold=1
+      -format=json
+  environment:
+    VAULT_ADDR: "{{ service.vars.vault_address }}"
+  register: vault_init
+  when: not (vault_status.stdout | from_json).initialized
+
+- name: Create vault directory
+  delegate_to: localhost
+  ansible.builtin.file:
+    path: "{{ common_secret_dir }}/vault"
+    state: directory
+
+- name: Save initialization output
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: "{{ vault_init.stdout }}"
+    dest: "{{ common_secret_dir }}/vault/vault-init.json"
+    backup: true
+  when: vault_init.changed
+
+- name: Set root token fact from file
+  ansible.builtin.set_fact:
+    root_token: "{{ (lookup('file', common_secret_dir ~ '/vault/vault-init.json') | from_json).root_token }}"

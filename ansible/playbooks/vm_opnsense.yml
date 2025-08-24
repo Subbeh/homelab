@@ -62,6 +62,7 @@
       host_nas: {desc: NAS address, type: host, content: "{{ hostvars['pve-nas'].ip_addr | ipaddr('address') }}"}
       host_mgmt: {desc: Management VM address, type: host, content: "{{ hostvars['mgmt'].ip_addr | ipaddr('address') }}"}
       host_services: {desc: Services LXC address, type: host, content: "{{ hostvars['services'].ip_addr | ipaddr('address') }}"}
+      host_k8s_api: {desc: Kubernetes API server, type: host, content: "10.11.80.100"}
       host_k8s_ext: {desc: Kubernetes External Gateway, type: host, content: "10.11.80.80"}
       host_k8s_int: {desc: Kubernetes Internal Gateway, type: host, content: "10.11.80.81"}
       host_k8s_dns_gateway: {desc: k8s-gateway DNS, type: host, content: "10.11.80.82"}
@@ -72,6 +73,7 @@
       ports_vault: {desc: Vault Server Ports, type: port, content: ["8200"]}
       ports_nfs: {desc: NFS Ports, type: port, content: ["111", "2049", "20048"]}
       ports_pve_api: {desc: Proxmox VE API Ports, type: port, content: ["8006"]}
+      ports_k8s_api: {desc: Kubernetes API port, type: port, content: ["6443"]}
 
     firewall:
       groups:
@@ -100,6 +102,7 @@
         allow_k8s_vps: {interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_vps.content }}", description: Allow all traffic from K8S to vps}
         allow_k8s_services: {interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_services.content }}", description: Allow all traffic from K8S to services}
         allow_k8s_mgmt: {interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_mgmt.content }}", description: Allow all traffic from K8S to mgmt}
+        allow_mgmt_k8s_api: {interface: INFRAGroup, protocol: TCP, source: "{{ aliases.host_mgmt.content }}", destination: "{{ aliases.host_k8s_api.content }}", destination_port: ports_k8s_api, description: Allow K8S API access to mgmt}
         allow_wan_k8s_external_https: {interface: WANGroup, protocol: TCP, source: any, destination: "{{ aliases.host_k8s_ext.content }}", destination_port: 443, description: Allow HTTPS to K8S External Gateway}
         allow_wan_k8s_external_http: {interface: WANGroup, protocol: TCP, source: any, destination: "{{ aliases.host_k8s_ext.content }}", destination_port: 80, description: Allow HTTP to K8S External Gateway}
         block_wan_k8s_internal_https: {interface: WANGroup, protocol: TCP, source: any, destination: "{{ aliases.host_k8s_int.content }}", destination_port: 443, action: block, description: Block HTTPS to K8S Internal Gateway}
@@ -132,14 +135,10 @@
           domain: "{{ net_domain_loc }}"
           ip: "{{ aliases.host_nas_k8s.content }}"
           description: "NAS endpoint for Kubernetes cluster"
-          # - hostname: status
-          #   domain: "{{ net_domain }}"
-          #   ip: "{{ aliases.host_k8s_ext.content }}"
-          #   description: "Forward status.sbbh.cloud to K8s External gateway"
-          # - hostname: "*"
-          #   domain: "{{ net_domain }}"
-          #   ip: "{{ aliases.host_k8s_int.content }}"
-          #   description: "Forward all to K8s Internal Gateway"
+        - hostname: vault
+          domain: "{{ net_domain }}"
+          ip: "{{ aliases.host_mgmt.content }}"
+          description: "Vault endpoint"
       query_forwarding:
         - domain: sbbh.cloud
           target: "{{ aliases.host_k8s_dns_gateway.content }}"

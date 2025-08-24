@@ -1,0 +1,33 @@
+---
+- name: Set service facts
+  ansible.builtin.set_fact:
+    service: "{{ service_configs[item] | combine({'name': item}) }}"
+
+- name: Run pre-tasks
+  tags: [pre-tasks]
+  ansible.builtin.include_tasks:
+    file: "{{ ansible_root + '/services/tasks/' + item }}"
+    apply: {tags: [always]}
+  loop: "{{ service.tasks.pre | default([]) }}"
+
+- name: Create files
+  tags: [files]
+  ansible.builtin.include_tasks:
+    file: files.yml
+    apply: {tags: [always]}
+  loop: "{{ service.files | default([]) }}"
+  loop_control:
+    loop_var: file
+
+- name: Create Docker container(s)
+  tags: [container]
+  ansible.builtin.include_tasks:
+    file: container.yml
+    apply: {tags: [always]}
+
+- name: Run post-tasks
+  tags: [post-tasks]
+  ansible.builtin.include_tasks:
+    file: "{{ ansible_root + '/services/tasks/' + item }}"
+    apply: {tags: [always]}
+  loop: "{{ service.tasks.post | default([]) }}"

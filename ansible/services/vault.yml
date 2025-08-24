@@ -1,21 +1,42 @@
 ---
 vault:
-  host: vps
+  host: mgmt
   container:
     image: hashicorp/vault:1.20
     env:
-      VAULT_ADDR: &addr https://100.94.245.44:8200
+      VAULT_ADDR: &addr https://vault.{{ net_domain }}:8200
       VAULT_API_ADDR: *addr
       VAULT_ADDRESS: *addr
     ports:
       - 8200:8200
       - 8201:8201
     volumes:
-      - "{{ common_data_dir }}/vault/logs:/vault/logs"
-      - "{{ common_data_dir }}/vault/data:/vault/data"
       - "{{ common_data_dir }}/vault/config:/vault/config"
+      - "{{ common_data_dir }}/vault/data:/vault/data"
+      - "{{ common_data_dir }}/vault/logs:/vault/logs"
       - "{{ common_data_dir }}/vault/file:/vault/file"
-      - "{{ common_data_dir }}/vault/certs:/certs"
+      - "{{ common_data_dir }}/certbot/data/archive/{{ net_domain }}/fullchain1.pem:/certs/cert.pem"
+      - "{{ common_data_dir }}/certbot/data/archive/{{ net_domain }}/privkey1.pem:/certs/privkey.pem"
     capabilities:
       - ipc_lock
-    entrypoint: vault server -config /vault/config/config.hcl
+    entrypoint: ["vault", "server", "-config", "/vault/config/config.hcl"]
+
+  files:
+    - src: vault/config.hcl.j2
+      dest: "{{ common_data_dir }}/vault/config/config.hcl"
+      mode: "0600"
+
+  tasks:
+    pre:
+      - vault/aws_creds.yml
+    post:
+      - vault/initialize.yml
+      - vault/policies.yml
+      - vault/tokens.yml
+      - vault/env.yml
+      - vault/engines.yml
+  vars:
+    vault_address: "https://vault.{{ net_domain }}:8200"
+    secret_engines:
+      - type: kv-v2
+        path: ops

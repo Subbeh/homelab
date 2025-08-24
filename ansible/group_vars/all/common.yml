@@ -14,9 +14,11 @@ ansible_user: "{{ common_user }}"
 ansible_password: "{{ common_password }}"
 ansible_uid: 1000
 ansible_gid: 1000
-ansible_root: "{{ inventory_dir }}"
+ansible_root: "{{ playbook_dir }}/.."
+common_root_dir: "{{ ansible_root }}/.."
+common_secret_dir: "{{ common_root_dir }}/.secret"
 
-common_pub_key_file: "{{ inventory_dir }}/../.secret/homelab.key.pub"
+common_pub_key_file: "{{ common_secret_dir }}/homelab.key.pub"
 common_pub_key: "{{ lookup('file', common_pub_key_file) }}"
 common_timezone: "Australia/Melbourne"
 common_data_dir: "/opt/data"

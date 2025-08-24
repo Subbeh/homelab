@@ -1,0 +1,22 @@
+---
+- name: Create admin token
+  ansible.builtin.command: >
+    vault token create -policy=admin -format=json
+  environment:
+    VAULT_ADDR: "{{ service.vars.vault_address }}"
+    VAULT_TOKEN: "{{ root_token }}"
+  register: admin_token_result
+  when: vault_init.changed
+
+- name: Save admin token
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: "{{ admin_token_result.stdout | from_json }}"
+    dest: "{{ common_secret_dir }}/vault/admin-token.json"
+    backup: true
+  when: admin_token_result.changed
+  no_log: true
+
+- name: Set admin token fact from file
+  ansible.builtin.set_fact:
+    admin_token: "{{ (lookup('file', common_secret_dir ~ '/vault/admin-token.json') | from_json).auth.client_token }}"

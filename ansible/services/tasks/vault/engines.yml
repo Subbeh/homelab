@@ -1,0 +1,13 @@
+---
+- name: Enable secrets engines
+  ansible.builtin.command: vault secrets enable -path={{ item.path }} {{ item.type }}
+  environment:
+    VAULT_ADDR: "{{ service.vars.vault_address }}"
+    VAULT_TOKEN: "{{ root_token }}"
+  loop: "{{ service.vars.secret_engines | default([]) }}"
+  register: enable_result
+  failed_when:
+    - enable_result.rc != 0
+    - '"path is already in use" not in enable_result.stderr'
+  changed_when: '"Success! Enabled the pki secrets engine at" in enable_result.stdout'
+

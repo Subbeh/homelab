@@ -1,17 +1,17 @@
 ---
 - name: Copy data to remote host
   become: true
-  delegate_to: "{{ file_item.host }}"
-  when: file_item.src is defined or file_item.content is defined
+  delegate_to: "{{ service.host }}"
+  when: file.src is defined or file.content is defined
   block:
     - name: Check source file
-      when: file_item.src is defined
+      when: file.src is defined
       block:
         - name: Set local file facts for {{ item.src }}
           ansible.builtin.set_fact:
-            src_file: "{{ ansible_root + '/services/data/' + file_item.src }}"
-            src_ext: "{{ file_item.src | splitext }}"
-          when: file_item.src is defined
+            src_file: "{{ ansible_root + '/services/data/' + file.src }}"
+            src_ext: "{{ file.src | splitext }}"
+          when: file.src is defined
 
         - name: Get local file stats for {{ src_file }}
           ansible.builtin.stat:
@@ -28,43 +28,53 @@
 
     - name: Ensure destination dir exists
       file:
-        path: "{{ file_item.dest | dirname }}"
-        owner: "{{ file_item.dir_owner | default(omit) }}"
-        group: "{{ file_item.dir_group | default(omit) }}"
-        mode: "{{ file_item.dir_mode | default('0700') }}"
+        path: "{{ file.dest | dirname }}"
+        owner: "{{ file.dir_owner | default(omit) }}"
+        group: "{{ file.dir_group | default(omit) }}"
+        mode: "{{ file.dir_mode | default('0755') }}"
         state: directory
 
     - name: Copy file over
       ansible.builtin.copy:
         src: "{{ src_file | default(omit) }}"
-        content: "{{ file_item.content | default(omit) }}"
-        dest: "{{ file_item.dest }}"
-        owner: "{{ file_item.owner | default(omit) }}"
-        group: "{{ file_item.group | default(omit) }}"
-        mode: "{{ file_item.mode | default(omit) }}"
-        force: "{{ file_item.force | default(true) }}"
-      when: src_ext[1] != '.j2'
+        content: "{{ file.content | default(omit) }}"
+        dest: "{{ file.dest }}"
+        owner: "{{ file.owner | default(omit) }}"
+        group: "{{ file.group | default(omit) }}"
+        mode: "{{ file.mode | default(omit) }}"
+        force: "{{ file.force | default(true) }}"
+      when: src_ext[1] != '.j2' and not file_stat.stat.isdir
+
+    - name: Copy directory contents
+      ansible.builtin.copy:
+        src: "{{ src_file }}/"
+        dest: "{{ file.dest }}"
+        owner: "{{ file.owner | default(omit) }}"
+        group: "{{ file.group | default(omit) }}"
+        mode: "{{ file.mode | default(omit) }}"
+        force: "{{ file.force | default(true) }}"
+      when: file_stat.stat.isdir
 
     - name: Copy template over
       ansible.builtin.template:
         src: "{{ src_file }}"
-        dest: "{{ file_item.dest }}"
-        owner: "{{ file_item.owner | default(omit) }}"
-        group: "{{ file_item.group | default(omit) }}"
-        mode: "{{ file_item.mode | default(omit) }}"
-        force: "{{ file_item.force | default(true) }}"
+        dest: "{{ file.dest }}"
+        owner: "{{ file.owner | default(omit) }}"
+        group: "{{ file.group | default(omit) }}"
+        mode: "{{ file.mode | default(omit) }}"
+        force: "{{ file.force | default(true) }}"
       when: src_ext[1] == '.j2'
 
 - name: Create empty file or directory
   become: true
-  delegate_to: "{{ file_item.host }}"
+  delegate_to: "{{ file.host }}"
   ansible.builtin.file:
-    path: "{{ file_item.dest }}"
-    state: "{{ file_item.state | default('directory') }}"
-    mode: "{{ file_item.mode | default(omit) }}"
-    owner: "{{ file_item.owner | default(omit) }}"
-    group: "{{ file_item.group | default(omit) }}"
-    recurse: "{{ true if (file_item.state is undefined or file_item.state == 'directory') else omit }}"
+    path: "{{ file.dest }}"
+    state: "{{ file.state | default('directory') }}"
+    mode: "{{ file.mode | default(omit) }}"
+    owner: "{{ file.owner | default(omit) }}"
+    group: "{{ file.group | default(omit) }}"
+    recurse: "{{ true if (file.state is undefined or file.state == 'directory') else omit }}"
   when:
-    - file_item.src is not defined
-    - file_item.content is not defined
+    - file.src is not defined
+    - file.content is not defined
