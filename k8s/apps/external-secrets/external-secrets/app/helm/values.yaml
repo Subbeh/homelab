@@ -2,9 +2,6 @@
 installCRDs: false
 replicaCount: 1
 
-podAnnotations:
-  tailscale.com/proxy-class: "default"
-
 resources:
   limits:
     cpu: 200m
@@ -35,4 +32,3 @@ certController:
     requests:
       cpu: 50m
       memory: 64Mi
-

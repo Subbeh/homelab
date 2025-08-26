@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
-version: '3'
+version: "3"
 
 tasks:
   setup:
@@ -13,17 +13,6 @@ tasks:
     vars:
       K8S_HOST:
         sh: kubectl config view -o jsonpath='{.clusters[0].cluster.server}'
-    preconditions:
-      - vault status &>/dev/null
-
-  store-secrets:
-    desc: Setup Vault secrets
-    cmds:
-      - task: store-github-deploy-key
-      - task: store-github-webhook-token
-      - task: store-github-status-token
-      - task: store-cf-api-token
-      - task: store-cf-tunnel-secret
     preconditions:
       - vault status &>/dev/null
 
@@ -56,38 +45,3 @@ tasks:
     cmd: |
       until JWT_TOKEN=$(kubectl get secret external-secrets-token -n external-secrets -o jsonpath='{.data.token}' | base64 -d); do sleep 5; done
       vault write auth/homelab/login role=external-secrets jwt="$JWT_TOKEN"
-
-  store-github-deploy-key:
-    desc: Store Github deploy key in Vault
-    cmd: vault kv put secret/k8s/github-deploy identity=@{{.SECRET_DIR}}/github-deploy.key known_hosts="$(ssh-keyscan github.com)"
-    preconditions:
-      - test -f {{.SECRET_DIR}}/github-deploy.key
-
-  store-github-webhook-token:
-    desc: Store Github webhook token in Vault
-    cmd: vault kv put secret/k8s/github-webhook-token token=@{{.SECRET_DIR}}/github-webhook-token.txt
-    preconditions:
-      - test -f {{.SECRET_DIR}}/github-webhook-token.txt
-
-  store-github-status-token:
-    desc: Store Github status token in Vault
-    cmd: vault kv put secret/k8s/github-status-token token=@{{.SECRET_DIR}}/github-status-token.txt
-    preconditions:
-      - test -f {{.SECRET_DIR}}/github-status-token.txt
-
-  store-cf-api-token:
-    desc: Store Cloudflare API token in Vault
-    cmd: vault kv put secret/k8s/cloudflare api_token="$CF_API_TOKEN" zone_id="$CF_ZONE_ID"
-    preconditions:
-      - test -n "$CF_API_TOKEN"
-      - test -n "$CF_ZONE_ID"
-
-  store-cf-tunnel-secret:
-    desc: Store Cloudflare Tunnel secrets in Vault
-    cmd: |
-      jq -r '(.AccountTag + " " + .TunnelSecret + " " + .TunnelID)' < {{.SECRET_DIR}}/cloudflare-tunnel.json | \
-      while read -r account_tag tunnel_secret tunnel_id; do
-        vault kv put secret/k8s/cloudflare-tunnel account_tag="$account_tag" tunnel_id="$tunnel_id" tunnel_secret="$tunnel_secret"
-      done
-    preconditions:
-      - test -f {{.SECRET_DIR}}/cloudflare-tunnel.json
