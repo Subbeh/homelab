@@ -9,17 +9,13 @@ spec:
   refreshInterval: 1h
   secretStoreRef:
     kind: ClusterSecretStore
-    name: vault-backend
+    name: vault
   target:
     name: github-deploy-key
-    creationPolicy: Owner
-  data:
-    - secretKey: identity
-      remoteRef:
-        key: k8s/github-deploy
-        property: identity
-    - secretKey: known_hosts
-      remoteRef:
-        key: k8s/github-deploy
-        property: known_hosts
-
+    template:
+      data:
+        identity: "{{ .identity }}"
+        known_hosts: "{{ .known_hosts }}"
+  dataFrom:
+    - extract:
+        key: ops/infra/github-deploy-key
