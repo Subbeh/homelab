@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
-version: '3'
+version: "3"
 
 vars:
   TALOS_DIR: "{{.ROOT_DIR}}/k8s/talos"
@@ -15,4 +15,3 @@ includes:
   flux: flux.yml
   status: status.yml
   volsync: volsync.yml
-

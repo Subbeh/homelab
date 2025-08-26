@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
-version: '3'
+version: "3"
 
 vars:
   K8S_DIR: "{{.ROOT_DIR}}/k8s"
@@ -21,6 +21,7 @@ includes:
   k8s:
     taskfile: .taskfiles/k8s
     dir: "{{.K8S_DIR}}"
+  secrets: .taskfiles/secrets
 
 tasks:
   default:
