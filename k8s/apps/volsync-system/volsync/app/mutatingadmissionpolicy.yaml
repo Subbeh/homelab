@@ -27,7 +27,7 @@ spec:
     - name: has-volsync-created-by-labels
       expression: >
         object.metadata.labels["app.kubernetes.io/created-by"] == "volsync"
-  failurePolicy: Fail
+  failurePolicy: Ignore
   reinvocationPolicy: IfNeeded
   mutations:
     - patchType: JSONPatch
@@ -79,7 +79,7 @@ spec:
     - name: repository-volume-does-not-exist
       expression: >
         !object.spec.template.spec.volumes.exists(item, item.name == "repository")
-  failurePolicy: Fail
+  failurePolicy: Ignore
   reinvocationPolicy: IfNeeded
   mutations:
     - patchType: JSONPatch
@@ -104,4 +104,3 @@ spec:
               }
             }
           ]
-
