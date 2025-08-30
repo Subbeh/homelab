@@ -5,8 +5,8 @@ groups:
     rules:
       - alert: LokiTest
         expr: |
-          sum by (app) (count_over_time({app="echo"} |~ "(?i)GET /loki-test"[2m])) > 0
-        for: 0m
+          sum by (app) (count_over_time({app="echo"} |~ "/loki-test"[1m])) > 0
+        for: 1m
         labels:
           severity: critical
           category: logs
