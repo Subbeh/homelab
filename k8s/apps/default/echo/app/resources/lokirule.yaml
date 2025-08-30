@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/prometheus.rules.json
+groups:
+  - name: loki-test
+    rules:
+      - alert: LokiTest
+        expr: |
+          sum by (app) (count_over_time({app="echo"} |~ "(?i)GET /loki-test"[2m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+          category: logs
+        annotations:
+          app: "{{ $labels.app }}"
+          summary: "{{ $labels.app }} triggered Loki test rule"
