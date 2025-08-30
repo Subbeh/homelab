@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/prometheus.rules.json
+groups:
+  - name: kometa
+    rules:
+      - alert: KometaErrorsDetected
+        expr: |
+          sum by (app) (count_over_time({app="kometa"} |~ "(?i)Error Summary"[5m])) > 0
+        for: 0m
+        labels:
+          severity: warning
+          category: logs
+        annotations:
+          app: "{{ $labels.app }}"
+          summary: "{{ $labels.app }} has encountered errors during execution"
+          description: "Check the logs for the Error Summary section with detailed error messages"
+
+      - alert: KometaCriticalErrorsDetected
+        expr: |
+          sum by (app) (count_over_time({app="kometa"} |~ "(?i)Critical Summary"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+          category: logs
+        annotations:
+          app: "{{ $labels.app }}"
+          summary: "{{ $labels.app }} has encountered critical errors"
+          description: "Check the logs for the Critical Summary section with detailed error messages"
+
