@@ -23,6 +23,8 @@ spec:
   chartRef:
     kind: OCIRepository
     name: loki
+  driftDetection:
+    mode: enabled
   install:
     crds: Skip
     remediation:
