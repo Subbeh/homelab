@@ -1,20 +1,125 @@
 ---
 libraries:
   Movies:
+    collection_files:
+      - default: basic
+      - default: imdb
+        template_variables:
+          use_popular: false
+          use_lowest: false
+          visible_library_top: true
+          visible_home_top: true
+          visible_shared_top: true
     overlay_files:
       - remove_overlays: false
       - default: ribbon
+        template_variables:
+          use_common: false
+          use_rotten: false
+          use_rottenverified: false
+          use_metacritic: false
+      - default: ratings
+        template_variables:
+          rating1: user
+          rating2: audience
+          rating1_image: imdb
+          rating2_image: rt_popcorn
+          horizontal_align: left
+          vertical_position: top
+          vertical_offset: 0
+          rating_alignment: horizontal
+          font_size: 55
+    operations:
+      mass_user_rating_update: imdb
+      mass_audience_rating_update: mdb_tomatoesaudience
+      mass_genre_update: imdb
+      mass_content_rating_update: omdb
+      delete_collections:
+        configured: true
+        managed: true
+        less: 2
+        ignore_empty_smart_collections: true
 
   TV Shows:
+    collection_files:
+      - default: basic
+      - default: imdb
     overlay_files:
       - remove_overlays: false
       - default: ribbon
+      - default: ratings
+        template_variables:
+          rating1: user
+          rating1_image: imdb
+          horizontal_position: left
+          vertical_position: top
+          rating_alignment: horizontal
+          vertical_offset: 15
+          horizontal_offset: 0
+      - default: ratings
+        template_variables:
+          builder_level: episode
+          rating1: user
+          rating1_image: imdb
+          horizontal_position: left
+          vertical_position: top
+          rating_alignment: horizontal
+          vertical_offset: 15
+          horizontal_offset: 0
+    operations:
+      mass_user_rating_update: imdb
+      mass_episode_user_rating_update: imdb
+      mass_genre_update: tmdb
+      mass_content_rating_update: omdb
+      delete_collections:
+        configured: true
+        managed: true
+        less: 2
+        ignore_empty_smart_collections: true
 
 settings:
+  run_order:
+    - collections
+    - metadata
+    - operations
+    - overlays
   sync_mode: sync
+  cache: true
+  cache_expiration: 60
+  asset_folders: false
+  asset_depth: 0
+  create_asset_folders: false
+  prioritize_assets: false
+  dimensional_asset_rename: false
+  download_url_assets: false
+  show_missing_season_assets: false
+  show_missing_episode_assets: false
+  show_asset_not_needed: true
+  default_collection_order:
+  minimum_items: 1
+  item_refresh_delay: 0
+  delete_below_minimum: false
+  delete_not_scheduled: false
+  run_again_delay: 0
+  missing_only_released: false
+  only_filter_missing: false
   show_missing: false
   show_missing_assets: false
+  show_unmanaged: true
+  show_unconfigured: true
+  show_filtered: false
+  show_unfiltered: false
+  show_options: false
+  save_report: false
+  tvdb_language: eng
+  playlist_sync_to_users:
+  playlist_exclude_users:
+  playlist_report: true
+  verify_ssl: true
   # custom_repo: https://github.com/Subbeh/homelab/tree/main/k8s/apps/media/plex/kometa/custom/
+  custom_repo:
+  overlay_artwork_filetype: webp_lossy
+  overlay_artwork_quality: 90
 
 mdblist:
   apikey: <<MDBLIST_API_KEY>>
@@ -31,39 +136,39 @@ plex:
   clean_bundles: false
   empty_trash: false
   optimize: false
+  verify_ssl:
+  db_cache:
 
-radarr:
-  url: http://radarr
-  token: <<RADARR_API_KEY>>
-  add_missing: false
-  add_existing: false
-  root_folder_path: /media/movies
-  monitor: true
-  availability: announced
-  quality_profile: HD
-  tag:
-  search: false
-  radarr_path:
-  plex_path:
-  upgrade_existing: false
+# radarr:
+#   url: http://radarr
+#   token: <<RADARR_API_KEY>>
+#   add_missing: false
+#   add_existing: false
+#   root_folder_path: /media/movies
+#   availability: announced
+#   quality_profile: HD
+#   tag:
+#   search: false
+#   radarr_path:
+#   plex_path:
+#   upgrade_existing: false
 
-sonarr:
-  url: http://sonarr
-  token: <<SONARR_API_KEY>>
-  add_missing: false
-  add_existing: false
-  root_folder_path: /media/tv
-  monitor: all
-  quality_profile: HD
-  language_profile: English
-  series_type: standard
-  season_folder: true
-  tag:
-  search: false
-  cutoff_search: false
-  sonarr_path:
-  plex_path:
-  upgrade_existing: false
+# sonarr:
+#   url: http://sonarr
+#   token: <<SONARR_API_KEY>>
+#   add_missing: false
+#   add_existing: false
+#   root_folder_path: /media/tv
+#   quality_profile: HD
+#   language_profile: English
+#   series_type: standard
+#   season_folder: true
+#   tag:
+#   search: false
+#   cutoff_search: false
+#   sonarr_path:
+#   plex_path:
+#   upgrade_existing: false
 
 tmdb:
   apikey: <<TMDB_API_KEY>>
