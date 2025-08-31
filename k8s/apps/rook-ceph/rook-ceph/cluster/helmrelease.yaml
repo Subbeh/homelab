@@ -27,7 +27,7 @@ spec:
   driftDetection:
     mode: enabled
     ignore:
-      - paths: ['']
+      - paths: [""]
         target:
           kind: CephCluster
   install:
@@ -67,12 +67,12 @@ spec:
     cephClusterSpec:
       cephConfig:
         global:
-          bdev_enable_discard: "true"  # quote
-          bdev_async_discard_threads: "1"  # quote
-          osd_class_update_on_start: "false"  # quote
-          device_failure_prediction_mode: local  # requires mgr module
+          bdev_enable_discard: "true" # quote
+          bdev_async_discard_threads: "1" # quote
+          osd_class_update_on_start: "false" # quote
+          device_failure_prediction_mode: local # requires mgr module
         mgr:
-          "mgr/prometheus/server_addr": "0.0.0.0"  # Fix IPv4 binding for prometheus metrics
+          "mgr/prometheus/server_addr": "0.0.0.0" # Fix IPv4 binding for prometheus metrics
       cleanupPolicy:
         wipeDevicesFromOtherClusters: true
       crashCollector:
@@ -99,9 +99,9 @@ spec:
         mgr:
           requests:
             cpu: 250m
-            memory: 512Mi
-          limits:
             memory: 1Gi
+          limits:
+            memory: 2Gi
         mon:
           requests:
             cpu: 250m
