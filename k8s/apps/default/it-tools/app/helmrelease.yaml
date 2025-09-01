@@ -1,0 +1,68 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: it-tools
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+  driftDetection:
+    mode: enabled
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      echo:
+        strategy: RollingUpdate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/corentinth/it-tools
+              tag: 2024.10.22-7ca5933
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: &port 80
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext: {}
+            resources:
+              requests:
+                cpu: 200m
+              limits:
+                memory: 124Mi
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    serviceMonitor:
+      app:
+        endpoints:
+          - port: http
+    route:
+      app:
+        hostnames: ["tools.sbbh.cloud"]
+        parentRefs:
+          - name: external
+            namespace: kube-system
+            sectionName: https
