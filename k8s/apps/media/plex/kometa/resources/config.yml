@@ -47,6 +47,11 @@ libraries:
     overlay_files:
       - remove_overlays: false
       - default: ribbon
+        template_variables:
+          use_common: false
+          use_rotten: false
+          use_rottenverified: false
+          use_metacritic: false
       - default: ratings
         template_variables:
           rating1: user
