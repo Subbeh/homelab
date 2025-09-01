@@ -37,7 +37,7 @@ releases:
   - name: tailscale
     namespace: tailscale
     chart: tailscale/tailscale-operator
-    version: 1.86.2
+    version: 1.86.5
     values: ['apps/tailscale/tailscale/app/helm/values.yaml']
     needs: ['kube-system/spegel']
 
