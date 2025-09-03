@@ -2,6 +2,15 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   packageRules: [
     {
+      description: "Auto-merge trusted container digests",
+      matchDatasources: ["docker"],
+      automerge: true,
+      automergeType: "pr",
+      matchUpdateTypes: ["digest"],
+      matchPackageNames: ["/home-operations/"],
+      ignoreTests: false,
+    },
+    {
       description: "Auto-merge OCI Charts",
       matchDatasources: ["docker"],
       automerge: true,
@@ -43,4 +52,3 @@
     },
   ],
 }
-
