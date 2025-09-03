@@ -9,6 +9,7 @@ spec:
   version: v1.34.0
   concurrency: 1
   exclusive: true
+  jobActiveDeadlineSecs: 1800
   serviceAccountName: system-upgrade-controller
   secrets:
     - name: system-upgrade-controller
