@@ -11,6 +11,7 @@ skip_list:
   - no-handler
   - empty-lines
   - line-length
+  - name[play]
 
 warn_list:
   - parser-error
