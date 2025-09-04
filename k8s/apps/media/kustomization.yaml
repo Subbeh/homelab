@@ -13,4 +13,4 @@ resources:
   - ./sonarr/ks.yaml
   - ./bazarr/ks.yaml
   - ./plex/ks.yaml
-
+  - ./audiobookshelf/ks.yaml
