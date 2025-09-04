@@ -10,12 +10,12 @@
     vm_memory: 8192
     vm_cores: 4
     vm_network:
-      net0: 'virtio,bridge=vmbr0,queues=4'
-      net1: 'virtio,bridge=vmbr1,queues=4'
-      net2: 'virtio,bridge=vmbr2,queues=4'
+      net0: "virtio,bridge=vmbr0,queues=4"
+      net1: "virtio,bridge=vmbr1,queues=4"
+      net2: "virtio,bridge=vmbr2,queues=4"
     vm_ostype: other
     vm_cpu: "x86-64-v2-AES,flags=+aes"
-    vm_scsi_options: {discard: on, iothread: 1, ssd: 1}
+    vm_scsi_options: { discard: "on", iothread: 1, ssd: 1 }
     vm_virtio:
       scsi0: "local-lvm:64,discard=on,iothread=1,ssd=1"
     vm_ide:
@@ -42,71 +42,85 @@
   gather_facts: false
   tags: ["never", "configure"]
 
+  module_defaults:
+    group/ansibleguy.opnsense.all:
+      firewall: opnsense
+      ssl_verify: false
+      api_port: "4443"
+      api_key: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
+      api_secret: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
+    ansibleguy.opnsense.rule_multi:
+      match_fields: ["description"]
+      key_field: "description"
+    ansibleguy.opnsense.rule_purge:
+      match_fields: ["description"]
+      key_field: "description"
+
   vars:
-    interfaces:  # INFO: CHANGE ACCORDINGLY
+    interfaces: # INFO: CHANGE ACCORDINGLY
       wan: vtnet0
       lan: vtnet1
       trunk: vtnet2
 
-    lan: {subnet: "10.11.254.0/24"}
+    lan: { subnet: "10.11.254.0/24" }
     vlans:
-      - {name: INFRA, interface: trunk, id: 10, subnet: "10.11.10.0/24", desc: "Infra", restricted: false}
-      - {name: K8S, interface: trunk, id: 80, subnet: "10.11.80.0/24", desc: "Kubernetes Cluster", restricted: false}
-      - {name: CLIENTS, interface: trunk, id: 100, subnet: "10.11.100.0/24", desc: "Clients", restricted: false}
-      - {name: RESTRICTED, interface: trunk, id: 200, subnet: "10.11.200.0/24", desc: "Restricted", restricted: true,}
+      - { name: INFRA, interface: trunk, id: 10, subnet: "10.11.10.0/24", desc: "Infra", restricted: false }
+      - { name: K8S, interface: trunk, id: 80, subnet: "10.11.80.0/24", desc: "Kubernetes Cluster", restricted: false }
+      - { name: CLIENTS, interface: trunk, id: 100, subnet: "10.11.100.0/24", desc: "Clients", restricted: false }
+      - { name: RESTRICTED, interface: trunk, id: 200, subnet: "10.11.200.0/24", desc: "Restricted", restricted: true }
 
     aliases:
-      net_tailscale: {desc: Tailscale CIDR, type: network, content: "100.64.0.0/10"}
-      net_local_all: {desc: Local Networks, type: network, content: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "100.64.0.0/10"]}
-      host_vps: {desc: VPS via Tailscale, type: host, content: "{{ lookup('pipe', 'tailscale status --json | jq -r \".Peer[] | select(.HostName == \\\"vps\\\") | .TailscaleIPs[0]\"') }}"}
-      host_nas: {desc: NAS address, type: host, content: "{{ hostvars['pve-nas'].ip_addr | ipaddr('address') }}"}
-      host_mgmt: {desc: Management VM address, type: host, content: "{{ hostvars['mgmt'].ip_addr | ipaddr('address') }}"}
-      host_services: {desc: Services LXC address, type: host, content: "{{ hostvars['services'].ip_addr | ipaddr('address') }}"}
-      host_k8s_api: {desc: Kubernetes API server, type: host, content: "10.11.80.100"}
-      host_k8s_ext: {desc: Kubernetes External Gateway, type: host, content: "10.11.80.80"}
-      host_k8s_int: {desc: Kubernetes Internal Gateway, type: host, content: "10.11.80.81"}
-      host_k8s_dns_gateway: {desc: k8s-gateway DNS, type: host, content: "10.11.80.82"}
-      host_nas_k8s: {desc: NAS Kubernetes address, type: host, content: "192.168.80.100"}
-      host_opnsense_k8s: {desc: OPNsense K8S VLAN Interface, type: host, content: "10.11.80.1"}
-      host_pve_fw: {desc: Proxmox VE Firewall Host, type: host, content: "{{ hostvars['pve-fw'].ip_addr | ipaddr('address') }}"}
-      ports_unifi: {desc: Unifi Network Server Ports, type: port, content: ["8080", "10001", "3478"]}
-      ports_vault: {desc: Vault Server Ports, type: port, content: ["8200"]}
-      ports_nfs: {desc: NFS Ports, type: port, content: ["111", "2049", "20048"]}
-      ports_pve_api: {desc: Proxmox VE API Ports, type: port, content: ["8006"]}
-      ports_k8s_api: {desc: Kubernetes API port, type: port, content: ["6443"]}
+      net_tailscale: { desc: Tailscale CIDR, type: network, content: "100.64.0.0/10" }
+      net_local_all: { desc: Local Networks, type: network, content: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "100.64.0.0/10"] }
+      host_vps: { desc: VPS via Tailscale, type: host, content: "{{ lookup('pipe', 'tailscale status --json | jq -r \".Peer[] | select(.HostName == \\\"vps\\\") | .TailscaleIPs[0]\"') }}" }
+      host_nas: { desc: NAS address, type: host, content: "{{ hostvars['pve-nas'].ip_addr | ipaddr('address') }}" }
+      host_mgmt: { desc: Management VM address, type: host, content: "{{ hostvars['mgmt'].ip_addr | ipaddr('address') }}" }
+      host_services: { desc: Services LXC address, type: host, content: "{{ hostvars['services'].ip_addr | ipaddr('address') }}" }
+      host_k8s_api: { desc: Kubernetes API server, type: host, content: "10.11.80.100" }
+      host_k8s_ext: { desc: Kubernetes External Gateway, type: host, content: "10.11.80.80" }
+      host_k8s_int: { desc: Kubernetes Internal Gateway, type: host, content: "10.11.80.81" }
+      host_k8s_dns_gateway: { desc: k8s-gateway DNS, type: host, content: "10.11.80.82" }
+      host_nas_k8s: { desc: NAS Kubernetes address, type: host, content: "192.168.80.100" }
+      host_opnsense_k8s: { desc: OPNsense K8S VLAN Interface, type: host, content: "10.11.80.1" }
+      host_pve_fw: { desc: Proxmox VE Firewall Host, type: host, content: "{{ hostvars['pve-fw'].ip_addr | ipaddr('address') }}" }
+      ports_web: { desc: HTTP(S) ports, type: port, content: ["80", "443"] }
+      ports_unifi: { desc: Unifi Network Server Ports, type: port, content: ["8080", "10001", "3478"] }
+      ports_vault: { desc: Vault Server Ports, type: port, content: ["8200"] }
+      ports_nfs: { desc: NFS Ports, type: port, content: ["111", "2049", "20048"] }
+      ports_pve_api: { desc: Proxmox VE API Ports, type: port, content: ["8006"] }
+      ports_k8s_api: { desc: Kubernetes API port, type: port, content: ["6443"] }
 
     firewall:
       groups:
-        - {name: WANGroup, desc: WAN interface, members: ['WAN']}
-        - {name: LANGroup, desc: LAN interface, members: ['LAN']}
-        - {name: VLANGroup, desc: all unrestricted VLAN interfaces, members: "{{ vlans | selectattr('restricted', 'equalto', false) | map(attribute='name') | list }}"}
-        - {name: VLANGroupAll, desc: all VLAN interfaces, members: "{{ vlans | map(attribute='name') | list }}"}
-        - {name: INFRAGroup, desc: INFRA interface, members: ['INFRA']}
-        - {name: K8SGroup, desc: K8S interface, members: ['K8S']}
-        - {name: CLIENTSGroup, desc: CLIENTS interface, members: ['CLIENTS']}
+        - { name: WANGroup, desc: WAN interface, members: ["WAN"] }
+        - { name: LANGroup, desc: LAN interface, members: ["LAN"] }
+        - { name: VLANGroup, desc: all unrestricted VLAN interfaces, members: "{{ vlans | selectattr('restricted', 'equalto', false) | map(attribute='name') | list }}" }
+        - { name: VLANGroupAll, desc: all VLAN interfaces, members: "{{ vlans | map(attribute='name') | list }}" }
+        - { name: INFRAGroup, desc: INFRA interface, members: ["INFRA"] }
+        - { name: K8SGroup, desc: K8S interface, members: ["K8S"] }
+        - { name: CLIENTSGroup, desc: CLIENTS interface, members: ["CLIENTS"] }
       rules:
-        allow_icmp: {interface: VLANGroup, protocol: ICMP, description: Allow ICMPv4}
-        allow_lan_icmp: {interface: LANGroup, protocol: ICMP, description: Allow LAN ICMPv4}
-        allow_dns_tcp: {interface: VLANGroupAll, protocol: TCP, source: __VLANGroupAll_network, destination: any, destination_port: 53, description: Allow DNS TCP}
-        allow_dns_udp: {interface: VLANGroupAll, protocol: UDP, source: __VLANGroupAll_network, destination: any, destination_port: 53, description: Allow DNS UDP}
-        allow_internet_tcp: {interface: VLANGroupAll, protocol: TCP, source: __VLANGroupAll_network, destination: net_local_all, destination_invert: true, description: Allow all internet TCP}
-        allow_internet_udp: {interface: VLANGroupAll, protocol: UDP, source: __VLANGroupAll_network, destination: net_local_all, destination_invert: true, description: Allow all internet UDP}
-        allow_lan_all_tcp: {interface: LANGroup, protocol: TCP, source: __LANGroup_network, destination: any, description: Allow all LAN TCP}
-        allow_lan_all_udp: {interface: LANGroup, protocol: UDP, source: __LANGroup_network, destination: any, description: Allow all LAN UDP}
-        allow_nfs_nas_tcp: {interface: VLANGroup, protocol: TCP, source: any, destination: "{{ aliases.host_nas.content }}", destination_port: ports_nfs, description: Allow TCP NFS and RPC to NAS from all networks}
-        allow_nfs_nas_udp: {interface: VLANGroup, protocol: UDP, source: any, destination: "{{ aliases.host_nas.content }}", destination_port: ports_nfs, description: Allow UDP NFS and RPC to NAS from all networks}
-        allow_tftp: {interface: VLANGroup, protocol: UDP, source: __VLANGroup_network, destination: "{{ aliases.host_services.content }}", destination_port: 69, description: Allow TFTP to NAS}  # TODO
-        allow_tftp_out: {interface: INFRAGroup, protocol: UDP, source: "{{ aliases.host_services.content }}", destination_port: 1024-65535, description: Allow TFTP UDP replies}  # TODO
-        allow_k8s_node_exporter: {interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_opnsense_k8s.content }}", destination_port: 9100, description: Allow K8S to OPNsense Node Exporter}
-        allow_k8s_pve_api: {interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_pve_fw.content }}", destination_port: ports_pve_api, description: Allow K8S to Proxmox VE API}
-        allow_k8s_vps: {interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_vps.content }}", description: Allow all traffic from K8S to vps}
-        allow_k8s_services: {interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_services.content }}", description: Allow all traffic from K8S to services}
-        allow_k8s_mgmt: {interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_mgmt.content }}", description: Allow all traffic from K8S to mgmt}
-        allow_mgmt_k8s_api: {interface: INFRAGroup, protocol: TCP, source: "{{ aliases.host_mgmt.content }}", destination: "{{ aliases.host_k8s_api.content }}", destination_port: ports_k8s_api, description: Allow K8S API access to mgmt}
-        allow_wan_k8s_external_https: {interface: WANGroup, protocol: TCP, source: any, destination: "{{ aliases.host_k8s_ext.content }}", destination_port: 443, description: Allow HTTPS to K8S External Gateway}
-        allow_wan_k8s_external_http: {interface: WANGroup, protocol: TCP, source: any, destination: "{{ aliases.host_k8s_ext.content }}", destination_port: 80, description: Allow HTTP to K8S External Gateway}
-        block_wan_k8s_internal_https: {interface: WANGroup, protocol: TCP, source: any, destination: "{{ aliases.host_k8s_int.content }}", destination_port: 443, action: block, description: Block HTTPS to K8S Internal Gateway}
-        block_wan_k8s_internal_http: {interface: WANGroup, protocol: TCP, source: any, destination: "{{ aliases.host_k8s_int.content }}", destination_port: 80, action: block, description: Block HTTP to K8S Internal Gateway}
+        allow_icmp: { interface: VLANGroup, protocol: ICMP, description: Allow ICMPv4 }
+        allow_lan_icmp: { interface: LANGroup, protocol: ICMP, description: Allow LAN ICMPv4 }
+        allow_dns_tcp: { interface: VLANGroupAll, protocol: TCP, source: __VLANGroupAll_network, destination_port: 53, description: Allow DNS TCP }
+        allow_dns_udp: { interface: VLANGroupAll, protocol: UDP, source: __VLANGroupAll_network, destination_port: 53, description: Allow DNS UDP }
+        allow_internet_tcp: { interface: VLANGroupAll, protocol: TCP, source: __VLANGroupAll_network, destination: net_local_all, destination_invert: true, description: Allow all internet TCP }
+        allow_internet_udp: { interface: VLANGroupAll, protocol: UDP, source: __VLANGroupAll_network, destination: net_local_all, destination_invert: true, description: Allow all internet UDP }
+        allow_lan_all_tcp: { interface: LANGroup, protocol: TCP, source: __LANGroup_network, description: Allow all LAN TCP }
+        allow_lan_all_udp: { interface: LANGroup, protocol: UDP, source: __LANGroup_network, description: Allow all LAN UDP }
+        allow_nfs_nas_tcp: { interface: VLANGroup, protocol: TCP, destination: "{{ aliases.host_nas.content }}", destination_port: ports_nfs, description: Allow TCP NFS and RPC to NAS from all networks }
+        allow_nfs_nas_udp: { interface: VLANGroup, protocol: UDP, destination: "{{ aliases.host_nas.content }}", destination_port: ports_nfs, description: Allow UDP NFS and RPC to NAS from all networks }
+        allow_tftp: { interface: VLANGroup, protocol: UDP, source: __VLANGroup_network, destination: "{{ aliases.host_services.content }}", destination_port: 69, description: Allow TFTP to NAS } # TODO
+        allow_tftp_out: { interface: INFRAGroup, protocol: UDP, source: "{{ aliases.host_services.content }}", destination_port: 1024-65535, description: Allow TFTP UDP replies } # TODO
+        allow_k8s_node_exporter: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_opnsense_k8s.content }}", destination_port: 9100, description: Allow K8S to OPNsense Node Exporter }
+        allow_k8s_pve_api: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_pve_fw.content }}", destination_port: ports_pve_api, description: Allow K8S to Proxmox VE API }
+        allow_k8s_vps: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_vps.content }}", description: Allow all traffic from K8S to vps }
+        allow_k8s_services: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_services.content }}", description: Allow all traffic from K8S to services }
+        allow_k8s_mgmt: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_mgmt.content }}", description: Allow all traffic from K8S to mgmt }
+        allow_mgmt_k8s_api: { interface: INFRAGroup, protocol: TCP, source: "{{ aliases.host_mgmt.content }}", destination: "{{ aliases.host_k8s_api.content }}", destination_port: ports_k8s_api, description: Allow K8S API access to mgmt }
+        allow_wan_k8s_external_web: { interface: WANGroup, protocol: TCP, destination: "{{ aliases.host_k8s_ext.content }}", destination_port: ports_web, description: Allow HTTP(S) to K8S External Gateway }
+        block_wan_k8s_internal_web: { interface: WANGroup, protocol: TCP, destination: "{{ aliases.host_k8s_int.content }}", destination_port: ports_web, action: block, description: Block HTTP(S) to K8S Internal Gateway }
+        allow_infra_k8s_web: { interface: INFRAGroup, protocol: TCP, destination: "{{ aliases.host_k8s_int.content }}", destination_port: ports_web, description: Allow HTTP(S) from INFRA to K8S Internal Gateway }
 
     dns:
       unbound:
@@ -152,20 +166,6 @@
       - os-qemu-guest-agent
 
     acme_email: "cert@{{ net_domain }}"
-
-  module_defaults:
-    group/ansibleguy.opnsense.all:
-      firewall: opnsense
-      ssl_verify: false
-      api_port: "4443"
-      api_key: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
-      api_secret: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
-    ansibleguy.opnsense.rule_multi:
-      match_fields: ['description']
-      key_field: 'description'
-    ansibleguy.opnsense.rule_purge:
-      match_fields: ['description']
-      key_field: 'description'
 
   tasks:
     - name: Install plugins
