@@ -10,3 +10,4 @@ resources:
   - ./echo/ks.yaml
   - ./openspeedtest/ks.yaml
   - ./it-tools/ks.yaml
+  - ./karakeep/ks.yaml
