@@ -17,6 +17,7 @@ spec:
     substitute:
       APP: *app
       GATUS_SUBDOMAIN: echo-ext
+      GATUS_GROUP: services
   prune: true
   retryInterval: 2m
   sourceRef:

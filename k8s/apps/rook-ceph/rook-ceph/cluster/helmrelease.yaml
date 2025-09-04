@@ -95,7 +95,7 @@ spec:
             enabled: true
           - name: rook
             enabled: true
-      resources:
+      resources: # TODO
         mgr:
           requests:
             cpu: 250m
