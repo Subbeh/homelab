@@ -24,7 +24,7 @@ spec:
     controllers:
       sabnzbd:
         annotations:
-          reloader.stakater.com/auto: 'true'
+          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
@@ -54,13 +54,12 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ['ALL']}
-            resources:
+              capabilities: { drop: ["ALL"] }
+            resources: # TODO
               requests:
                 cpu: 100m
-                memory: 1Gi
               limits:
-                memory: 12Gi
+                memory: 6Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -118,4 +117,3 @@ spec:
                 subPath: logs
               - path: /tmp
                 subPath: tmp
-
