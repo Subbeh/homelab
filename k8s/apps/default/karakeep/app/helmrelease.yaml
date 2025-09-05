@@ -162,8 +162,7 @@ spec:
                 subPath: meilisearch
     route:
       app:
-        hostnames:
-          - karakeep.sbbh.cloud
+        hostnames: ["karakeep.sbbh.cloud"]
         parentRefs:
           - name: external
             namespace: kube-system
