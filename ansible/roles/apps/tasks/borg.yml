@@ -3,7 +3,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: '0750'
+    mode: "0750"
     owner: root
     group: root
   loop:
@@ -64,7 +64,7 @@
 
 - name: Set key ID from existing key
   ansible.builtin.set_fact:
-    borgbase_key: {"key_id": "{{ borgbase_key_org[0].id }}"}
+    borgbase_key: { "key_id": "{{ borgbase_key_org[0].id }}" }
   when: borgbase_key_org | length > 0
 
 - name: Find admin key ID
@@ -78,7 +78,7 @@
     name: "{{ borgbase_repo_name }}"
     full_access_keys: ["{{ borgbase_key.key_id }}", "{{ admin_key_id }}"]
     quota_enabled: false
-    alert_days: 1
+    alert_days: "{{ borgbase_alert_days | default(1) }}"
   register: borgbase_repo
 
 - name: Set borgbase repo path
@@ -97,7 +97,7 @@
   ansible.builtin.template:
     src: borgmatic/config.yaml.j2
     dest: /etc/borgmatic/config.yaml
-    mode: '0600'
+    mode: "0600"
     owner: root
     group: root
   become: true
@@ -111,7 +111,7 @@
   ansible.builtin.template:
     src: borgmatic/borgmatic.timer.j2
     dest: /etc/systemd/system/borgmatic.timer
-    mode: '0644'
+    mode: "0644"
   become: true
   notify: Restart borgmatic timer
 
@@ -119,7 +119,7 @@
   ansible.builtin.template:
     src: borgmatic/borgmatic.service.j2
     dest: /etc/systemd/system/borgmatic.service
-    mode: '0644'
+    mode: "0644"
   become: true
   notify: Restart borgmatic timer
 

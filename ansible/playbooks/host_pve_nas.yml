@@ -16,6 +16,7 @@
       - ssh
       - profile
     apps:
+      - borg
       - node_exporter
     host_packages:
       - name: nfs-kernel-server
@@ -38,6 +39,11 @@
       - { path: /data/nvme/downloads, options: "10.11.0.0/16({{ nfs_opts}}) 100.64.0.0/10({{ nfs_opts}}) 192.168.80.0/24({{ nfs_opts}})" }
       - { path: /data/nvme/k8s/data, options: "192.168.80.0/24({{ nfs_opts}})" }
       - { path: /data/nvme/k8s/volsync, options: "192.168.80.0/24({{ nfs_opts}})" }
+    borgbase_repo_name: nas
+    borg_schedule: weekly
+    borgbase_alert_days: 7
+    borg_source_directories:
+      - "/data/nvme/k8s/volsync"
 
   roles:
     - { role: pve_setup, tags: pve_setup }
