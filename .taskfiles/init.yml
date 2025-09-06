@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
-version: '3'
+version: "3"
 
 tasks:
   default:
@@ -50,6 +50,7 @@ tasks:
       - kubectl krew index add netshoot https://github.com/nilic/kubectl-netshoot.git || true
       - kubectl krew install netshoot/netshoot
       - kubectl krew install get-all
+      - kubectl krew install tree
 
   :update:
     desc: Update all dependencies
@@ -59,4 +60,3 @@ tasks:
       # - task: precommit:update # TODO
       - pre-commit autoupdate
       - kubectl krew update
-

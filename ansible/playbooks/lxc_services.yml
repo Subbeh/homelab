@@ -15,8 +15,8 @@
       config:
         vmid: 1020
         hostname: services
-        memory: 4096
-        cpus: 2
+        memory: 8192
+        cpus: 4
         disk: "local-lvm:20"
         netif:
           net0: "name=eth0,ip={{ hostvars['services'].ip_addr }},gw={{ hostvars['services'].ip_addr | ansible.utils.nthhost(1) }},bridge=vmbr0"
@@ -72,6 +72,6 @@
           ansible.builtin.setup:
 
   roles:
-    - {role: common, tags: common}
-    - {role: apps, tags: apps}
-    - {role: services, tags: services}
+    - { role: common, tags: common }
+    - { role: apps, tags: apps }
+    - { role: services, tags: services }
