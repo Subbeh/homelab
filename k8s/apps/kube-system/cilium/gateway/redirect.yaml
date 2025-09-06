@@ -11,6 +11,9 @@ spec:
     - name: internal
       namespace: kube-system
       sectionName: http
+    - name: internal-root
+      namespace: kube-system
+      sectionName: http
     - name: external
       namespace: kube-system
       sectionName: http
@@ -20,4 +23,3 @@ spec:
             scheme: https
             statusCode: 301
           type: RequestRedirect
-

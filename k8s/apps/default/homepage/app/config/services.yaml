@@ -1,0 +1,133 @@
+---
+- Media:
+    - Bazarr:
+        icon: bazarr.svg
+        href: https://bazarr.sbbh.cloud
+        app: bazarr
+        namespace: media
+        widget:
+          type: bazarr
+          url: http://bazarr.media.svc.cluster.local.:80
+          key: "{{HOMEPAGE_VAR_BAZARR_TOKEN}}"
+    - Calibre:
+        icon: calibre-web.svg
+        href: https://calibre.sbbh.cloud
+        app: calibre
+        namespace: media
+        widget:
+          type: calibreweb
+          url: http://calibre.media.svc.cluster.local.:8083
+          username: "{{HOMEPAGE_VAR_CALIBRE_USER}}"
+          password: "{{HOMEPAGE_VAR_CALIBRE_PASS}}"
+    - Plex:
+        icon: plex.svg
+        href: https://plex.sbbh.cloud
+        app: plex
+        namespace: media
+        widget:
+          type: plex
+          url: http://plex.media.svc.cluster.local.:32400
+          key: "{{HOMEPAGE_VAR_PLEX_TOKEN}}"
+          enableNowPlaying: true
+    - Prowlarr:
+        icon: prowlarr.svg
+        href: https://prowlarr.sbbh.cloud
+        app: prowlarr
+        namespace: media
+        widget:
+          type: prowlarr
+          url: http://prowlarr.media.svc.cluster.local.:80
+          key: "{{HOMEPAGE_VAR_PROWLARR_TOKEN}}"
+    - qBittorrent:
+        icon: qbittorrent.svg
+        href: https://qb.sbbh.cloud
+        app: qbittorrent
+        namespace: media
+        widget:
+          type: qbittorrent
+          url: http://qbittorrent.media.svc.cluster.local.:80
+          username: "{{HOMEPAGE_VAR_QB_USER}}"
+          password: "{{HOMEPAGE_VAR_QB_PASS}}"
+          enableLeechProgress: true # optional, defaults to false
+    - Radarr:
+        href: https://radarr.sbbh.cloud
+        icon: radarr.svg
+        app: radarr
+        namespace: media
+        widget:
+          type: radarr
+          url: http://radarr.media.svc.cluster.local.:80
+          key: "{{HOMEPAGE_VAR_RADARR_TOKEN}}"
+    - SABnzbd:
+        icon: sabnzbd.svg
+        href: https://sabnzbd.sbbh.cloud
+        app: sabnzbd
+        namespace: media
+        widget:
+          type: sabnzbd
+          url: http://sabnzbd.media.svc.cluster.local.:80
+          key: "{{HOMEPAGE_VAR_SABNZBD_TOKEN}}"
+    - Sonarr:
+        href: https://sonarr.sbbh.cloud
+        icon: sonarr.svg
+        app: sonarr
+        namespace: media
+        widget:
+          type: sonarr
+          url: http://sonarr.media.svc.cluster.local.:80
+          key: "{{HOMEPAGE_VAR_SONARR_TOKEN}}"
+
+- Infrastructure:
+    - Unifi:
+        icon: unifi.svg
+        href: https://mgmt:8443
+    - OPNsense:
+        href: https://opnsense.int.sbbh.cloud:4443
+        icon: opnsense.svg
+        widget:
+          type: opnsense
+          url: &opnense_url https://opnsense.int.sbbh.cloud:4443
+          username: "{{HOMEPAGE_VAR_OPNSENSE_KEY}}"
+          password: "{{HOMEPAGE_VAR_OPNSENSE_SECRET}}"
+    - Proxmox:
+        - Cluster:
+            icon: proxmox.svg
+            href: &pve_url https://pve-fw.int.sbbh.cloud:8006
+            widget:
+              type: proxmox
+              url: *pve_url
+              username: "{{HOMEPAGE_VAR_PVE_TOKEN}}"
+              password: "{{HOMEPAGE_VAR_PVE_SECRET}}"
+
+        - OPNsense:
+            icon: opnsense.svg
+            href: *opnense_url
+            description: OPNsense Firewall VM
+            proxmoxNode: pve-fw
+            proxmoxVMID: 2541
+        - Management:
+            icon: mdi-server-outline.svg
+            description: Management VM
+            proxmoxNode: pve-fw
+            proxmoxVMID: 1002
+        - Services:
+            icon: mdi-server-outline.svg
+            description: Services VM
+            proxmoxNode: pve-nas
+            proxmoxVMID: 1020
+            proxmoxType: lxc
+
+- Calendar:
+    - Agenda:
+        widget:
+          type: calendar
+          view: agenda # optional - possible values monthly, agenda
+          maxEvents: 5 # optional - defaults to 10
+          integrations: # optional
+            - type: sonarr # active widget type that is currently enabled on homepage - possible values: radarr, sonarr, lidarr, readarr, ical
+              service_group: Media # group name where widget exists
+              service_name: Sonarr # service name for that widget
+            - type: radarr # active widget type that is currently enabled on homepage - possible values: radarr, sonarr, lidarr, readarr, ical
+              service_group: Media # group name where widget exists
+              service_name: Radarr # service name for that widget
+

@@ -112,6 +112,7 @@
         allow_nfs_nas_udp: { interface: VLANGroup, protocol: UDP, destination: "{{ aliases.host_nas.content }}", destination_port: ports_nfs, description: Allow UDP NFS and RPC to NAS from all networks }
         allow_tftp: { interface: VLANGroup, protocol: UDP, source: __VLANGroup_network, destination: "{{ aliases.host_services.content }}", destination_port: 69, description: Allow TFTP to NAS } # TODO
         allow_tftp_out: { interface: INFRAGroup, protocol: UDP, source: "{{ aliases.host_services.content }}", destination_port: 1024-65535, description: Allow TFTP UDP replies } # TODO
+        allow_k8s_opnsense: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_opnsense_k8s.content }}", destination_port: 4443, description: Allow K8S to OPNsense Web UI }
         allow_k8s_node_exporter: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_opnsense_k8s.content }}", destination_port: 9100, description: Allow K8S to OPNsense Node Exporter }
         allow_k8s_pve_api: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_pve_fw.content }}", destination_port: ports_pve_api, description: Allow K8S to Proxmox VE API }
         allow_k8s_vps: { interface: K8SGroup, protocol: TCP, source: __K8SGroup_network, destination: "{{ aliases.host_vps.content }}", description: Allow all traffic from K8S to vps }

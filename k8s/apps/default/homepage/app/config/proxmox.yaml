@@ -1,0 +1,4 @@
+---
+url: https://pve-fw.int.sbbh.cloud:8006
+token: "{{ HOMEPAGE_VAR_PVE_TOKEN }}"
+secret: "{{ HOMEPAGE_VAR_PVE_SECRET }}"

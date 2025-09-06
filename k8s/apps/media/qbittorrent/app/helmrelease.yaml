@@ -35,6 +35,7 @@ spec:
               DNS_ADDRESS: 10.43.0.10  # CoreDNS
               HTTP_CONTROL_SERVER_AUTH_CONFIG_FILEPATH: &gluetunAuthPath /gluetun/auth.toml
               FIREWALL_INPUT_PORTS: 80,8388,9999  # 80: WebUI, 8388 Socks Proxy, 9999 Kube Probes
+              FIREWALL_INPUT_SUBNETS: 10.42.0.0/16,10.43.0.0/16  # Allow inbound traffic from k8s subnets
               FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16  # Allow access to k8s subnets
               HEALTH_SERVER_ADDRESS: :9999
               HEALTH_SUCCESS_WAIT_DURATION: 10s

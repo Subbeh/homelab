@@ -11,3 +11,4 @@ resources:
   - ./speedtest/ks.yaml
   - ./it-tools/ks.yaml
   - ./karakeep/ks.yaml
+  - ./homepage/ks.yaml

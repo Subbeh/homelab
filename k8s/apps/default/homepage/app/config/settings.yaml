@@ -1,0 +1,27 @@
+---
+title: Dashboard
+favicon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/homepage.png
+theme: dark
+color: slate
+headerStyle: clean
+layout:
+  Media:
+    style: row
+    columns: 4
+    icon: mdi-play-circle
+  Calendar:
+    style: column
+    icon: mdi-calendar
+  Home:
+    style: column
+    icon: mdi-home-analytics
+  Dev Tools:
+    style: column
+    icon: mdi-desktop-tower
+  Observability:
+    style: column
+    icon: mdi-chart-line
+  Infrastructure:
+    style: row
+    columns: 4
+    icon: mdi-server
