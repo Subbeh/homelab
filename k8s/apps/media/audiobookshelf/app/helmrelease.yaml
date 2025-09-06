@@ -75,6 +75,15 @@ spec:
             sectionName: https
         rules:
           - backendRefs: [{}]
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/description: Audiobook Server
+          gethomepage.dev/group: Media
+          gethomepage.dev/icon: audiobookshelf.png
+          gethomepage.dev/name: Audiobookshelf
+          gethomepage.dev/widget.type: "audiobookshelf"
+          gethomepage.dev/widget.url: "https://audiobookshelf.${DOMAIN}"
+          gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_AUDIOBOOKSHELF_TOKEN}}`}}"
     persistence:
       config:
         existingClaim: audiobookshelf
