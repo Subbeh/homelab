@@ -11,7 +11,7 @@ spec:
   targets:
     staticConfig:
       static:
-        - nas-k8s.int.sbbh.cloud
+        - "${NAS_HOST}"
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/probe_v1.json
 apiVersion: monitoring.coreos.com/v1
@@ -25,5 +25,4 @@ spec:
   targets:
     staticConfig:
       static:
-        - nas-k8s.int.sbbh.cloud:2049
-
+        - "${NAS_HOST}:2049"

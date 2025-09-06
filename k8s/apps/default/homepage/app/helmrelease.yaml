@@ -31,7 +31,7 @@ spec:
               repository: ghcr.io/gethomepage/homepage
               tag: v1.4.6@sha256:a1a578fdcfc72754985c3b3b26e4f398a6a782e354d10cf2b156ecbf06d252e9
             env:
-              HOMEPAGE_ALLOWED_HOSTS: "sbbh.cloud"
+              HOMEPAGE_ALLOWED_HOSTS: "${DOMAIN}"
             envFrom:
               - secretRef:
                   name: homepage-secret
@@ -120,7 +120,7 @@ spec:
 
     route:
       app:
-        hostnames: ["sbbh.cloud"]
+        hostnames: ["${DOMAIN}"]
         parentRefs:
           - name: internal-root
             namespace: kube-system

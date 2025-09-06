@@ -29,4 +29,3 @@ spec:
       EXTERNAL_IP: 100.94.245.44
       EXTERNAL_PORT: "8384"
       EXTERNAL_DOMAIN: sync.sbbh.cloud
-

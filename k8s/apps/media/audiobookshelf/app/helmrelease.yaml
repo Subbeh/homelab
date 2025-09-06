@@ -68,7 +68,7 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.sbbh.cloud"
+          - "{{ .Release.Name }}.${DOMAIN}"
         parentRefs:
           - name: external
             namespace: kube-system
@@ -86,7 +86,7 @@ spec:
           - path: /metadata
       media:
         type: nfs
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         path: /data/nvme/media/books/audiobooks
         globalMounts:
           - path: /audiobooks

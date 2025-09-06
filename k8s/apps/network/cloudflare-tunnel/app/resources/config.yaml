@@ -1,11 +1,10 @@
 ---
 originRequest:
-  originServerName: external.sbbh.cloud
+  originServerName: "external.${DOMAIN}"
 
 ingress:
-  - hostname: sbbh.cloud
+  - hostname: "${DOMAIN}"
     service: &svc https://cilium-gateway-external.kube-system.svc.cluster.local
-  - hostname: "*.sbbh.cloud"
+  - hostname: "*.${DOMAIN}"
     service: *svc
   - service: http_status:404
-

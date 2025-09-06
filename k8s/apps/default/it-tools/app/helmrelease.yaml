@@ -57,7 +57,7 @@ spec:
             port: *port
     route:
       app:
-        hostnames: ["tools.sbbh.cloud"]
+        hostnames: ["tools.${DOMAIN}"]
         parentRefs:
           - name: external
             namespace: kube-system

@@ -34,7 +34,7 @@ spec:
       retries: 3
   values:
     fullnameOverride: k8s-gateway
-    domain: sbbh.cloud
+    domain: "${DOMAIN}"
     service:
       type: LoadBalancer
       port: 53

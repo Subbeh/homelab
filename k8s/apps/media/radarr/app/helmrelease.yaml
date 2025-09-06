@@ -24,7 +24,7 @@ spec:
     controllers:
       radarr:
         annotations:
-          reloader.stakater.com/auto: 'true'
+          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
@@ -34,7 +34,7 @@ spec:
               RADARR__APP__INSTANCENAME: Radarr
               RADARR__APP__THEME: dark
               RADARR__AUTH__REQUIRED: DisabledForLocalAddresses
-              RADARR__LOG__DBENABLED: 'False'
+              RADARR__LOG__DBENABLED: "False"
               RADARR__LOG__LEVEL: info
               RADARR__SERVER__PORT: &port 80
               RADARR__UPDATE__BRANCH: develop
@@ -57,7 +57,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ['ALL']}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
@@ -78,7 +78,7 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.sbbh.cloud"
+          - "{{ .Release.Name }}.${DOMAIN}"
         parentRefs:
           - name: internal
             namespace: kube-system
@@ -94,13 +94,13 @@ spec:
           - path: /config/MediaCover
       downloads:
         type: nfs
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         path: /data/nvme/downloads
         globalMounts:
           - path: /media/downloads
       media:
         type: nfs
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         path: /data/hdd1/media/movies
         globalMounts:
           - path: /media/movies

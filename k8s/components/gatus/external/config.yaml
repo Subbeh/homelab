@@ -2,7 +2,7 @@
 endpoints:
   - name: "${APP}"
     group: external
-    url: "https://${GATUS_SUBDOMAIN:=${APP}}.sbbh.cloud${GATUS_PATH:=/}"
+    url: "https://${GATUS_SUBDOMAIN:=${APP}}.${DOMAIN}${GATUS_PATH:=/}"
     interval: 1m
     client:
       dns-resolver: tcp://1.1.1.1:53
@@ -11,4 +11,3 @@ endpoints:
       hide-url: true
     conditions:
       - "[STATUS] == ${GATUS_STATUS:=200}"
-

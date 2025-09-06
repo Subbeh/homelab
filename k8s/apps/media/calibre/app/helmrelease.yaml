@@ -72,7 +72,7 @@ spec:
 
     route:
       app:
-        hostnames: [calibre.sbbh.cloud]
+        hostnames: ["calibre.${DOMAIN}"]
         parentRefs:
           - name: external
             namespace: kube-system
@@ -91,7 +91,7 @@ spec:
           - path: /cache
       media:
         type: nfs
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         path: /data/nvme
         globalMounts: # needs to be set to nobody:nobody perms on setup of a fresh volume, because of the weird stuff s6 does, then set it to 1000:1000
           - path: /calibre-library

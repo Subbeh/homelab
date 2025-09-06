@@ -9,6 +9,5 @@ spec:
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
-  commonName: sbbh.cloud
-  dnsNames: ["sbbh.cloud", "*.sbbh.cloud"]
-
+  commonName: "${DOMAIN}"
+  dnsNames: ["${DOMAIN}", "*.${DOMAIN}"]

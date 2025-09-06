@@ -5,7 +5,7 @@ kind: HTTPRoute
 metadata:
   name: hubble-ui
 spec:
-  hostnames: ["hubble.sbbh.cloud"]
+  hostnames: ["hubble.${DOMAIN}"]
   parentRefs:
     - name: internal
       namespace: kube-system

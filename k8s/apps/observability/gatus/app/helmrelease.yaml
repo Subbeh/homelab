@@ -65,7 +65,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"], add: ["NET_RAW"]}
+              capabilities: { drop: ["ALL"], add: ["NET_RAW"] }
             resources:
               requests:
                 cpu: 100m
@@ -90,8 +90,8 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.sbbh.cloud"
-          - status.sbbh.cloud
+          - "{{ .Release.Name }}.${DOMAIN}"
+          - "status.${DOMAIN}"
         parentRefs:
           - name: external
             namespace: kube-system
@@ -123,4 +123,3 @@ spec:
           - path: /config/config.yaml
             subPath: config.yaml
             readOnly: true
-

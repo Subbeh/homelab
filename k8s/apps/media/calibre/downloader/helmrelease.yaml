@@ -84,7 +84,7 @@ spec:
 
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.sbbh.cloud"]
+        hostnames: ["{{ .Release.Name }}.${DOMAIN}"]
         parentRefs:
           - name: internal
             namespace: kube-system
@@ -115,7 +115,7 @@ spec:
                 subPath: drivers
       media:
         type: nfs
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         path: /data/nvme
         advancedMounts:
           *app :

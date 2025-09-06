@@ -46,7 +46,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ['ALL']}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 10m
@@ -67,7 +67,7 @@ spec:
     route:
       app:
         hostnames:
-          - '{{ .Release.Name }}.sbbh.cloud'
+          - "{{ .Release.Name }}.${DOMAIN}"
         parentRefs:
           - name: internal
             namespace: kube-system
@@ -88,7 +88,7 @@ spec:
             subPath: tmp
       media:
         type: nfs
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         path: /data/hdd1/media
         globalMounts:
           - path: /media

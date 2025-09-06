@@ -43,7 +43,7 @@ spec:
       route:
         main:
           enabled: true
-          hostnames: ["alertmanager.sbbh.cloud"]
+          hostnames: ["alertmanager.${DOMAIN}"]
           parentRefs:
             - name: internal
               namespace: kube-system
@@ -53,7 +53,7 @@ spec:
           name: alertmanager
           global:
             resolveTimeout: 5m
-        externalUrl: https://alertmanager.sbbh.cloud
+        externalUrl: "https://alertmanager.${DOMAIN}"
         storage:
           volumeClaimTemplate:
             spec:
@@ -64,14 +64,14 @@ spec:
     kubeEtcd:
       service:
         selector:
-          component: kube-apiserver  # etcd runs on control plane nodes
+          component: kube-apiserver # etcd runs on control plane nodes
     kubeProxy:
       enabled: false
     prometheus:
       route:
         main:
           enabled: true
-          hostnames: ["prometheus.sbbh.cloud"]
+          hostnames: ["prometheus.${DOMAIN}"]
           parentRefs:
             - name: internal
               namespace: kube-system
@@ -165,4 +165,3 @@ spec:
                 expr: node_zfs_zpool_state{state!="online"} > 0
                 labels:
                   severity: critical
-

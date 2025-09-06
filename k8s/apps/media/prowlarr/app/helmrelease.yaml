@@ -15,7 +15,7 @@ spec:
     controllers:
       prowlarr:
         annotations:
-          reloader.stakater.com/auto: 'true'
+          reloader.stakater.com/auto: "true"
 
         pod:
           securityContext:
@@ -33,7 +33,7 @@ spec:
             env:
               PROWLARR__APP__INSTANCENAME: Prowlarr
               PROWLARR__APP__THEME: dark
-              PROWLARR__LOG__DBENABLED: 'False'
+              PROWLARR__LOG__DBENABLED: "False"
               PROWLARR__LOG__LEVEL: info
               PROWLARR__SERVER__PORT: &port 80
               PROWLARR__UPDATE__BRANCH: develop
@@ -75,7 +75,7 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.sbbh.cloud"
+          - "{{ .Release.Name }}.${DOMAIN}"
         parentRefs:
           - name: internal
             namespace: kube-system
@@ -86,4 +86,3 @@ spec:
     persistence:
       config:
         existingClaim: prowlarr
-

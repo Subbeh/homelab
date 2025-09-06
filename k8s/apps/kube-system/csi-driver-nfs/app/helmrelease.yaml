@@ -35,7 +35,7 @@ spec:
       create: true
       name: nfs-data
       parameters:
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         share: /data/nvme/k8s/data
       mountOptions:
         - nfsvers=4.2
@@ -44,4 +44,3 @@ spec:
         - noatime
       reclaimPolicy: Delete
       volumeBindingMode: Immediate
-

@@ -8,13 +8,13 @@ endpoints:
       hide-hostname: true
       hide-url: true
     dns:
-      query-name: "${GATUS_SUBDOMAIN:=${APP}}.sbbh.cloud"
+      query-name: "${GATUS_SUBDOMAIN:=${APP}}.${DOMAIN}"
       query-type: A
     conditions:
       - "len([BODY]) == 0"
   - name: "${APP}"
     group: "${GATUS_GROUP:=internal}"
-    url: "https://${GATUS_SUBDOMAIN:=${APP}}.sbbh.cloud${GATUS_PATH:=/}"
+    url: "https://${GATUS_SUBDOMAIN:=${APP}}.${DOMAIN}${GATUS_PATH:=/}"
     interval: 1m
     client:
       dns-resolver: tcp://10.11.80.1:53
@@ -22,4 +22,4 @@ endpoints:
       hide-hostname: true
       hide-url: true
     conditions:
-      - '[STATUS] == ${GATUS_STATUS:=200}'
+      - "[STATUS] == ${GATUS_STATUS:=200}"

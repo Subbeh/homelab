@@ -42,7 +42,7 @@ spec:
       GF_EXPLORE_ENABLED: true
       GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: natel-discrete-panel,pr0ps-trackmap-panel,panodata-map-panel
       GF_SECURITY_ANGULAR_SUPPORT_ENABLED: true
-      GF_SERVER_ROOT_URL: https://grafana.sbbh.cloud
+      GF_SERVER_ROOT_URL: "https://grafana.${DOMAIN}"
     grafana.ini:
       analytics:
         check_for_updates: false
@@ -59,9 +59,9 @@ spec:
       datasources.yaml:
         apiVersion: 1
         deleteDatasources:
-          - {name: Alertmanager, orgId: 1}
-          - {name: Loki, orgId: 1}
-          - {name: Prometheus, orgId: 1}
+          - { name: Alertmanager, orgId: 1 }
+          - { name: Loki, orgId: 1 }
+          - { name: Prometheus, orgId: 1 }
         datasources:
           - name: Prometheus
             type: prometheus
@@ -122,13 +122,13 @@ spec:
           gnetId: 17457
           revision: 6
           datasource:
-            - {name: DS_PROMETHEUS, value: Prometheus}
+            - { name: DS_PROMETHEUS, value: Prometheus }
         envoy:
           # renovate: depName="Envoy Proxy Monitoring gRPC"
           gnetId: 23239
           revision: 1
           datasource:
-            - {name: DS_AFRANET_PROMETHEUS, value: Prometheus}
+            - { name: DS_AFRANET_PROMETHEUS, value: Prometheus }
         external-dns:
           # renovate: depName="External-dns"
           gnetId: 15038
@@ -174,7 +174,7 @@ spec:
           gnetId: 1860
           revision: 41
           datasource:
-            - {name: DS_PROMETHEUS, value: Prometheus}
+            - { name: DS_PROMETHEUS, value: Prometheus }
         prometheus:
           # renovate: depName="Prometheus"
           gnetId: 19105
@@ -185,14 +185,14 @@ spec:
           gnetId: 21356
           revision: 3
           datasource:
-            - {name: DS_PROMETHEUS, value: Prometheus}
-            - {name: VAR_REPLICATIONDESTNAME, value: .*-dst}
+            - { name: DS_PROMETHEUS, value: Prometheus }
+            - { name: VAR_REPLICATIONDESTNAME, value: .*-dst }
         pve:
           # renovate: depName="Proxmox via Prometheus"
           gnetId: 10347
           revision: 5
           datasource:
-            - {name: DS_PROMETHEUS, value: Prometheus}
+            - { name: DS_PROMETHEUS, value: Prometheus }
     sidecar:
       image:
         registry: ghcr.io
@@ -222,7 +222,7 @@ spec:
     route:
       main:
         enabled: true
-        hostnames: ["{{ .Release.Name }}.sbbh.cloud"]
+        hostnames: ["{{ .Release.Name }}.${DOMAIN}"]
         parentRefs:
           - name: internal
             namespace: kube-system
@@ -231,4 +231,3 @@ spec:
       enabled: false
     testFramework:
       enabled: false
-

@@ -46,7 +46,7 @@ spec:
                   secretKeyRef:
                     name: karakeep-secret
                     key: encryption_key
-              NEXTAUTH_URL: https://karakeep.sbbh.cloud
+              NEXTAUTH_URL: "https://karakeep.${DOMAIN}"
               OPENAI_API_KEY:
                 valueFrom:
                   secretKeyRef:
@@ -162,7 +162,7 @@ spec:
                 subPath: meilisearch
     route:
       app:
-        hostnames: ["karakeep.sbbh.cloud"]
+        hostnames: ["karakeep.${DOMAIN}"]
         parentRefs:
           - name: external
             namespace: kube-system

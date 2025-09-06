@@ -2,7 +2,7 @@
 - Media:
     - Bazarr:
         icon: bazarr.svg
-        href: https://bazarr.sbbh.cloud
+        href: https://bazarr.${DOMAIN}
         app: bazarr
         namespace: media
         widget:
@@ -11,7 +11,7 @@
           key: "{{HOMEPAGE_VAR_BAZARR_TOKEN}}"
     - Calibre:
         icon: calibre-web.svg
-        href: https://calibre.sbbh.cloud
+        href: https://calibre.${DOMAIN}
         app: calibre
         namespace: media
         widget:
@@ -21,7 +21,7 @@
           password: "{{HOMEPAGE_VAR_CALIBRE_PASS}}"
     - Plex:
         icon: plex.svg
-        href: https://plex.sbbh.cloud
+        href: https://plex.${DOMAIN}
         app: plex
         namespace: media
         widget:
@@ -31,7 +31,7 @@
           enableNowPlaying: true
     - Prowlarr:
         icon: prowlarr.svg
-        href: https://prowlarr.sbbh.cloud
+        href: https://prowlarr.${DOMAIN}
         app: prowlarr
         namespace: media
         widget:
@@ -40,7 +40,7 @@
           key: "{{HOMEPAGE_VAR_PROWLARR_TOKEN}}"
     - qBittorrent:
         icon: qbittorrent.svg
-        href: https://qb.sbbh.cloud
+        href: https://qb.${DOMAIN}
         app: qbittorrent
         namespace: media
         widget:
@@ -50,7 +50,7 @@
           password: "{{HOMEPAGE_VAR_QB_PASS}}"
           enableLeechProgress: true # optional, defaults to false
     - Radarr:
-        href: https://radarr.sbbh.cloud
+        href: https://radarr.${DOMAIN}
         icon: radarr.svg
         app: radarr
         namespace: media
@@ -60,7 +60,7 @@
           key: "{{HOMEPAGE_VAR_RADARR_TOKEN}}"
     - SABnzbd:
         icon: sabnzbd.svg
-        href: https://sabnzbd.sbbh.cloud
+        href: https://sabnzbd.${DOMAIN}
         app: sabnzbd
         namespace: media
         widget:
@@ -68,7 +68,7 @@
           url: http://sabnzbd.media.svc.cluster.local.:80
           key: "{{HOMEPAGE_VAR_SABNZBD_TOKEN}}"
     - Sonarr:
-        href: https://sonarr.sbbh.cloud
+        href: https://sonarr.${DOMAIN}
         icon: sonarr.svg
         app: sonarr
         namespace: media
@@ -82,17 +82,17 @@
         icon: unifi.svg
         href: https://mgmt:8443
     - OPNsense:
-        href: https://opnsense.int.sbbh.cloud:4443
+        href: https://opnsense.int.${DOMAIN}:4443
         icon: opnsense.svg
         widget:
           type: opnsense
-          url: &opnense_url https://opnsense.int.sbbh.cloud:4443
+          url: &opnense_url https://opnsense.int.${DOMAIN}:4443
           username: "{{HOMEPAGE_VAR_OPNSENSE_KEY}}"
           password: "{{HOMEPAGE_VAR_OPNSENSE_SECRET}}"
     - Proxmox:
         - Cluster:
             icon: proxmox.svg
-            href: &pve_url https://pve-fw.int.sbbh.cloud:8006
+            href: &pve_url https://pve-fw.int.${DOMAIN}:8006
             widget:
               type: proxmox
               url: *pve_url

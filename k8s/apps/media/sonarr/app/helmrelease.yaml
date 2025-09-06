@@ -24,7 +24,7 @@ spec:
     controllers:
       sonarr:
         annotations:
-          reloader.stakater.com/auto: 'true'
+          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
@@ -34,7 +34,7 @@ spec:
               SONARR__APP__INSTANCENAME: Sonarr
               SONARR__APP__THEME: dark
               SONARR__AUTH__REQUIRED: DisabledForLocalAddresses
-              SONARR__LOG__DBENABLED: 'False'
+              SONARR__LOG__DBENABLED: "False"
               SONARR__LOG__LEVEL: info
               SONARR__SERVER__PORT: &port 80
               SONARR__UPDATE__BRANCH: develop
@@ -57,7 +57,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ['ALL']}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
@@ -78,7 +78,7 @@ spec:
     route:
       app:
         hostnames:
-          - '{{ .Release.Name }}.sbbh.cloud'
+          - "{{ .Release.Name }}.${DOMAIN}"
         parentRefs:
           - name: internal
             namespace: kube-system
@@ -94,13 +94,13 @@ spec:
           - path: /config/MediaCover
       downloads:
         type: nfs
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         path: /data/nvme/downloads
         globalMounts:
           - path: /media/downloads
       media:
         type: nfs
-        server: nas-k8s.int.sbbh.cloud
+        server: "${NAS_HOST}"
         path: /data/hdd1/media/tv
         globalMounts:
           - path: /media/tv

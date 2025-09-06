@@ -5,7 +5,7 @@ kind: HTTPRoute
 metadata:
   name: github-webhook
 spec:
-  hostnames: ["flux-webhook.sbbh.cloud"]
+  hostnames: ["flux-webhook.${DOMAIN}"]
   parentRefs:
     - name: external
       namespace: kube-system
@@ -19,4 +19,3 @@ spec:
         - path:
             type: PathPrefix
             value: /hook/
-
