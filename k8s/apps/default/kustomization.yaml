@@ -8,6 +8,6 @@ components:
 resources:
   - ./iperf3/ks.yaml
   - ./echo/ks.yaml
-  - ./openspeedtest/ks.yaml
+  - ./speedtest/ks.yaml
   - ./it-tools/ks.yaml
   - ./karakeep/ks.yaml

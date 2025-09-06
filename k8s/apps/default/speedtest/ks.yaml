@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app openspeedtest
+  name: &app speedtest
   namespace: &namespace default
 spec:
   commonMetadata:
@@ -12,7 +12,7 @@ spec:
   components:
     - ../../../../components/gatus/external
   interval: 1h
-  path: ./k8s/apps/default/openspeedtest/app
+  path: ./k8s/apps/default/speedtest/app
   postBuild:
     substitute:
       APP: *app
@@ -26,4 +26,3 @@ spec:
   targetNamespace: *namespace
   timeout: 5m
   wait: false
-
