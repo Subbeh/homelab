@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: calibre-web-automated-cache
+  name: calibre-cache
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:

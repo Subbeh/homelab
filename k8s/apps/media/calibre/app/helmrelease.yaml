@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app calibre-web-automated
+  name: &app calibre
 spec:
   interval: 1h
   chartRef:
@@ -86,7 +86,7 @@ spec:
         globalMounts:
           - path: /config
       data-cache:
-        existingClaim: calibre-web-automated-cache
+        existingClaim: calibre-cache
         globalMounts:
           - path: /cache
       media:

@@ -1,0 +1,69 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app calibre
+  namespace: &namespace media
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/gatus/external
+    - ../../../../components/volsync
+    - ../../../../components/keda/nfs-scaler
+  dependsOn:
+    - name: keda
+      namespace: observability
+    - name: storage-ready
+      namespace: flux-system
+  interval: 1h
+  retryInterval: 2m
+  path: ./k8s/apps/media/calibre/app
+  postBuild:
+    substitute:
+      APP: *app
+      GATUS_SUBDOMAIN: calibre
+      VOLSYNC_CAPACITY: 5Gi
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app calibre-downloader
+  namespace: &namespace media
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/gatus/internal
+    - ../../../../components/keda/nfs-scaler
+  dependsOn:
+    - name: calibre
+      namespace: media
+    - name: keda
+      namespace: observability
+    - name: storage-ready
+      namespace: flux-system
+  interval: 1h
+  retryInterval: 2m
+  path: ./k8s/apps/media/calibre/downloader
+  postBuild:
+    substitute:
+      APP: *app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m

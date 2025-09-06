@@ -14,4 +14,4 @@ resources:
   - ./bazarr/ks.yaml
   - ./plex/ks.yaml
   - ./audiobookshelf/ks.yaml
-  - ./calibre-web-automated/ks.yaml
+  - ./calibre/ks.yaml
