@@ -24,7 +24,7 @@ spec:
     controllers:
       *app :
         annotations:
-          reloader.stakater.com/auto: 'true'
+          reloader.stakater.com/auto: "true"
         initContainers:
           gluetun:
             image:
@@ -32,11 +32,11 @@ spec:
               tag: v3.40.0@sha256:2b42bfa046757145a5155acece417b65b4443c8033fb88661a8e9dcf7fda5a00
             env:
               DOT: off
-              DNS_ADDRESS: 10.43.0.10  # CoreDNS
+              DNS_ADDRESS: 10.43.0.10 # CoreDNS
               HTTP_CONTROL_SERVER_AUTH_CONFIG_FILEPATH: &gluetunAuthPath /gluetun/auth.toml
-              FIREWALL_INPUT_PORTS: 80,8388,9999  # 80: WebUI, 8388 Socks Proxy, 9999 Kube Probes
-              FIREWALL_INPUT_SUBNETS: 10.42.0.0/16,10.43.0.0/16  # Allow inbound traffic from k8s subnets
-              FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16  # Allow access to k8s subnets
+              FIREWALL_INPUT_PORTS: 80,8388,9999 # 80: WebUI, 8388 Socks Proxy, 9999 Kube Probes
+              FIREWALL_INPUT_SUBNETS: 10.42.0.0/16,10.43.0.0/16 # Allow inbound traffic from k8s subnets
+              FIREWALL_OUTBOUND_SUBNETS: 10.42.0.0/16,10.43.0.0/16 # Allow access to k8s subnets
               HEALTH_SERVER_ADDRESS: :9999
               HEALTH_SUCCESS_WAIT_DURATION: 10s
               VPN_TYPE: wireguard
@@ -62,6 +62,8 @@ spec:
                       - -c
                       - >-
                         [ $(wget -O - -q --header="X-API-KEY: $GLUETUN_CONTROL_SERVER_API_KEY" http://localhost:8000/v1/openvpn/portforwarded) != '{"port":0}' ]
+
+
                   initialDelaySeconds: 10
                   periodSeconds: 10
                   successThreshold: 1
@@ -78,6 +80,8 @@ spec:
                       - -c
                       - >-
                         wget -O - -q --header="X-API-KEY: $GLUETUN_CONTROL_SERVER_API_KEY" http://localhost:8000/v1/publicip/ip
+
+
             lifecycle:
               postStart:
                 exec:
@@ -86,6 +90,8 @@ spec:
                     - -c
                     - >-
                       (ip rule del table 51820; ip -6 rule del table 51820) || true
+
+
             restartPolicy: Always
             securityContext:
               # can't be non-root, or it has no access to tunnel
@@ -93,7 +99,7 @@ spec:
               runAsUser: 0
               runAsGroup: 0
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false  # wants to create a user, etc
+              readOnlyRootFilesystem: false # wants to create a user, etc
               capabilities:
                 add: [NET_ADMIN]
             resources:
@@ -108,7 +114,7 @@ spec:
               repository: ghcr.io/home-operations/qbittorrent
               tag: 5.1.2@sha256:31ac39705e31f7cdcc04dc46c1c0b0cdf8dc6f9865d4894efc097a33adc41524
             env:
-              UMASK: '022'
+              UMASK: "022"
               QBT_WEBUI_PORT: &port 80
               PUSHOVER_ENABLED: true
               GLUETUN_CONTROL_SERVER_API_KEY:
@@ -116,6 +122,9 @@ spec:
                   secretKeyRef:
                     name: gluetun
                     key: GLUETUN_CONTROL_SERVER_API_KEY
+            envFrom:
+              - secretRef:
+                  name: qbittorrent
             probes:
               liveness:
                 enabled: true
@@ -129,7 +138,7 @@ spec:
             securityContext: &securityContext
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: [ALL]}
+              capabilities: { drop: [ALL] }
             resources:
               requests:
                 cpu: 100m
@@ -150,8 +159,35 @@ spec:
               QBITTORRENT_HOST: localhost
               QBITTORRENT_WEBUI_PORT: *port
               CRON_ENABLED: true
-              CRON_SCHEDULE: '*/5 * * * *'
+              CRON_SCHEDULE: "*/5 * * * *"
               LOG_TIMESTAMP: false
+            resources:
+              requests:
+                cpu: 5m
+              limits:
+                memory: 32Mi
+            securityContext: *securityContext
+          mam-keepalive:
+            image:
+              repository: curlimages/curl
+              tag: 8.11.1
+            command:
+              - /bin/sh
+              - -c
+              - |
+                while [ -z "$MAM_ID" ]; do echo "$(date): MAM_ID not set..."; sleep 5; done
+                while true; do
+                  echo "$(date): MAM_ID: $MAM_ID"
+                  curl -b "mam_id=$MAM_ID" -Ls https://t.myanonamouse.net/json/dynamicSeedbox.php --connect-timeout 5 --max-time 30 || echo -e "\nMAM keepalive failed"
+                  echo -e "\n$(date): Sleeping for 1 hour..."
+                  sleep 3600
+                done
+            env:
+              MAM_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent
+                    key: MAM_ID
             resources:
               requests:
                 cpu: 5m
@@ -203,7 +239,7 @@ spec:
         type: configMap
         name: *app
         advancedMounts:
-          *app :  # in qbit config, set "on torrent add" to "/config/qbrr --hash "%I" && qbt tag delete "cross-seed""
+          *app : # in qbit config, set "on torrent add" to "/config/qbrr --hash "%I" && qbt tag delete "cross-seed""
             app:
               - path: /config/.qbt.toml
                 subPath: .qbt.toml
@@ -217,7 +253,7 @@ spec:
                 subPath: config
       gluetun-auth:
         type: secret
-        name: '{{ .Release.Name }}-gluetun'
+        name: "{{ .Release.Name }}-gluetun"
         advancedMounts:
           *app :
             gluetun:
