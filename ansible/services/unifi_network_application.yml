@@ -22,7 +22,7 @@ unifi_db:
 unifi_network_application:
   host: mgmt
   container:
-    image: lscr.io/linuxserver/unifi-network-application:9.0.114
+    image: lscr.io/linuxserver/unifi-network-application:9.3.45
     ports:
       - 8443:8443
       - 3478:3478/udp

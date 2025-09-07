@@ -101,6 +101,14 @@ spec:
                   type: PathPrefix
                   value: /library/streams
           - backendRefs: [{}]
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Media
+          gethomepage.dev/icon: "{{ .Release.Name }}.svg"
+          gethomepage.dev/name: "{{ .Release.Name | title }}"
+          gethomepage.dev/widget.type: "{{ .Release.Name }}"
+          gethomepage.dev/widget.url: "https://{{ .Release.Name }}.${DOMAIN}"
+          gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_PLEX_TOKEN}}`}}"
     persistence:
       config:
         enabled: true
