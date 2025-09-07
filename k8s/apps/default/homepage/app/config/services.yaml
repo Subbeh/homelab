@@ -1,20 +1,25 @@
 ---
-- Media:
-    - Calendar:
-        - Agenda:
-            widget:
-              type: calendar
-              view: agenda # optional - possible values monthly, agenda
-              maxEvents: 5 # optional - defaults to 10
-              integrations: # optional
-                - type: sonarr # active widget type that is currently enabled on homepage - possible values: radarr, sonarr, lidarr, readarr, ical
-                  service_group: Media # group name where widget exists
-                  service_name: Sonarr # service name for that widget
-                - type: radarr # active widget type that is currently enabled on homepage - possible values: radarr, sonarr, lidarr, readarr, ical
-                  service_group: Media # group name where widget exists
-                  service_name: Radarr # service name for that widget
+- Calendar:
+    - Agenda:
+        widget:
+          type: calendar
+          view: agenda # optional - possible values monthly, agenda
+          maxEvents: 5 # optional - defaults to 10
+          integrations: # optional
+            - type: sonarr # active widget type that is currently enabled on homepage - possible values: radarr, sonarr, lidarr, readarr, ical
+              service_group: Media # group name where widget exists
+              service_name: Sonarr # service name for that widget
+            - type: radarr # active widget type that is currently enabled on homepage - possible values: radarr, sonarr, lidarr, readarr, ical
+              service_group: Media # group name where widget exists
+              service_name: Radarr # service name for that widget
 
 - Infrastructure:
+    - Gatus:
+        href: "https://status.${DOMAIN}"
+        icon: gatus.svg
+        widget:
+          type: gatus
+          url: http://gatus.obervability.svc.cluster.local.:80
     - OPNsense:
         href: https://opnsense.int.${DOMAIN}:4443
         icon: opnsense.svg
@@ -23,13 +28,6 @@
           url: https://opnsense.int.${DOMAIN}:4443
           username: "{{HOMEPAGE_VAR_OPNSENSE_KEY}}"
           password: "{{HOMEPAGE_VAR_OPNSENSE_SECRET}}"
-    - Unifi:
-        icon: unifi.svg
-        href: &unifi_url https://unifi.int.sbbh.cloud:4443
-        widget:
-          type: unifi
-          url: *unifi_url
-          key: "{{HOMEPAGE_VAR_UNIFI_TOKEN}}"
     - Proxmox:
         icon: proxmox.svg
         href: &pve_url https://pve-fw.int.${DOMAIN}:8006
@@ -38,3 +36,11 @@
           url: *pve_url
           username: "{{HOMEPAGE_VAR_PVE_TOKEN}}"
           password: "{{HOMEPAGE_VAR_PVE_SECRET}}"
+    - Unifi:
+        icon: unifi.svg
+        href: &unifi_url https://unifi.int.sbbh.cloud:8443
+        widget:
+          type: unifi
+          url: *unifi_url
+          username: monitoring
+          password: "{{HOMEPAGE_VAR_UNIFI_PASS}}"
