@@ -74,6 +74,14 @@ spec:
             sectionName: https
         rules:
           - backendRefs: [{}]
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Media
+          gethomepage.dev/icon: bazarr.svg
+          gethomepage.dev/name: Bazarr
+          gethomepage.dev/widget.type: "bazarr"
+          gethomepage.dev/widget.url: "https://bazarr.${DOMAIN}"
+          gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_BAZARR_TOKEN}}`}}"
     persistence:
       config:
         existingClaim: bazarr
