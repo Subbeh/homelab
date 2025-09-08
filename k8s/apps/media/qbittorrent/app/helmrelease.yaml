@@ -170,7 +170,7 @@ spec:
           mam-keepalive:
             image:
               repository: curlimages/curl
-              tag: 8.11.1
+              tag: 8.15.0
             command:
               - /bin/sh
               - -c
