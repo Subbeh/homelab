@@ -28,4 +28,3 @@ spec:
       APP: *app
       EXTERNAL_IP: 10.11.10.20
       EXTERNAL_PORT: "8081"
-

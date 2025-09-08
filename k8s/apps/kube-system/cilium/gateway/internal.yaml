@@ -5,7 +5,7 @@ kind: Gateway
 metadata:
   name: internal
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN}"
+    external-dns.alpha.kubernetes.io/target: &hostname internal.sbbh.cloud
 spec:
   gatewayClassName: cilium
   addresses:
@@ -18,14 +18,14 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
-      hostname: "*.${DOMAIN}"
+      hostname: "*.sbbh.cloud"
       allowedRoutes:
         namespaces:
           from: Same
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: "*.${DOMAIN}"
+      hostname: "*.sbbh.cloud"
       allowedRoutes:
         namespaces:
           from: All
@@ -40,7 +40,7 @@ kind: Gateway
 metadata:
   name: internal-root
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname "internal-root.${DOMAIN}"
+    external-dns.alpha.kubernetes.io/target: &hostname internal-root.sbbh.cloud
 spec:
   gatewayClassName: cilium
   addresses:
@@ -53,14 +53,14 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
-      hostname: "${DOMAIN}"
+      hostname: "sbbh.cloud"
       allowedRoutes:
         namespaces:
           from: Same
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: "${DOMAIN}"
+      hostname: "sbbh.cloud"
       allowedRoutes:
         namespaces:
           from: All

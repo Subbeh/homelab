@@ -24,4 +24,3 @@ subsets:
       - port: ${EXTERNAL_PORT:=80}
         name: http
         protocol: TCP
-

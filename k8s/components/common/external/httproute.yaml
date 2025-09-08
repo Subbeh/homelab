@@ -6,7 +6,7 @@ metadata:
   namespace: &namespace ${NS:=network}
 spec:
   hostnames:
-    - "${EXTERNAL_DOMAIN:=${APP}.${DOMAIN}}"
+    - "${EXTERNAL_DOMAIN:=${APP}.sbbh.cloud}"
   parentRefs:
     - name: ${GATEWAY:=internal}
       namespace: kube-system
