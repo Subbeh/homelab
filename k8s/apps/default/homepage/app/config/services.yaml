@@ -14,12 +14,6 @@
               service_name: Radarr # service name for that widget
 
 - Infrastructure:
-    - Gatus:
-        href: "https://status.${DOMAIN}"
-        icon: gatus.svg
-        widget:
-          type: gatus
-          url: http://gatus.obervability.svc.cluster.local.:80
     - OPNsense:
         href: https://opnsense.int.${DOMAIN}:4443
         icon: opnsense.svg
