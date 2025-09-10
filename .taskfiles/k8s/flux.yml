@@ -1,8 +1,14 @@
 ---
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
-version: '3'
+version: "3"
 
 tasks:
-  refresh:
+  annotate:
     desc: Annotate Git repository and refresh cluster
     cmd: kubectl annotate gitrepository flux-system -n flux-system reconcile.fluxcd.io/requestedAt="$(date +%Y-%m-%dT%H:%M:%SZ)" --overwrite
+
+  annotate:*:
+    desc: Annotate app
+    cmd: kubectl annotate helmrelease {{.APP}} -n default reconcile.fluxcd.io/requestedAt="$(date +%Y-%m-%dT%H:%M:%SZ)" --overwrite
+    vars:
+      APP: "{{index .MATCH 0}}"

@@ -79,6 +79,7 @@
       host_k8s_api: { desc: Kubernetes API server, type: host, content: "10.11.80.100" }
       host_k8s_ext: { desc: Kubernetes External Gateway, type: host, content: "10.11.80.80" }
       host_k8s_int: { desc: Kubernetes Internal Gateway, type: host, content: "10.11.80.81" }
+      host_k8s_int_root: { desc: Kubernetes Internal Gateway, type: host, content: "10.11.80.181" }
       host_k8s_dns_gateway: { desc: k8s-gateway DNS, type: host, content: "10.11.80.82" }
       host_nas_k8s: { desc: NAS Kubernetes address, type: host, content: "192.168.80.100" }
       host_opnsense_k8s: { desc: OPNsense K8S VLAN Interface, type: host, content: "10.11.80.1" }
@@ -123,6 +124,7 @@
         allow_wan_k8s_external_web: { interface: WANGroup, protocol: TCP, destination: "{{ aliases.host_k8s_ext.content }}", destination_port: ports_web, description: Allow HTTP(S) to K8S External Gateway }
         block_wan_k8s_internal_web: { interface: WANGroup, protocol: TCP, destination: "{{ aliases.host_k8s_int.content }}", destination_port: ports_web, action: block, description: Block HTTP(S) to K8S Internal Gateway }
         allow_infra_k8s_web: { interface: INFRAGroup, protocol: TCP, destination: "{{ aliases.host_k8s_int.content }}", destination_port: ports_web, description: Allow HTTP(S) from INFRA to K8S Internal Gateway }
+        allow_infra_k8s_web_root: { interface: INFRAGroup, protocol: TCP, destination: "{{ aliases.host_k8s_int_root.content }}", destination_port: ports_web, description: Allow HTTP(S) from INFRA to K8S Internal Root Gateway }
 
     dns:
       unbound:
