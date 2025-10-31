@@ -37,7 +37,7 @@ spec:
 
     image:
       repository: registry.k8s.io/descheduler/descheduler
-      tag: v0.33.0
+      tag: v0.34.0
 
     priorityClassName: system-cluster-critical
 
